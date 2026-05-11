@@ -46,20 +46,20 @@
 
         <div class="toolbar mb-2">
             <div class="search-wrapper">
-                <input type="text" placeholder="Search Tenant..">
+                <input type="text" placeholder="Cari Penyewa..">
                 <span><i class="fa-solid fa-magnifying-glass"></i></span>
             </div>
 
             <div class="toolbar-action">
                 <button class="light-brown-btn btn-small" data-popup="add-invoices">
                     <span><i class="fa-solid fa-plus"></i></span>
-                    <span>Generate Invoice</span>
+                    <span>Buat Tagihan</span>
                 </button>
             </div>
         </div>
 
         <div class="table-wrapper">
-            @foreach($invoices->groupBy('tenant.tenant_name') as $tenantName => $groupedInvoices)
+            @forelse($invoices->groupBy('tenant.tenant_name') as $tenantName => $groupedInvoices)
                 <div class="table-card mb-4">
                     <div class="table-card-header">
                         <div class="table-card-title">
@@ -70,7 +70,6 @@
                             {{ $groupedInvoices->count() }} Invoice(s)
                         </div>
                     </div>
-
                     <table class="table">
                         <thead>
                             <tr>
@@ -140,15 +139,27 @@
                         </tbody>
                     </table>
                 </div>
-            @endforeach
+            @empty
+            <div class="table-card p-10 text-center text-zinc-400 italic">
+                Data tagihan tidak ditemukan
+            </div>
+            @endforelse
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
+            <div class="text-sm text-zinc-500">
+                Showing <span class="text-white">{{ $invoices->firstItem() }}</span> 
+                to <span class="text-white">{{ $invoices->lastItem() }}</span> 
+                of <span class="text-white">{{ $invoices->total() }}</span> results
+            </div>
+
+            <div class="braga-pagination">
+                {{ $invoices->links('pagination::bootstrap-4') }}
+            </div>
         </div>
 
     </div>
 
-    <div class="mt-6">
-        {{ $invoices->links() }}
-    </div>
-    
     <div class="popup" id="add-invoices">
         <div class="popup-overlay"></div>
 

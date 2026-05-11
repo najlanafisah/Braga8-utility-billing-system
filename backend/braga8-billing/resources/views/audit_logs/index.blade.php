@@ -1,82 +1,154 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 
-@section('content')
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="flex items-center justify-between mb-10">
-        <div>
-            <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">System Audit Logs</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">Real-time activity tracking for Braga 8</p>
-        </div>
-        <div class="bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-full">
-            <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
-                {{ $logs->total() }} Total Events
-            </span>
-        </div>
-    </div>
+@section('content') 
 
-    <div class="relative border-l-2 border-gray-100 dark:border-gray-800 ml-4 space-y-8">
-        @foreach($logs as $log)
-        <div class="relative pl-8">
-            {{-- Timeline Status Dot --}}
-            <div class="absolute -left-[9px] top-2 w-4 h-4 rounded-full border-4 border-white dark:border-gray-900 
-                {{ $log->action == 'deleted' ? 'bg-rose-500' : ($log->action == 'created' ? 'bg-emerald-500' : 'bg-blue-500') }}">
+<div class="min-h-screen"> 
+    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8"> 
+        <div> 
+            <h1 class="title-text">Log Audit</h1> 
+            <p class="subtitle-text">Braga8 Utility Billing Management</p> 
+        </div> 
+        <div class="header-user"> 
+            <div class="icon-wrapper" data-popup="notif-popup"> 
+                <i class="fa-solid fa-bell"></i> 
+                <span class="notif-dot"></span> 
+            </div> 
+            <div class="profile-container" data-popup="detail-profile-popup"> 
+                <div class="profile-icon"> 
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i> 
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+
+    <div class="flex flex-col gap-6"> 
+        <div class="toolbar"> 
+            <form method="GET" action="{{ route('audit_logs.index') }}" class="flex items-center gap-2 relative"> 
+                <div class="search-wrapper"> 
+                    <input type="text" name="search" placeholder="Search History.." value="{{ request('search') }}" > 
+                    <span> <i class="fa-solid fa-magnifying-glass"></i> </span> 
+                </div> 
+                <button type="button" class="dark-brown-button btn-small" id="filter-btn-trigger" > 
+                    <i class="fa-solid fa-filter"></i> 
+                </button> 
+
+                <div class="hidden absolute mt-2 z-50 w-[260px] bg-white border border-zinc-200 rounded-2xl shadow-xl p-4" id="filter-dropdown" style="top: 100%;"> 
+                    <div class="flex flex-col gap-4"> 
+                        <div> 
+                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Activity </label> 
+                            <select name="action" class="text-field-input"> 
+                                <option value="">All Activity</option> 
+                                <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}> Created </option> 
+                                <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}> Updated </option> 
+                                <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}> Deleted </option> 
+                            </select> 
+                        </div> 
+
+                        <div> 
+                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Category </label> 
+                            <select name="category" class="text-field-input">
+                                <option value="">All Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
+                                        {{ ucfirst(str_replace('_', ' ', $category)) }} 
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div> 
+                        <button type="submit" class="dark-brown-button w-full"> Apply Filter </button> 
+                    </div> 
+                </div> 
+
+            </form>
+            
+            <div class="green-btn btn-small"> 
+                <span> {{ $logs->total() }} Total Events </span> 
+            </div> 
+        </div> 
+
+        <div class="table-wrapper"> 
+            <div class="table-card"> 
+                <div class="table-card-header"> 
+                    <div class="table-card-title"> 
+                        <span class="value">System Activity Logs</span> 
+                    </div> 
+                    <div class="table-card-meta"> {{ $logs->count() }} Records </div> 
+                </div> 
+                <div class="overflow-x-auto"> 
+                    <table class="table"> 
+                        <thead> 
+                            <tr> 
+                                <th>User</th> 
+                                <th>Activity</th> 
+                                <th>Category</th> 
+                                <th>Item</th> 
+                                <th>Activity Time</th> 
+                            </tr> 
+                        </thead> 
+                        <tbody> 
+                            @forelse($logs as $index => $log) 
+                            <tr> 
+                                <td> 
+                                    <div class="flex items-center gap-3"> 
+                                        <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center"> 
+                                            <i class="fa-solid fa-user text-zinc-500"></i> 
+                                        </div> 
+                                        <div class="flex flex-col"> 
+                                            <span class="font-semibold"> {{ $log->user->name ?? 'System' }} </span> 
+                                        </div> 
+                                    </div> 
+                                </td> 
+                                <td> 
+                                    @if($log->action == 'created') <div> Created </div> 
+                                    @elseif($log->action == 'deleted') <div> Deleted </div> 
+                                    @else <div> Updated </div> 
+                                    @endif 
+                                </td> 
+                                <td> <span> {{ $log->table_label }} </span> </td> 
+                                <td> <span> {{ $log->item_label }} </span> </td> 
+                                <td> <div> {{ $log->created_at->format('d M Y') }} • {{ $log->created_at->format('H:i') }} </div> </td> 
+                            </tr> 
+                            @empty 
+                            <tr> 
+                                <td colspan="7" class="text-center py-10 text-zinc-400"> No audit logs available. </td> 
+                            </tr> 
+                            @endforelse 
+                        </tbody> 
+                    </table> 
+                </div> 
+            </div> 
+        </div> 
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
+            <div class="text-sm text-zinc-500">
+                Showing <span class="text-white">{{ $logs->firstItem() }}</span> 
+                to <span class="text-white">{{ $logs->lastItem() }}</span> 
+                of <span class="text-white">{{ $logs->total() }}</span> results
             </div>
 
-            <div class="flex items-start p-5 bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-sm hover:shadow-md transition-all duration-200">
-                
-                {{-- Action Icon --}}
-                <div class="p-2.5 rounded-xl mr-4 
-                    {{ $log->action == 'deleted' ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 
-                       ($log->action == 'created' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 
-                       'bg-blue-50 dark:bg-blue-900/20 text-blue-600') }}">
-                    @if($log->action == 'created') 
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6v12m6-6H6" stroke-width="2.5" stroke-linecap="round"/></svg>
-                    @elseif($log->action == 'deleted') 
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round"/></svg>
-                    @else 
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-width="2" stroke-linecap="round"/></svg> 
-                    @endif
-                </div>
-
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-baseline justify-between gap-4">
-                        <div class="text-sm dark:text-gray-200 leading-relaxed">
-                            <span class="font-bold text-gray-900 dark:text-white">
-                                {{ $log->user->name ?? 'System' }}
-                            </span> 
-                            <span class="text-gray-500 font-medium lowercase mx-1">{{ $log->action }}</span> 
-                            
-                            {{-- Professional Category Badge --}}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50">
-                                {{ $log->table_label }}
-                            </span> 
-
-                            {{-- THE STAR: The actual Item Name/Number --}}
-                            <span class="ml-1.5 font-bold text-gray-800 dark:text-gray-100 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
-                                {{ $log->item_label }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    {{-- Timestamp Section --}}
-                    <div class="flex items-center gap-3 mt-3">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/></svg>
-                            {{ $log->created_at->diffForHumans() }}
-                        </p>
-                        <span class="text-gray-300 dark:text-gray-700 text-xs">•</span>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                            {{ $log->created_at->format('M d, Y — H:i') }}
-                        </p>
-                    </div>
-                </div>
+            <div class="braga-pagination">
+                {{ $logs->links('pagination::bootstrap-4') }}
             </div>
         </div>
-        @endforeach
-    </div>
+    </div> 
 
-    <div class="mt-12">
-        {{ $logs->links() }}
-    </div>
-</div>
+</div> 
+
+<script> 
+    const filterBtn = document.getElementById('filter-btn-trigger'); 
+    const filterDropdown = document.getElementById('filter-dropdown'); 
+
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', (e) => { 
+            e.stopPropagation();
+            filterDropdown.classList.toggle('hidden'); 
+        }); 
+
+        document.addEventListener('click', (e) => {
+            if (!filterDropdown.contains(e.target) && e.target !== filterBtn) {
+                filterDropdown.classList.add('hidden');
+            }
+        });
+    }
+</script> 
 @endsection

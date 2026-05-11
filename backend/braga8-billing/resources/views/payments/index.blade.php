@@ -112,7 +112,6 @@
                 <span><i class="fa-solid fa-magnifying-glass"></i></span>
             </div>
             <div class="toolbar-action">
-                {{-- Tombol pemicu modal --}}
                 <button type="button" class="light-brown-btn btn-small" data-popup="add-payment-modal">
                     <i class="fa-solid fa-plus"></i>
                     <span>Tambah Pembayaran</span>
@@ -284,6 +283,21 @@
                                 </div>
                             </div>
 
+                            @if($payment->proof_img)
+                            <div class="popup" id="detail-payment-{{ $payment->id }}">
+                                <div class="popup-overlay"></div>
+                                <div class="popup-card popup-md">
+                                    <div class="popup-close-wrapper">
+                                        <button class="popup-close" data-close="detail-payment-{{ $payment->id }}"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                    <div class="popup-header">Evidence: {{ $payment->invoice->invoice_number }}</div>
+                                    <div class="popup-body text-center">
+                                        <img src="{{ asset('storage/' . $payment->proof_img) }}" class="w-full rounded-lg">
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <tr>
                                 <td>{{ $payment->invoice->invoice_number }}</td>
                                 <td>{{ $payment->invoice->unit->unit_number ?? '-' }}</td>
@@ -352,23 +366,6 @@
                     </table>
                 </div>
             </div>
-
-            @foreach($tenantPayments as $payment)
-                @if($payment->proof_img)
-                <div class="popup" id="detail-payment-{{ $payment->id }}">
-                    <div class="popup-overlay"></div>
-                    <div class="popup-card popup-md">
-                        <div class="popup-close-wrapper">
-                            <button class="popup-close" data-close="detail-payment-{{ $payment->id }}"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                        <div class="popup-header">Evidence: {{ $payment->invoice->invoice_number }}</div>
-                        <div class="popup-body text-center">
-                            <img src="{{ asset('storage/' . $payment->proof_img) }}" class="w-full rounded-lg">
-                        </div>
-                    </div>
-                </div>
-                @endif
-            @endforeach
 
             @empty
             <div class="table-card p-10 text-center text-zinc-400 italic">

@@ -130,7 +130,6 @@ class InvoiceController extends Controller
             return ['error' => "Meteran Listrik/Air tidak ditemukan untuk unit ini."];
         }
 
-        // Ambil 2 pembacaan terakhir yang sudah dicek
         $getReadings = function($meterId) {
             return MeterReading::where('meter_id', $meterId)
                                 ->where('status', 'checked')

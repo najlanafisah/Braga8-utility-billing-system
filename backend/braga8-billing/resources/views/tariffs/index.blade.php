@@ -317,9 +317,9 @@
                     </div>
                 </div>
             @empty
-                <div class="table-card p-5 text-center text-muted">
-                    Tarif Tidak Ditemukan <a href="{{ route('tariffs.create') }}">Buat Tariff Pertama Anda</a>
-                </div>
+            <div class="table-card p-10 text-center text-zinc-400 italic">
+                Data tarif tidak ditemukan
+            </div>
             @endforelse
         </div>
     </div>
