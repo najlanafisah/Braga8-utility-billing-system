@@ -4,17 +4,23 @@ export function initPopups() {
   const popups = document.querySelectorAll(".popup");
 
   document.querySelectorAll("[data-popup]").forEach(trigger => {
-    trigger.addEventListener("click", () => {
-      const target = trigger.getAttribute("data-popup");
-      const popup = document.getElementById(target);
+      trigger.addEventListener("click", () => {
+          const target = trigger.getAttribute("data-popup");
+          const popup = document.getElementById(target);
 
-      // 🔥 ambil ID kalau ada (khusus delete / dynamic data)
-      if (trigger.dataset.id) {
-        selectedDeleteId = trigger.dataset.id;
-      }
+          if (trigger.dataset.id) {
+              selectedDeleteId = trigger.dataset.id;
+              
+              // Tambahin baris ini biar teks unitnya ganti otomatis:
+              const unitName = trigger.getAttribute('data-unit');
+              const displaySpan = document.getElementById('display-unit-number');
+              if (displaySpan && unitName) {
+                  displaySpan.innerText = unitName;
+              }
+          }
 
-      if (popup) popup.classList.add("active");
-    });
+          if (popup) popup.classList.add("active");
+      });
   });
 
   popups.forEach(popup => {

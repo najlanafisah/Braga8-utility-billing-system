@@ -238,14 +238,13 @@ main {
 }
 
 .detail-item p:first-child {
-    color: #ffffff8c;
+    color: rgba(255, 255, 255, 0.5);
     font-size: 14px;
-    font-weight: 500;
 }
 
 .detail-item p:last-child {
-    color: white;
-    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
 }
 
 /* TITLE TEXT */

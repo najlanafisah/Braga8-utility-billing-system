@@ -1,102 +1,389 @@
 @extends('layouts.app')
 
 @section('content')
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<div class="container mt-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Units</h1>
+<div class="min-h-screen">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-zinc-200 pb-8">
         <div>
-            <a href="{{ route('units.create') }}" class="btn btn-primary me-2">
-                <i class="bi bi-plus-lg"></i> Add Unit
-            </a>
-            <a href="{{ route('tenants.create') }}" class="btn btn-success">
-                <i class="bi bi-building"></i> Create Tenant
-            </a>
+            <h1 class="title-text">Unit List</h1>
+            <p class="subtitle-text">Braga8 Utility Billing Management</p>
+        </div>
+        <div class="header-user">
+            <div class="icon-wrapper" data-popup="notif-popup">
+                <i class="fa-solid fa-bell"></i>
+                <span class="notif-dot"></span>
+            </div>
+            <div class="profile-container" data-popup="detail-profile-popup">
+                <div class="profile-icon">
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <form action="{{ route('units.index') }}" method="GET" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Search tenant or unit..." value="{{ request('search') }}">
-                <button type="submit" class="btn btn-secondary">Search</button>
+    <div class="flex flex-col gap-6">
+        @if (session('success'))
+            <div id="universal-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500" style="background-color: rgba(96, 35, 22, 0.6);">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/10 shadow-inner">
+                        <i class="fa-solid fa-circle-check text-[#FA8327] text-lg"></i>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <p class="text-sm font-bold tracking-wide">Berhasil!</p>
+                        <p class="text-xs text-white/50 font-light">{{ session('success') }}</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeUniversalAlert()" class="p-2 text-white/20 hover:text-[#FA8327] transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <script>
+                function closeUniversalAlert() {
+                    const alert = document.getElementById('universal-alert');
+                    if (alert) {
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateX(30px)';
+                        setTimeout(() => alert.remove(), 500);
+                    }
+                }
+                setTimeout(closeUniversalAlert, 4500);
+            </script>
+        @endif
+
+        <div class="toolbar">
+            <form action="{{ route('units.index') }}" method="GET" class="search-wrapper">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Tenant / Unit...">
+                <span><i class="fa-solid fa-magnifying-glass"></i></span>
+            </form>
+            <div class="toolbar-action">
+                <button class="light-brown-btn btn-small" data-popup="addUnitModal">
+                    <span><i class="fa-solid fa-plus"></i></span>
+                    <span>Add Unit</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            @forelse($tenants as $tenant)
+                <div class="table-card mb-8">
+                    <div class="table-card-header">
+                        <div class="table-card-title">
+                            <span class="label">Tenant:</span>
+                            <span class="value">{{ $tenant->tenant_name }}</span>
+                        </div>
+                        <div class="table-card-meta">
+                            {{ $tenant->units->count() }} Unit(s)
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Unit</th>
+                                <th>Floor</th>
+                                <th>Area (m²)</th>
+                                <th>Status</th>
+                                <th>Lease Start</th>
+                                <th>Lease End</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($tenant->units as $unit)
+                                <tr>
+                                    <td><strong>{{ $unit->unit_number }}</strong></td>
+                                    <td>{{ $unit->floor ?? '-' }}</td>
+                                    <td>{{ $unit->area_size ?? '0' }} m²</td>
+                                    <td>
+                                        @if($unit->is_active)
+                                            <span class="dark-green-btn px-3 py-1 rounded-full text-[10px]">Active</span>
+                                        @else
+                                            <span class="red-btn px-3 py-1 rounded-full text-[10px]" style="background: #fee2e2; color: #ef4444; border-color: #fecaca;">Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $unit->lease_start ? \Carbon\Carbon::parse($unit->lease_start)->format('d/m/Y') : '-' }}</td>
+                                    <td>{{ $unit->lease_end ? \Carbon\Carbon::parse($unit->lease_end)->format('d/m/Y') : '-' }}</td>
+                                    <td class="actions">
+                                        <div class="grid grid-cols-3 gap-2 w-full">
+                                            <button type="button" class="light-green-btn-action w-full justify-center" data-popup="detail-unit-{{ $unit->id }}">
+                                                <i class="fa-solid fa-eye text-xs"></i>
+                                                <span class="text-xs">Lihat</span>
+                                            </button>
+
+                                            <button type="button" class="light-brown-btn-action w-full justify-center text-center" data-popup="edit-unit-{{ $unit->id }}">
+                                                <i class="fa-solid fa-pen text-xs"></i>
+                                                <span class="text-xs">Edit</span>
+                                            </button>
+
+                                            <form id="delete-form-{{ $unit->id }}" action="{{ route('units.destroy', $unit->id) }}" method="POST" class="m-0 p-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" 
+                                                        class="dark-brown-btn-action border-0 w-full justify-center btn-trigger-delete" 
+                                                        data-popup="delete-unit-modal" 
+                                                        data-id="{{ $unit->id }}"
+                                                        data-unit="{{ $unit->unit_number }}">
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="fa-solid fa-trash text-xs"></i>
+                                                        <span class="text-xs">Hapus</span>
+                                                    </div>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <div class="popup" id="detail-unit-{{ $unit->id }}">
+                                    <div class="popup-overlay"></div>
+                                    <div class="popup-card popup-md">
+                                        <div class="popup-close-wrapper">
+                                            <button class="popup-close" data-close="detail-unit-{{ $unit->id }}">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                        <div class="popup-header">Unit {{ $unit->unit_number }}</div>
+                                        <div class="popup-body user-detail-info">
+                                            <div class="flex justify-between">
+                                                <div class="flex flex-col gap-5">
+                                                    <div class="flex flex-col gap-2">
+                                                        <div class="detail-item">
+                                                            <p>Tenant</p>
+                                                            <p>{{ $tenant->tenant_name }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p>Lantai</p>
+                                                            <p>{{ $unit->floor ?? '-' }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p>Luas Area</p>
+                                                            <p>{{ $unit->area_size ?? '0' }} m²</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col gap-5">
+                                                    <div class="flex flex-col gap-2">
+                                                        <div class="detail-item">
+                                                            <p>Mulai</p>
+                                                            <p>{{ $unit->lease_start ? \Carbon\Carbon::parse($unit->lease_start)->format('d M Y') : '-' }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p>Berakhir</p>
+                                                            <p>{{ $unit->lease_end ? \Carbon\Carbon::parse($unit->lease_end)->format('d M Y') : '-' }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p>Status</p>
+                                                            <p>{{ $unit->is_active ? 'Active' : 'Inactive' }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-6 flex justify-between items-center text-[12px] text-zinc-400">
+                                            <p>ID: #UNIT-{{ $unit->id }}</p>
+                                            <p>Terakhir Diperbarui: {{ $unit->updated_at->format('d M Y') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="popup" id="edit-unit-{{ $unit->id }}">
+                                    <div class="popup-overlay"></div>
+                                    <div class="popup-card popup-md text-left">
+                                        <div class="popup-close-wrapper">
+                                            <button class="popup-close" data-close="edit-unit-{{ $unit->id }}">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                        <div class="popup-header">Edit Unit {{ $unit->unit_number }}</div>
+                                        
+                                        <form action="{{ route('units.update', $unit->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="popup-body flex flex-col gap-5">
+                                                
+                                                <div>
+                                                    <div class="text-field">
+                                                        <label class="text-field-label">Pilih Tenant</label>
+                                                        <div class="custom-dropdown w-full">
+                                                            <div class="dropdown-selected">
+                                                                <span class="placeholder">{{ $tenant->tenant_name }}</span>
+                                                                <i class="fa-solid fa-chevron-down text-xs"></i>
+                                                            </div>
+                                                            <div class="dropdown-options">
+                                                                @foreach($tenants as $t)
+                                                                    <div class="option" data-value="{{ $t->id }}">
+                                                                        {{ $t->tenant_name }}
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                            <input type="hidden" name="tenant_id" value="{{ $unit->tenant_id }}" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Nomor Unit</label>
+                                                            <input type="text" name="unit_number" class="text-field-input" value="{{ old('unit_number', $unit->unit_number) }}" required>
+                                                        </div>
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Lantai</label>
+                                                            <input type="text" name="floor" class="text-field-input" value="{{ old('floor', $unit->floor) }}">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Luas Area (m²)</label>
+                                                            <input type="number" step="0.01" name="area_size" class="text-field-input" value="{{ old('area_size', $unit->area_size) }}">
+                                                        </div>
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Status</label>
+                                                            <div class="custom-dropdown w-full">
+                                                                <div class="dropdown-selected">
+                                                                    <span class="placeholder">{{ $unit->is_active ? 'Active' : 'Inactive' }}</span>
+                                                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                                                </div>
+                                                                <div class="dropdown-options">
+                                                                    <div class="option" data-value="1">Active</div>
+                                                                    <div class="option" data-value="0">Inactive</div>
+                                                                </div>
+                                                                <input type="hidden" name="is_active" value="{{ $unit->is_active }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Lease Start</label>
+                                                            <input type="date" name="lease_start" class="text-field-input" value="{{ $unit->lease_start?->format('Y-m-d') }}">
+                                                        </div>
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Lease End</label>
+                                                            <input type="date" name="lease_end" class="text-field-input" value="{{ $unit->lease_end?->format('Y-m-d') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <button type="submit" class="dark-brown-button py-4 mt-2">
+                                                    Update Perubahan
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @empty
+                <div class="table-card p-10 text-center text-zinc-400 italic">
+                    Data unit tidak ditemukan
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    <div class="popup" id="addUnitModal">
+        <div class="popup-overlay"></div>
+        <div class="popup-card popup-md">
+            <div class="popup-close-wrapper">
+                <button class="popup-close" data-close="addUnitModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="popup-header">Tambah Unit Baru</div>
+            
+            <form action="{{ route('units.store') }}" method="POST">
+                @csrf
+                <div class="popup-body flex flex-col gap-6 text-left">
+                    <div>
+                        {{-- CUSTOM DROPOUP TENANT --}}
+                        <div class="text-field">
+                            <label class="text-field-label">Pilih Tenant</label>
+                            <div class="custom-dropdown w-full">
+                                <div class="dropdown-selected">
+                                    <span class="placeholder">-- Pilih Tenant --</span>
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </div>
+                                <div class="dropdown-options">
+                                    @foreach($tenants as $t)
+                                        <div class="option" data-value="{{ $t->id }}">
+                                            {{ $t->tenant_name }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="tenant_id" id="tenant_id_input" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="text-field">
+                                <label class="text-field-label">Nomor Unit</label>
+                                <input type="text" name="unit_number" class="text-field-input" placeholder="e.g. 2A" required>
+                            </div>
+                            <div class="text-field">
+                                <label class="text-field-label">Lantai</label>
+                                <input type="text" name="floor" class="text-field-input" placeholder="e.g. 2">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="text-field">
+                                <label class="text-field-label">Luas Area (m²)</label>
+                                <input type="number" step="0.01" name="area_size" class="text-field-input" placeholder="0.00">
+                            </div>
+                            {{-- CUSTOM DROPDOWN STATUS --}}
+                            <div class="text-field">
+                                <label class="text-field-label">Status</label>
+                                <div class="custom-dropdown w-full">
+                                    <div class="dropdown-selected">
+                                        <span class="placeholder">Active</span>
+                                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                                    </div>
+                                    <div class="dropdown-options">
+                                        <div class="option" data-value="1">Active</div>
+                                        <div class="option" data-value="0">Inactive</div>
+                                    </div>
+                                    <input type="hidden" name="is_active" value="1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="text-field">
+                                <label class="text-field-label">Lease Start</label>
+                                <input type="date" name="lease_start" class="text-field-input">
+                            </div>
+                            <div class="text-field">
+                                <label class="text-field-label">Lease End</label>
+                                <input type="date" name="lease_end" class="text-field-input">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="dark-brown-button py-4">
+                        Simpan Unit Baru
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    @foreach($tenants as $tenant)
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center bg-light">
-                <span><strong>Tenant:</strong> {{ $tenant->tenant_name }}</span>
-                <span class="text-muted">{{ $tenant->units->count() }} Units</span>
+    <div class="popup" id="delete-unit-modal">
+        <div class="popup-overlay"></div>
+        <div class="popup-card popup-md">
+            <div class="popup-close-wrapper">
+                <button class="popup-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <div class="card-body p-0">
-                @if($tenant->units->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Unit</th>
-                                    <th>Floor</th>
-                                    <th>Area Size (m²)</th>
-                                    <th>Status</th>
-                                    <th>Lease Start</th>
-                                    <th>Lease End</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($tenant->units as $unit)
-                                    <tr>
-                                        <td>{{ $unit->unit_number }}</td>
-                                        <td>{{ $unit->floor ?? '-' }}</td>
-                                        <td>{{ $unit->area_size ?? '-' }}</td>
-                                        <td>
-                                            @if($unit->is_active)
-                                                <span class="badge bg-success">Active</span>
-                                            @else
-                                                <span class="badge bg-secondary">Inactive</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $unit->lease_start ?? '-' }}</td>
-                                        <td>{{ $unit->lease_end ?? '-' }}</td>
-                                        <td class="text-end">
-                                            <a href="{{ route('units.show', $unit->id) }}" class="btn btn-sm btn-info me-1">
-                                                <i class="bi bi-eye"></i> View
-                                            </a>
-                                            <a href="{{ route('units.edit', $unit->id) }}" class="btn btn-sm btn-warning me-1">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </a>
-                                            <form action="{{ route('units.destroy', $unit->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="p-3">
-                        <p class="mb-0 text-muted">No units assigned to this tenant yet.</p>
-                    </div>
-                @endif
+            <div class="popup-header">Hapus Unit <span id="display-unit-number" class="text-[#FA8327]"></span>?</div>
+
+            <div class="popup-body">
+                <div class="btn-delete-wrapper flex gap-3">
+                    <button id="confirm-delete-btn" class="light-brown-btn flex-1">Ya</button>
+                    <button class="dark-brown-button flex-1" data-close="delete-unit-modal">Tidak</button>
+                </div>
             </div>
         </div>
-    @endforeach
-
+    </div>
 </div>
 
 @endsection
