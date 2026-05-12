@@ -24,7 +24,8 @@ class MeterReadingController extends Controller
     public function index()
     {
         $tenants = Tenant::with(['units.meters.readings.user'])->get();
-        return view('readings.index', compact('tenants'));
+        $meters = UtilityMeter::with('unit')->get();
+        return view('readings.index', compact('tenants', 'meters'));
     }
 
     public function create()
@@ -46,16 +47,14 @@ class MeterReadingController extends Controller
             'description'   => 'nullable|string',
         ]);
 
-        if (!$request->hasFile('photo') && !$request->filled('photo_base64')) {
-            return $this->jsonResponse("Foto meter wajib diisi", null, 422);
-        }
 
         $lastReading = MeterReading::where('meter_id', $request->meter_id)
             ->latest('recorded_at')
             ->first();
 
         if ($lastReading && $request->reading_value < $lastReading->reading_value) {
-            return $this->jsonResponse("Input ({$request->reading_value}) lebih rendah dari sebelumnya ({$lastReading->reading_value}).", null, 422);
+            return back()->withErrors(['reading_value' => "Input ({$request->reading_value}) lebih rendah dari sebelumnya ({$lastReading->reading_value})."])
+                        ->withInput();
         }
 
         $path = null;
