@@ -327,7 +327,7 @@
                 </button>
             </div>
 
-            <div class="popup-header">Hapus Tarif Ini</div>
+            <div class="popup-header">Hapus Reminder Ini</div>
 
             <div class="popup-body btn-delete-wrapper">
                 <button id="confirm-delete-btn" class="light-brown-btn">Ya</button>

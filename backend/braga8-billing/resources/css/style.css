@@ -237,6 +237,12 @@ main {
     color: white;
 }
 
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .detail-item p:first-child {
     color: rgba(255, 255, 255, 0.5);
     font-size: 14px;

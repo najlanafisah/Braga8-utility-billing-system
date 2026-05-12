@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-namespace App\Http\Controllers;
-
 use App\Models\Complaint;
 use App\Models\Notification;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ComplaintController extends Controller
@@ -32,12 +29,10 @@ public function store(Request $request)
         'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
     ]);
 
-    // 📸 handle image
     if ($request->hasFile('image')) {
         $data['image'] = $request->file('image')->store('complaints', 'public');
     }
 
-    // 💾 save complaint first (important, shocking concept)
     $complaint = Complaint::create($data);
 
     // 🧠 get all admins
@@ -65,35 +60,46 @@ public function store(Request $request)
     }
 
     
-public function action(Complaint $complaint) {
-    return view('complaints.action', compact('complaint'));
-}
+    public function action(Request $request, Complaint $complaint) 
+    {
+        $request->validate([
+            'solution' => 'required|string|min:5',
+        ]);
 
-public function show(Complaint $complaint)
-{
-    return view('complaints.show', compact('complaint'));
-}
+        $complaint->update([
+            'solution' => $request->solution,
+            'status' => 'resolved',
+        ]);
 
-public function update(Request $request, Complaint $complaint) {
-    $data = $request->validate([
-        'reported_by' => 'sometimes|required|string|max:255',
-        'role'        => 'sometimes|required|string',
-        'report_date' => 'sometimes|required|date',
-        'description' => 'sometimes|required|string',
-        'status'      => 'sometimes|required|in:pending,in_progress,resolved,rejected',
-        'solution'    => 'nullable|string',
-    ]);
+        return redirect()->back()->with('status', 'complaint-resolved');
+    }
 
-    $complaint->update($data);
-    
-    return redirect()->route('complaints.index')
-        ->with('success', 'Complaint successfully updated.');
-}
+    public function show(Complaint $complaint)
+    {
+        return view('complaints.show', compact('complaint'));
+    }
+
+    public function update(Request $request, Complaint $complaint) {
+        $data = $request->validate([
+            'reported_by' => 'sometimes|required|string|max:255',
+            'role'        => 'sometimes|required|string',
+            'report_date' => 'sometimes|required|date',
+            'description' => 'sometimes|required|string',
+            'status'      => 'sometimes|required|in:pending,in_progress,resolved,rejected',
+            'solution'    => 'nullable|string',
+        ]);
+
+        $complaint->update($data);
+        
+        return redirect()->route('complaints.index')
+            ->with('success', 'Complaint successfully updated.');
+    }
     
 
     public function destroy(Complaint $complaint) {
         if($complaint->image) Storage::disk('public')->delete($complaint->image);
         $complaint->delete();
-        return back()->with('success', 'Complaint deleted.');
+        
+        return redirect()->back()->with('status', 'complaint-deleted');
     }
 }

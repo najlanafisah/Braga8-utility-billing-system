@@ -82,13 +82,10 @@
                 </div>
 
                 <div class="menu-group">
-                    <a href="#" class="menu-item">
+                    <a href="{{ route('complaints.index') }}" @class(['menu-item', 'active'=> request()->routeIs('complaints.*')])>
                         <span><i class="fa-solid fa-triangle-exclamation"></i></span>
                         <span>Keluhan</span>
                     </a>
-                    <div class="submenu">
-                        <a href="#">Daftar Keluhan</a>
-                    </div>
                 </div>
 
                 <div class="menu-group">

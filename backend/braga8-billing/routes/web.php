@@ -34,7 +34,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
@@ -43,13 +42,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
-    // Audit Logs Routes
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
     
-    // Optional: Route to clear logs (Careful with this one!)
     Route::delete('/audit-logs/clear', [AuditLogController::class, 'clear'])->name('audit_logs.clear');
 
-    // Resources (Standard CRUD)
     Route::resource('users', UserController::class);
     Route::resource('tenants', TenantController::class);
     Route::resource('units', UnitController::class);
@@ -64,7 +60,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
 });
 
-// 4. Include Laravel Breeze/Fortify Auth Routes
 require __DIR__.'/auth.php';
 
 Route::patch('/meter-readings/{id}/status', [MeterReadingController::class, 'updateStatus'])
@@ -72,15 +67,11 @@ Route::patch('/meter-readings/{id}/status', [MeterReadingController::class, 'upd
 
 Route::get('/invoices/{invoice}/notify', [InvoiceController::class, 'notifyTenant'])->name('invoices.notify');
 
-// Usage & Analytics Reports
 Route::prefix('reports')->group(function () {
-    // 1. The Main Dashboard (Index)
     Route::get('/', [UsageReportController::class, 'index'])->name('reports.index');
 
-    // 2. The Logic Trigger (Generate/Recalculate)
     Route::post('/generate', [UsageReportController::class, 'generate'])->name('reports.generate');
 
-    // 3. The Export (PDF Download)
     Route::get('/{id}/pdf', [UsageReportController::class, 'exportPdf'])->name('reports.pdf');
 });
 Route::resource('payments', PaymentController::class);
@@ -89,8 +80,7 @@ Route::post('/payments/{payment}/remind', [PaymentController::class, 'remind'])-
 
 
 Route::resource('complaints', ComplaintController::class);
-Route::get('complaints/{complaint}/action', [App\Http\Controllers\ComplaintController::class, 'action'])->name('complaints.action');
-Route::resource('complaints', App\Http\Controllers\ComplaintController::class);
+Route::post('complaints/{complaint}/action', [ComplaintController::class, 'action'])->name('complaints.action');
 
 use App\Http\Controllers\NotificationController;
 
