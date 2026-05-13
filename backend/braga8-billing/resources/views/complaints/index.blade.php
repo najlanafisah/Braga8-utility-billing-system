@@ -198,15 +198,15 @@
                                 <td class="actions">
                                     <div class="flex justify-center gap-2">
                                         <button class="light-green-btn-action" data-popup="view-complaint-{{ $complaint->id }}">
-                                            <i class="fa-solid fa-eye text-xs"></i>
-                                            <span class="text-xs">Buka</span>
+                                            <i class="fa-solid fa-eye"></i>
+                                            <span class="">Buka</span>
                                         </button>
                                         <form id="delete-form-{{ $complaint->id }}" action="{{ route('complaints.destroy', $complaint->id) }}" method="POST" class="m-0 p-0">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" class="dark-brown-btn-action border-0" data-popup="delete-complaint" data-id="{{ $complaint->id }}">
-                                                <i class="fa-solid fa-trash text-xs"></i>
-                                                <span class="text-xs">Hapus</span>
+                                                <i class="fa-solid fa-trash "></i>
+                                                <span class="">Hapus</span>
                                             </button>
                                         </form>
                                     </div>

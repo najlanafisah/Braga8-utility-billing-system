@@ -11,30 +11,27 @@ use Illuminate\Support\Str;
 
 class TenantController extends Controller
 {
-   public function index(Request $request)
+public function index(Request $request)
 {
     $query = Tenant::query();
 
     if ($request->filled('search')) {
-        $query->where('tenant_name', 'LIKE', "%{$request->search}%");
+        $query->where('tenant_name', 'LIKE', "%{$request->search}%")
+              ->orWhere('person_in_charge', 'LIKE', "%{$request->search}%");
     }
 
     $query->with(['units.meters.readings' => function($q) {
-        $q->latest();
+        $q->orderBy('recorded_at', 'desc'); 
     }]);
 
-    if ($request->expectsJson()) {
-        return response()->json($query->latest()->get());
-    }
+    $tenants = $query->latest()->paginate(10)->withQueryString();
 
-$tenants = $query->with(['units.meters.readings' => function($q) {
-    $q->orderBy('recorded_at', 'desc'); 
-}])->latest()->get();
+    if ($request->expectsJson()) {
+        return response()->json($tenants);
+    }
 
     return view('tenants.index', compact('tenants'));
-
-    }
-
+}
     public function create()
     {
         return view('tenants.create');
@@ -56,7 +53,7 @@ $tenants = $query->with(['units.meters.readings' => function($q) {
                 'username'     => Str::slug($request->person_in_charge) . rand(10, 99),
                 'password'     => Hash::make('password123'),
                 'role'         => 'tenant',
-                'phone_number' => $request->contact_phone, // Mapped to your actual column
+                'phone_number' => $request->contact_phone,
             ]);
 
             Tenant::create([
@@ -69,8 +66,7 @@ $tenants = $query->with(['units.meters.readings' => function($q) {
                 'contact_email'    => $request->contact_email,
             ]);
 
-            return redirect()->route('tenants.index')
-                ->with('success', "Tenant and User Account created successfully.");
+            return redirect()->route('tenants.index')->with('status', 'tenant-created');
         });
     }
 
@@ -96,7 +92,7 @@ $tenants = $query->with(['units.meters.readings' => function($q) {
                 ]);
             }
 
-            return redirect()->route('tenants.index')->with('success', 'Tenant and account updated.');
+            return redirect()->route('tenants.index')->with('status', 'tenant-updated');
         });
     }
 
@@ -117,7 +113,8 @@ $tenants = $query->with(['units.meters.readings' => function($q) {
                 User::where('id', $tenant->user_id)->delete();
             }
             $tenant->delete();
-            return redirect()->route('tenants.index')->with('success', 'Tenant deleted.');
+
+            return redirect()->route('tenants.index')->with('status', 'tenant-deleted');
         });
     }
     

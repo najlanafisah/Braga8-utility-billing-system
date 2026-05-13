@@ -11,7 +11,6 @@ export function initPopups() {
           if (trigger.dataset.id) {
               selectedDeleteId = trigger.dataset.id;
               
-              // Tambahin baris ini biar teks unitnya ganti otomatis:
               const unitName = trigger.getAttribute('data-unit');
               const displaySpan = document.getElementById('display-unit-number');
               if (displaySpan && unitName) {
@@ -72,7 +71,6 @@ export function initPasswordToggle() {
 
     toggleBtns.forEach(btn => {
         btn.addEventListener("click", function() {
-            // Kita cari input password yang ada di satu wrapper parent
             const input = this.parentElement.querySelector(".password-input");
             const icon = this.querySelector("i");
 
