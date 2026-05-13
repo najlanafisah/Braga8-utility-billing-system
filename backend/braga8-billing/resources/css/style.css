@@ -641,6 +641,7 @@ main {
     border-radius: 14px;
     background: #E5D0C9;
     font-size: 14px;
+    color: #131316;
     transition: all 0.3s ease;
     box-shadow: 0 3.5px 14px rgba(0, 0, 0, 0.2);
 }

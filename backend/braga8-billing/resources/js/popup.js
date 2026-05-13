@@ -66,3 +66,23 @@ export function initPopups() {
     });
   }
 }
+
+export function initPasswordToggle() {
+    const toggleBtns = document.querySelectorAll(".toggle-password");
+
+    toggleBtns.forEach(btn => {
+        btn.addEventListener("click", function() {
+            // Kita cari input password yang ada di satu wrapper parent
+            const input = this.parentElement.querySelector(".password-input");
+            const icon = this.querySelector("i");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        });
+    });
+}

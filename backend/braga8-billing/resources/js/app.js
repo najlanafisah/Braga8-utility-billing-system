@@ -12,6 +12,7 @@ import { initChart } from "./chart.js";
 import { initDropdown } from "./dropdown.js";
 import { initPayment } from "./payment.js";
 import { initUtilityFeatures } from './utility.js';
+import { initPasswordToggle } from './popup';
 
 document.addEventListener("DOMContentLoaded", () => {
     initSidebar();
@@ -20,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initDropdown();
     initPayment();
     initUtilityFeatures();
+    initPasswordToggle();
 
     const openEdit = document.getElementById("openEdit");
     if (openEdit) {

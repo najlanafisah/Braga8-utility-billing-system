@@ -1,56 +1,340 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-3xl font-bold mb-6">User Profiles</h1>
+<div class="min-h-screen">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8">
+        <div>
+            <h1 class="title-text">User Management</h1>
+            <p class="subtitle-text">Manage your administrators, officers, and tenants</p>
+        </div>
+        <div class="header-user">
+            <div class="icon-wrapper"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></div>
+            <div class="profile-container"><div class="profile-icon"><i class="fa-solid fa-user text-[#a04d30]"></i></div></div>
+        </div>
+    </div>
 
-    @if(session('success'))
-        <div class="bg-green-200 text-green-800 p-4 rounded mb-4">{{ session('success') }}</div>
-    @endif
+    <div class="flex flex-col gap-6">
+        @if (session('status'))
+            @php
+                $alerts = [
+                    'user-stored'    => [
+                        'title' => 'Berhasil Registrasi!',
+                        'desc'  => 'Akun baru telah berhasil ditambahkan ke sistem.',
+                        'icon'  => 'fa-circle-check'
+                    ],
+                    'user-updated'   => [
+                        'title' => 'Update Berhasil!',
+                        'desc'  => 'Informasi akun telah diperbarui sepenuhnya.',
+                        'icon'  => 'fa-user-check'
+                    ],
+                    'user-deleted'   => [
+                        'title' => 'Akun Dihapus!',
+                        'desc'  => 'Data user tersebut telah dibersihkan dari database.',
+                        'icon'  => 'fa-trash-can'
+                    ],
+                    'profile-updated' => [
+                        'title' => 'Profil Diperbarui!',
+                        'desc'  => 'Informasi akun kamu sudah berhasil diubah.',
+                        'icon'  => 'fa-id-card'
+                    ]
+                ];
 
-    <a href="{{ route('users.create') }}" class="bg-blue-600 text-white px-4 py-2 mb-4 inline-block rounded">
-        Add User
-    </a>
+                $statusKey = session('status');
+                $current = $alerts[$statusKey] ?? null;
+            @endphp
 
-    <table class="w-full border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border p-2">ID</th>
-                <th class="border p-2">Name</th>
-                <th class="border p-2">Username</th>
-                <th class="border p-2">Email</th>
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <th class="border p-2">Role</th>
-                @endif
-                <th class="border p-2">Created At</th>
-                <th class="border p-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($users as $user)
-                <tr class="hover:bg-gray-50">
-                    <td class="border p-2">{{ $user->id }}</td>
-                    <td class="border p-2">{{ $user->name }}</td>
-                    <td class="border p-2">{{ $user->username }}</td>
-                    <td class="border p-2">{{ $user->email }}</td>
-                    @if(auth()->check() && auth()->user()->role === 'admin')
-                        <td class="border p-2">{{ $user->role }}</td>
-                    @endif
-                    <td class="border p-2">{{ $user->created_at->format('d M Y') }}</td>
-                    <td class="border p-2 flex gap-2">
-                        <a href="{{ route('users.edit', $user->id) }}" class="text-blue-500">Edit</a>
-                        <form action="{{ route('users.destroy', $user->id) }}" method="POST">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500" onclick="return confirm('Confirm?')">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                   <td colspan="7" class="text-center py-4">No users found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            @if ($current)
+                <div id="universal-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500" style="background-color: rgba(96, 35, 22, 0.6);">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/10 shadow-inner">
+                            <i class="fa-solid {{ $current['icon'] }} text-[#FA8327] text-lg"></i>
+                        </div>
+                        <div class="flex flex-col gap-0.5">
+                            <p class="text-sm font-bold tracking-wide">{{ $current['title'] }}</p>
+                            <p class="text-xs text-white/50 font-light">{{ $current['desc'] }}</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeUniversalAlert()" class="p-2 text-white/20 hover:text-[#FA8327] transition-colors">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <script>
+                    function closeUniversalAlert() {
+                        const alert = document.getElementById('universal-alert');
+                        if (alert) {
+                            alert.style.opacity = '0';
+                            alert.style.transform = 'translateX(30px)';
+                            setTimeout(() => alert.remove(), 500);
+                        }
+                    }
+                    setTimeout(closeUniversalAlert, 4500);
+                </script>
+            @endif
+        @endif
+
+        <div class="toolbar">
+            <form method="GET" action="{{ route('users.index') }}" class="w-full md:w-72">
+                <input type="hidden" name="role" value="{{ $role }}">
+                <div class="search-wrapper !m-0">
+                    <input type="text" name="search" placeholder="Search {{ $role }}..." value="{{ request('search') }}">
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+            </form>
+
+            <button type="button" class="dark-brown-button btn-small w-full md:w-auto" data-popup="create-user-modal">
+                <span><i class="fa-solid fa-plus text-xs"></i></span>
+                <span>Create New Account</span>
+            </button>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-card overflow-hidden">
+                <div class="table-card-header !p-0 overflow-hidden border-b border-white/20">
+                    <div class="flex w-full h-full">
+                        @foreach(['admin' => 'Admin', 'petugas' => 'Petugas', 'tenant' => 'Tenant'] as $key => $label)
+                            <a href="{{ route('users.index', ['role' => $key, 'search' => request('search')]) }}" 
+                            class="flex-1 flex items-center justify-center gap-3 py-5 text-[11px] font-bold tracking-widest uppercase transition-all border-r border-white/10
+                            {{ $role === $key 
+                                ? 'bg-white/10 text-white shadow-[inset_0_2px_10px_rgba(255,255,255,0.1)]' 
+                                : 'text-zinc-500 hover:bg-white/[0.02] hover:text-zinc-300' }}">
+                                <i class="fa-solid {{ $key === 'admin' ? 'fa-user-shield' : ($key === 'petugas' ? 'fa-user-tie' : 'fa-users') }} text-[12px]"></i>
+                                {{ $label }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <table class="table w-full">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>No. Telepon</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $index => $user)
+                        <tr>
+                            <td>{{ $users->firstItem() + $index }}</td>
+                            <td class="font-bold text-zinc-100">{{ $user->name }}</td>
+                            <td>{{ '@' . $user->username }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->phone_number ?? '-' }}</td>
+                            <td class="actions">
+                                <div class="flex justify-center gap-2">
+                                    <button type="button" class="light-green-btn-action" data-popup="edit-user-{{ $user->id }}">
+                                        <i class="fa-solid fa-pen"></i> Ubah
+                                    </button>
+                                    
+                                    <form id="delete-form-{{ $user->id }}" 
+                                        action="{{ route('users.destroy', $user->id) }}" 
+                                        method="POST" 
+                                        class="m-0 p-0">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" 
+                                                class="dark-brown-btn-action border-0" 
+                                                data-popup="delete-user" 
+                                                data-id="{{ $user->id }}"
+                                                data-name="{{ $user->name }}">
+                                            <i class="fa-solid fa-trash text-xs"></i>
+                                            <span class="text-xs">Hapus</span>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="popup" id="edit-user-{{ $user->id }}">
+                                    <div class="popup-overlay"></div>
+                                        <div class="popup-card popup-md">
+                                            <div class="popup-close-wrapper">
+                                                <button type="button" class="popup-close" data-close="edit-user-{{ $user->id }}">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+                                            <div class="popup-header">Edit User Account</div>
+                                            <form action="{{ route('users.update', $user->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="popup-body flex flex-col gap-6">
+                                                    <div>
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Full Name</label>
+                                                            <input type="text" name="name" class="text-field-input" value="{{ old('name', $user->name) }}" required>
+                                                        </div>
+                                                        <div class="grid grid-cols-2 gap-4">
+                                                            <div class="text-field">
+                                                                <label class="text-field-label">Username</label>
+                                                                <input type="text" name="username" class="text-field-input" value="{{ old('username', $user->username) }}" required>
+                                                            </div>
+                                                            <div class="text-field">
+                                                                <label class="text-field-label">Phone Number</label>
+                                                                <input type="text" name="phone_number" class="text-field-input" value="{{ old('phone_number', $user->phone_number) }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Email Address</label>
+                                                            <input type="email" name="email" class="text-field-input" value="{{ old('email', $user->email) }}" required>
+                                                        </div>
+
+                                                        <div class="grid grid-cols-2 gap-4">
+                                                            <div class="text-field">
+                                                                <label class="text-field-label">Account Role</label>
+                                                                <div class="custom-dropdown">
+                                                                    <div class="dropdown-selected">
+                                                                        <span class="placeholder text-[#131316]">
+                                                                            {{ ucfirst($user->role) }}
+                                                                        </span>
+                                                                        <i class="fa-solid fa-chevron-down text-[10px]" style="color: #131316;"></i>
+                                                                    </div>
+                                                                    <div class="dropdown-options">
+                                                                        <div class="option" data-value="admin">Administrator</div>
+                                                                        <div class="option" data-value="supervisor">Supervisor</div>
+                                                                        <div class="option" data-value="petugas">Petugas</div>
+                                                                        <div class="option" data-value="tenant">Tenant</div>
+                                                                    </div>
+                                                                    <input type="hidden" name="role" value="{{ $user->role }}" required>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="text-field">
+                                                                <label class="text-field-label">New Password</label>
+                                                                <div class="relative w-full">
+                                                                    <input type="password" name="password" class="text-field-input pr-12 password-input" placeholder="••••••••">
+                                                                    <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#FA8327]">
+                                                                        <i class="fa-solid fa-eye"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="submit" class="dark-brown-button w-full">
+                                                        Simpan Perubahan
+                                                    </button>
+                                                </div>
+                                            </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-20 text-zinc-500 italic"> No {{ $role }} found in the system. </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 px-2">
+            <div class="text-sm text-zinc-500">
+                Showing <span class="text-white">{{ $users->firstItem() }}</span> to <span class="text-white">{{ $users->lastItem() }}</span> of <span class="text-white">{{ $users->total() }}</span> results
+            </div>
+            <div class="braga-pagination">
+                {{ $users->links() }}
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="delete-user">
+        <div class="popup-overlay"></div>
+
+        <div class="popup-card popup-md">
+            <div class="popup-close-wrapper">
+                <button class="popup-close" data-close="delete-user">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="popup-header">Hapus User Ini</div>
+
+            <div class="popup-body">
+                <div class="btn-delete-wrapper">
+                    <button id="confirm-delete-btn" class="light-brown-btn">Ya</button>
+                    <button class="dark-brown-button" data-close="delete-user">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="create-user-modal">
+        <div class="popup-overlay"></div>
+        <div class="popup-card popup-md">
+            <div class="popup-close-wrapper">
+                <button type="button" class="popup-close" data-close="create-user-modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="popup-header">Register New User</div>
+
+            <form action="{{ route('users.store') }}" method="POST">
+                @csrf
+                <div class="popup-body flex flex-col gap-6">
+                    
+                    <div>
+                        <div class="text-field">
+                            <label class="text-field-label">Full Name</label>
+                            <input type="text" name="name" class="text-field-input" placeholder="Masukkan nama lengkap.." required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-field">
+                                <label class="text-field-label">Username</label>
+                                <input type="text" name="username" class="text-field-input" placeholder="Username unik.." required>
+                            </div>
+                            <div class="text-field">
+                                <label class="text-field-label">Phone Number</label>
+                                <input type="text" name="phone_number" class="text-field-input" placeholder="08xxxxxxxx">
+                            </div>
+                        </div>
+
+                        <div class="text-field">
+                            <label class="text-field-label">Email Address</label>
+                            <input type="email" name="email" class="text-field-input" placeholder="email@jasa.com" required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-field">
+                                <label class="text-field-label">Account Role</label>
+                                <div class="custom-dropdown">
+                                    <div class="dropdown-selected">
+                                        <span class="placeholder">Pilih Role</span>
+                                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                    </div>
+                                    <div class="dropdown-options">
+                                        <div class="option" data-value="admin">Administrator</div>
+                                        <div class="option" data-value="supervisor">Supervisor</div>
+                                        <div class="option" data-value="petugas">Petugas</div>
+                                        <div class="option" data-value="tenant">Tenant</div>
+                                    </div>
+                                    <input type="hidden" name="role" required>
+                                </div>
+                            </div>
+
+                            <div class="text-field">
+                                <label class="text-field-label">Password</label>
+                                <div class="relative w-full">
+                                    <input type="password" name="password" class="text-field-input pr-12 password-input" placeholder="••••••••">
+                                    
+                                    <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#FA8327]">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="dark-brown-button w-full">
+                        Simpan Akun Baru
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
