@@ -71,14 +71,10 @@
                 </div>
 
                 <div class="menu-group">
-                    <a href="#" class="menu-item">
+                    <a href="{{ route('reports.index') }}" @class(['menu-item', 'active'=> request()->routeIs('reports.*')])>
                         <span><i class="fa-solid fa-list"></i></span>
-                        <span>Laporan</span>
+                        <span>Laporan Pemakaian</span>
                     </a>
-                    <div class="submenu">
-                        <a href="{{ route('reports.index') }}">Laporan Pemakaian</a>
-                        <a href="#">Ekspor Data</a>
-                    </div>
                 </div>
 
                 <div class="menu-group">

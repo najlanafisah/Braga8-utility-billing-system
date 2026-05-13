@@ -1,49 +1,44 @@
 <?php
 
-use App\Http\Controllers\AuditLogController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\TenantController;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\MeterReadingController;
-use App\Http\Controllers\TariffController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\UtilityMeterController;
+use App\Http\Controllers\{
+    AuditLogController,
+    Auth\RegisteredUserController,
+    ProfileController,
+    DashboardController,
+    UserController,
+    TenantController,
+    UnitController,
+    MeterReadingController,
+    TariffController,
+    InvoiceController,
+    PaymentController,
+    UtilityMeterController,
+    ReminderController,
+    UsageReportController,
+    ComplaintController,
+    NotificationController
+};
 
-use App\Http\Controllers\ReminderController;
-use App\Http\Controllers\UsageReportController;
-use App\Http\Controllers\ComplaintController;
-
-// 1. Homepage
 Route::get('/', function () {
     return view('welcome');
 });
 
-// 2. Auth Routes (Guest)
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('register', [RegisteredUserController::class, 'store']);
 });
 
-// 3. Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 
-
-
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
-    
     Route::delete('/audit-logs/clear', [AuditLogController::class, 'clear'])->name('audit_logs.clear');
 
     Route::resource('users', UserController::class);
@@ -53,44 +48,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('meter-readings', MeterReadingController::class);
     Route::resource('tariffs', TariffController::class);
     Route::resource('invoices', InvoiceController::class);
-
     Route::resource('reminders', ReminderController::class);
+    Route::resource('payments', PaymentController::class);
+    Route::resource('complaints', ComplaintController::class);
 
-    // Custom Extra Routes
+
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+    Route::get('invoices/{invoice}/notify', [InvoiceController::class, 'notifyTenant'])->name('invoices.notify');
+
+    Route::patch('/meter-readings/{id}/status', [MeterReadingController::class, 'updateStatus'])
+        ->name('meter-readings.update-status');
+
+    Route::prefix('reports')->group(function () {
+        Route::get('/', [UsageReportController::class, 'index'])->name('reports.index');
+        Route::post('/generate', [UsageReportController::class, 'generate'])->name('reports.generate');
+        Route::get('/{id}/pdf', [UsageReportController::class, 'exportPdf'])->name('reports.pdf');
+    });
+
+    Route::post('/payments/{payment}/remind', [PaymentController::class, 'remind'])->name('payments.remind');
+
+    Route::post('complaints/{complaint}/action', [ComplaintController::class, 'action'])->name('complaints.action');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 require __DIR__.'/auth.php';
-
-Route::patch('/meter-readings/{id}/status', [MeterReadingController::class, 'updateStatus'])
-    ->name('meter-readings.update-status');
-
-Route::get('/invoices/{invoice}/notify', [InvoiceController::class, 'notifyTenant'])->name('invoices.notify');
-
-Route::prefix('reports')->group(function () {
-    Route::get('/', [UsageReportController::class, 'index'])->name('reports.index');
-
-    Route::post('/generate', [UsageReportController::class, 'generate'])->name('reports.generate');
-
-    Route::get('/{id}/pdf', [UsageReportController::class, 'exportPdf'])->name('reports.pdf');
-});
-Route::resource('payments', PaymentController::class);
-
-Route::post('/payments/{payment}/remind', [PaymentController::class, 'remind'])->name('payments.remind');
-
-
-Route::resource('complaints', ComplaintController::class);
-Route::post('complaints/{complaint}/action', [ComplaintController::class, 'action'])->name('complaints.action');
-
-use App\Http\Controllers\NotificationController;
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
-
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
-        ->name('notifications.read');
-
-    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])
-        ->name('notifications.destroy');
-});

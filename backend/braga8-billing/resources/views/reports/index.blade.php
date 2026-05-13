@@ -1,96 +1,158 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    {{-- Header Section --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div class="min-h-screen">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                Monthly Usage Reports
-            </h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">Consumption and Revenue Analytics for Braga 8.</p>
+            <h1 class="title-text">Usage Reports</h1>
+            <p class="subtitle-text">Braga8 Utility Billing Management</p>
         </div>
-        
-        {{-- Generate Report Form --}}
-        <form action="{{ route('reports.generate') }}" method="POST" class="flex items-center gap-2">
-            @csrf
-            <input type="month" name="month" required 
-                   class="rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
-            <button type="submit" 
-                    class="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/30 transition-all transform hover:-translate-y-1">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Generate Report
-            </button>
-        </form>
-    </div>
-
-    {{-- Stats Overview (Latest Report Summary) --}}
-    @if($reports->count() > 0)
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        @php $latest = $reports->first(); @endphp
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xl">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Expected Revenue ({{ $latest->month_year }})</p>
-            <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">Rp {{ number_format($latest->total_revenue_expected) }}</p>
-        </div>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xl">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Electricity Usage</p>
-            <p class="text-2xl font-bold text-amber-500 mt-1">{{ number_format($latest->total_electric_usage) }} kWh</p>
-        </div>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xl">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Water Usage</p>
-            <p class="text-2xl font-bold text-blue-500 mt-1">{{ number_format($latest->total_water_usage) }} m³</p>
+        <div class="header-user">
+            <div class="icon-wrapper" data-popup="notif-popup">
+                <i class="fa-solid fa-bell"></i>
+                <span class="notif-dot"></span>
+            </div>
+            <div class="profile-container" data-popup="detail-profile-popup">
+                <div class="profile-icon">
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i>
+                </div>
+            </div>
         </div>
     </div>
-    @endif
 
-    {{-- Reports Table --}}
-    <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-900/50">
-                <tr>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Month / Year</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Units Billed</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Electricity (kWh)</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Water (m³)</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Revenue</th>
-                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                @forelse($reports as $report)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900 dark:text-white">
-                        {{ \Carbon\Carbon::parse($report->month_year)->format('F Y') }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
-                        {{ $report->total_units_billed }} Units
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-amber-600 font-medium">
-                        {{ number_format($report->total_electric_usage) }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">
-                        {{ number_format($report->total_water_usage) }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">
-                        Rp {{ number_format($report->total_revenue_expected) }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                        <a href="{{ route('reports.pdf', $report->id) }}" 
-                           class="inline-flex items-center px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg text-sm font-bold transition-all border border-rose-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Export PDF
-                        </a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">
-                        No reports generated yet. Use the selector above to start.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div class="flex flex-col gap-6">
+        <div class="toolbar flex items-end justify-between">
+            <div class="flex flex-col w-64">
+                <div class="search-wrapper !mb-0 w-full">
+                    <input type="text" placeholder="Cari laporan (Contoh: April 2026)..." id="tableSearch">
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+            </div>
+
+            <div class="toolbar-action">
+                <button type="button" class="light-brown-btn btn-small" data-popup="generate-report-modal">
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    <span>Generate New Report</span>
+                </button>
+            </div>
+        </div>
+
+        @if($reports->count() > 0)
+            @php $latest = $reports->first(); @endphp
+            <div class="card-image-container mb-2">
+                <div class="card card-with-image">
+                    <div class="card-image"></div>
+                    <div class="card-body">
+                        <p class="card-label">Expected Revenue ({{ \Carbon\Carbon::parse($latest->month_year)->format('M Y') }})</p>
+                        <p class="card-value">Rp {{ number_format($latest->total_revenue_expected, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+                <div class="card card-with-image">
+                    <div class="card-image"></div>
+                    <div class="card-body">
+                        <p class="card-label">Total Electricity</p>
+                        <p class="card-value">{{ number_format($latest->total_electric_usage) }} <span class="text-xs font-normal">kWh</span></p>
+                    </div>
+                </div>
+                <div class="card card-with-image">
+                    <div class="card-image"></div>
+                    <div class="card-body">
+                        <p class="card-label">Total Water</p>
+                        <p class="card-value">{{ number_format($latest->total_water_usage) }} <span class="text-xs font-normal">m³</span></p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="table-wrapper">
+            <div class="table-card mb-8">
+                <div class="table-card-header">
+                    <div class="table-card-title">
+                        <span class="label">Total Reports:</span>
+                        <span class="value">{{ $reports->count() }}</span>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Month / Year</th>
+                            <th>Units Billed</th>
+                            <th>Electricity (kWh)</th>
+                            <th>Water (m³)</th>
+                            <th>Total Revenue</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reports as $report)
+                        <tr>
+                            <td class="font-bold text-zinc-800">
+                                {{ \Carbon\Carbon::parse($report->month_year)->format('F Y') }}
+                            </td>
+                            <td><span class="blue-btn pointer-events-none">{{ $report->total_units_billed }} Units</span></td>
+                            <td class="text-zinc-600 font-medium">{{ number_format($report->total_electric_usage) }}</td>
+                            <td class="text-zinc-600 font-medium">{{ number_format($report->total_water_usage) }}</td>
+                            <td class="font-bold text-[#602316]">
+                                Rp {{ number_format($report->total_revenue_expected, 0, ',', '.') }}
+                            </td>
+                            <td class="actions">
+                                <div class="flex justify-center">
+                                    <a href="{{ route('reports.pdf', $report->id) }}" 
+                                    class="light-green-btn-action px-4 py-2 flex items-center gap-2 relative z-[999]" 
+                                    download> 
+                                        <i class="fa-solid fa-file-pdf"></i>
+                                        <span>Export PDF</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="p-10 text-center text-zinc-400 italic">
+                                No reports found. Generate one to see the data.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
+
+<div class="popup" id="generate-report-modal">
+    <div class="popup-overlay"></div>
+    <div class="popup-card popup-md">
+        <div class="popup-close-wrapper">
+            <button class="popup-close" data-close="generate-report-modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="popup-header">Generate Monthly Report</div>
+        <div class="popup-body">
+            <form action="{{ route('reports.generate') }}" method="POST">
+                @csrf
+                <div class="flex flex-col gap-6">
+                    <div>
+                        <div class="text-field">
+                            <label class="text-field-label text-left text-zinc-700">Pilih Periode Laporan</label>
+                            <input type="month" name="month" required 
+                                class="text-field-input [color-scheme:light] cursor-pointer text-zinc-800 border-zinc-300">
+                        </div>
+
+                        <p class="text-xs text-zinc-400 italic">
+                            Pilih periode bulan dan tahun untuk menghitung penggunaan listrik, air, dan estimasi pendapatan.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="dark-brown-button flex-[2] py-3"> 
+                        Generate Sekarang
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 @endsection

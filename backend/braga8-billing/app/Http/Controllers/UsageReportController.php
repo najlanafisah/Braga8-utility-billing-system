@@ -26,16 +26,21 @@ public function generate(Request $request)
     return redirect()->route('reports.index')->with('success', 'Report generated for ' . $month);
 }
 public function exportPdf($id)
-
 {
     $report = UsageReport::findOrFail($id);
     
-    $invoices = Invoice::where('billing_period_start', 'like', $report->month_year . "%")
+    $dateParts = explode('-', $report->month_year);
+    $year = $dateParts[0];
+    $month = $dateParts[1];
+
+    $invoices = Invoice::whereYear('billing_period_start', $year)
+                ->whereMonth('billing_period_start', $month)
                 ->with(['tenant', 'unit'])
                 ->get();
 
-    $pdf = Pdf::loadView('pdf.usage-report', compact('report', 'invoices'))
-              ->setPaper('a4', 'landscape'); // Landscape is better for reports
+    if (ob_get_contents()) ob_end_clean(); 
+
+    $pdf = Pdf::loadView('pdf.usage-report', compact('report', 'invoices'));
 
     return $pdf->download("Usage-Report-{$report->month_year}.pdf");
 }
