@@ -52,7 +52,7 @@
             @endphp
 
             @if ($current)
-            <div id="universal-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl bg-[#602316] shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all duration-500">
+            <div id="universal-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500" style="background-color: rgba(96, 35, 22, 0.6);">
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/10 shadow-inner">
                         <i class="fa-solid {{ $current['icon'] }} text-[#FA8327] text-lg"></i>
@@ -82,10 +82,10 @@
         @endif
 
         <div class="toolbar">
-            <div class="search-wrapper">
-                <input type="text" placeholder="Cari Jenis Tarif..">
+            <form action="{{ route('tariffs.index') }}" method="GET" class="search-wrapper">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Jenis Tarif..">
                 <span><i class="fa-solid fa-magnifying-glass"></i></span>
-            </div>
+            </form>
 
             <div class="toolbar-action">
                 <button class="light-brown-btn btn-small" data-popup="add-new-tariff">
@@ -211,7 +211,7 @@
                                                 <input type="number" name="other_fees[admin_fee]" class="text-field-input" step="0.01" value="{{ old('other_fees.admin_fee', $tariff->other_fees['admin_fee'] ?? 0) }}">
                                             </div>
                                             <div class="text-field">
-                                                <label class="text-field-label">Persentase Pajak %</label>
+                                                <label class="text-field-label">Persentase Pajak (%)</label>
                                                 <input type="number" name="tax_percent" class="text-field-input" step="0.01" value="{{ old('tax_percent', $tariff->tax_percent) }}">
                                             </div>
                                         </div>
@@ -248,10 +248,6 @@
                         <div class="table-card-title">
                             <span class="label">Nama Tarif:</span>
                             <span class="value">{{ $tariff->name ?? 'Unnamed Tariff' }}</span>
-                        </div>
-
-                        <div class="table-card-meta">
-                            {{ is_array($tariff->other_fees) ? count($tariff->other_fees) : 0 }} Biaya Tambahan
                         </div>
                     </div>
 
@@ -340,46 +336,46 @@
                 <div class="popup-body flex flex-col gap-6">
                     <div>
                         <div class="text-field">
-                            <label class="text-field-label">Nama Tarif</label>
+                            <label class="text-field-label">Nama Tarif <span class="text-[#FA8327]">*</span></label>
                             <input type="text" name="name" class="text-field-input" placeholder="e.g., Residential Type A" required>
                         </div>
 
                         <div class="add-tariff-wrapper">
                             <div class="column">
                                 <div class="text-field">
-                                    <label class="text-field-label">Biaya Listrik (per kWh)</label>
-                                    <input type="number" name="electric_price" class="text-field-input" step="0.01" required>
+                                    <label class="text-field-label">Biaya Listrik (per kWh) <span class="text-[#FA8327]">*</span></label>
+                                    <input type="number" name="electric_price" class="text-field-input" step="0.01" placeholder="Contoh: 1500" required>
                                 </div>
                                 <div class="text-field">
                                     <label class="text-field-label">Biaya Beban Listrik</label>
-                                    <input type="number" name="other_fees[electric_load]" class="text-field-input" step="0.01">
+                                    <input type="number" name="other_fees[electric_load]" class="text-field-input" step="0.01" placeholder="0">
                                 </div>
                                 <div class="text-field">
-                                    <label class="text-field-label">Biaya Adminstrasi</label>
-                                    <input type="number" name="other_fees[admin_fee]" class="text-field-input" step="0.01">
+                                    <label class="text-field-label">Biaya Administrasi</label>
+                                    <input type="number" name="other_fees[admin_fee]" class="text-field-input" step="0.01" placeholder="0">
                                 </div>
                                 <div class="text-field">
-                                    <label class="text-field-label">Persentase Pajak %</label>
-                                    <input type="number" name="other_fees[tax_percent]" class="text-field-input" step="0.01">
+                                    <label class="text-field-label text-blue-600 font-bold">Persentase Pajak (%) <span class="text-[#FA8327]">*</span></label>
+                                    <input type="number" name="tax_percent" class="text-field-input border-blue-200" step="0.01" placeholder="0" required>
                                 </div>
                             </div>
 
                             <div class="column">
                                 <div class="text-field">
-                                    <label class="text-field-label">Biaya Air (per m³)</label>
-                                    <input type="number" name="water_price" class="text-field-input" step="0.01" required>
+                                    <label class="text-field-label">Biaya Air (per m³) <span class="text-[#FA8327]">*</span></label>
+                                    <input type="number" name="water_price" class="text-field-input" step="0.01" placeholder="Contoh: 5000" required>
                                 </div>
                                 <div class="text-field">
                                     <label class="text-field-label">Pemeliharaan</label>
-                                    <input type="number" name="other_fees[maintenance]" class="text-field-input" step="0.01">
+                                    <input type="number" name="other_fees[maintenance]" class="text-field-input" step="0.01" placeholder="0">
                                 </div>
                                 <div class="text-field">
                                     <label class="text-field-label">Biaya Materai</label>
-                                    <input type="number" name="other_fees[stamp_fee]" class="text-field-input" step="0.01">
+                                    <input type="number" name="other_fees[stamp_fee]" class="text-field-input" step="0.01" placeholder="0">
                                 </div>
                                 <div class="text-field">
                                     <label class="text-field-label">Biaya Lainnya</label>
-                                    <input type="number" name="other_fees[other_fee]" class="text-field-input" step="0.01">
+                                    <input type="number" name="other_fees[other_fee]" class="text-field-input" step="0.01" placeholder="0">
                                 </div>
                             </div>
                         </div>

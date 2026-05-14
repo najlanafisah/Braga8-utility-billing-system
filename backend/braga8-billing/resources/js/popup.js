@@ -11,11 +11,20 @@ export function initPopups() {
           if (trigger.dataset.id) {
               selectedDeleteId = trigger.dataset.id;
               
+              // Logika Unit
               const unitName = trigger.getAttribute('data-unit');
-              const displaySpan = document.getElementById('display-unit-number');
-              if (displaySpan && unitName) {
-                  displaySpan.innerText = unitName;
-              }
+              const displayUnit = document.getElementById('display-unit-number');
+              if (displayUnit && unitName) displayUnit.innerText = unitName;
+
+              // Logika Tenant
+              const tenantName = trigger.getAttribute('data-name');
+              const displayTenant = document.getElementById('display-tenant-name');
+              if (displayTenant && tenantName) displayTenant.innerText = tenantName;
+
+              // Logika Invoice (Tambahan Baru)
+              const invNo = trigger.getAttribute('data-invoice');
+              const displayInv = document.getElementById('display-invoice-number');
+              if (displayInv && invNo) displayInv.innerText = invNo;
           }
 
           if (popup) popup.classList.add("active");

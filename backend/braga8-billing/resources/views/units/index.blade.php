@@ -4,8 +4,8 @@
 <div class="min-h-screen">
     <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-zinc-200 pb-8">
         <div>
-            <h1 class="title-text">Unit List</h1>
-            <p class="subtitle-text">Braga8 Utility Billing Management</p>
+            <h1 class="title-text">Daftar Unit</h1>
+            <p class="subtitle-text">Manajemen Penagihan Utilitas Braga8</p>
         </div>
         <div class="header-user">
             <div class="icon-wrapper" data-popup="notif-popup">
@@ -51,13 +51,13 @@
 
         <div class="toolbar">
             <form action="{{ route('units.index') }}" method="GET" class="search-wrapper">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Tenant / Unit...">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Tenant / Unit...">
                 <span><i class="fa-solid fa-magnifying-glass"></i></span>
             </form>
             <div class="toolbar-action">
                 <button class="light-brown-btn btn-small" data-popup="addUnitModal">
                     <span><i class="fa-solid fa-plus"></i></span>
-                    <span>Add Unit</span>
+                    <span>Tambah Unit</span>
                 </button>
             </div>
         </div>
@@ -71,19 +71,19 @@
                             <span class="value">{{ $tenant->tenant_name }}</span>
                         </div>
                         <div class="table-card-meta">
-                            {{ $tenant->units->count() }} Unit(s)
+                            {{ $tenant->units->count() }} Unit
                         </div>
                     </div>
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Unit</th>
-                                <th>Floor</th>
-                                <th>Area (m²)</th>
+                                <th>Lantai</th>
+                                <th>Luas (m²)</th>
                                 <th>Status</th>
-                                <th>Lease Start</th>
-                                <th>Lease End</th>
-                                <th>Actions</th>
+                                <th>Mulai Sewa</th>
+                                <th>Sewa Berakhir</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,9 +94,9 @@
                                     <td>{{ $unit->area_size ?? '0' }} m²</td>
                                     <td>
                                         @if($unit->is_active)
-                                            <span class="dark-green-btn px-3 py-1 rounded-full text-[10px]">Active</span>
+                                            <span class="dark-green-btn px-3 py-1 rounded-full text-[10px]">Aktif</span>
                                         @else
-                                            <span class="red-btn px-3 py-1 rounded-full text-[10px]" style="background: #fee2e2; color: #ef4444; border-color: #fecaca;">Inactive</span>
+                                            <span class="red-btn px-3 py-1 rounded-full text-[10px]" style="background: #fee2e2; color: #ef4444; border-color: #fecaca;">Nonaktif</span>
                                         @endif
                                     </td>
                                     <td>{{ $unit->lease_start ? \Carbon\Carbon::parse($unit->lease_start)->format('d/m/Y') : '-' }}</td>
@@ -107,20 +107,14 @@
                                                 <i class="fa-solid fa-eye text-xs"></i>
                                                 <span class="text-xs">Lihat</span>
                                             </button>
-
                                             <button type="button" class="light-brown-btn-action w-full justify-center text-center" data-popup="edit-unit-{{ $unit->id }}">
                                                 <i class="fa-solid fa-pen text-xs"></i>
-                                                <span class="text-xs">Edit</span>
+                                                <span class="text-xs">Ubah</span>
                                             </button>
-
                                             <form id="delete-form-{{ $unit->id }}" action="{{ route('units.destroy', $unit->id) }}" method="POST" class="m-0 p-0">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" 
-                                                        class="dark-brown-btn-action border-0 w-full justify-center btn-trigger-delete" 
-                                                        data-popup="delete-unit-modal" 
-                                                        data-id="{{ $unit->id }}"
-                                                        data-unit="{{ $unit->unit_number }}">
+                                                <button type="button" class="dark-brown-btn-action border-0 w-full justify-center btn-trigger-delete" data-popup="delete-unit-modal" data-id="{{ $unit->id }}" data-unit="{{ $unit->unit_number }}">
                                                     <div class="flex items-center gap-2">
                                                         <i class="fa-solid fa-trash text-xs"></i>
                                                         <span class="text-xs">Hapus</span>
@@ -140,7 +134,7 @@
                                             </button>
                                         </div>
                                         <div class="popup-header">Unit {{ $unit->unit_number }}</div>
-                                        <div class="popup-body user-detail-info">
+                                        <div class="popup-body user-detail-info text-left">
                                             <div class="flex justify-between">
                                                 <div class="flex flex-col gap-5">
                                                     <div class="flex flex-col gap-2">
@@ -161,16 +155,16 @@
                                                 <div class="flex flex-col gap-5">
                                                     <div class="flex flex-col gap-2">
                                                         <div class="detail-item">
-                                                            <p>Mulai</p>
+                                                            <p>Mulai Sewa</p>
                                                             <p>{{ $unit->lease_start ? \Carbon\Carbon::parse($unit->lease_start)->format('d M Y') : '-' }}</p>
                                                         </div>
                                                         <div class="detail-item">
-                                                            <p>Berakhir</p>
+                                                            <p>Berakhir Sewa</p>
                                                             <p>{{ $unit->lease_end ? \Carbon\Carbon::parse($unit->lease_end)->format('d M Y') : '-' }}</p>
                                                         </div>
                                                         <div class="detail-item">
                                                             <p>Status</p>
-                                                            <p>{{ $unit->is_active ? 'Active' : 'Inactive' }}</p>
+                                                            <p>{{ $unit->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -191,13 +185,11 @@
                                                 <i class="fa-solid fa-xmark"></i>
                                             </button>
                                         </div>
-                                        <div class="popup-header">Edit Unit {{ $unit->unit_number }}</div>
-                                        
+                                        <div class="popup-header">Ubah Unit {{ $unit->unit_number }}</div>
                                         <form action="{{ route('units.update', $unit->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="popup-body flex flex-col gap-5">
-                                                
                                                 <div>
                                                     <div class="text-field">
                                                         <label class="text-field-label">Pilih Tenant</label>
@@ -216,7 +208,6 @@
                                                             <input type="hidden" name="tenant_id" value="{{ $unit->tenant_id }}" required>
                                                         </div>
                                                     </div>
-
                                                     <div class="grid grid-cols-2 gap-4">
                                                         <div class="text-field">
                                                             <label class="text-field-label">Nomor Unit</label>
@@ -227,7 +218,6 @@
                                                             <input type="text" name="floor" class="text-field-input" value="{{ old('floor', $unit->floor) }}">
                                                         </div>
                                                     </div>
-
                                                     <div class="grid grid-cols-2 gap-4">
                                                         <div class="text-field">
                                                             <label class="text-field-label">Luas Area (m²)</label>
@@ -237,32 +227,30 @@
                                                             <label class="text-field-label">Status</label>
                                                             <div class="custom-dropdown w-full">
                                                                 <div class="dropdown-selected">
-                                                                    <span class="placeholder">{{ $unit->is_active ? 'Active' : 'Inactive' }}</span>
+                                                                    <span class="placeholder">{{ $unit->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                                                                     <i class="fa-solid fa-chevron-down text-xs"></i>
                                                                 </div>
                                                                 <div class="dropdown-options">
-                                                                    <div class="option" data-value="1">Active</div>
-                                                                    <div class="option" data-value="0">Inactive</div>
+                                                                    <div class="option" data-value="1">Aktif</div>
+                                                                    <div class="option" data-value="0">Nonaktif</div>
                                                                 </div>
                                                                 <input type="hidden" name="is_active" value="{{ $unit->is_active }}">
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                     <div class="grid grid-cols-2 gap-4">
                                                         <div class="text-field">
-                                                            <label class="text-field-label">Lease Start</label>
+                                                            <label class="text-field-label">Mulai Sewa</label>
                                                             <input type="date" name="lease_start" class="text-field-input" value="{{ $unit->lease_start?->format('Y-m-d') }}">
                                                         </div>
                                                         <div class="text-field">
-                                                            <label class="text-field-label">Lease End</label>
+                                                            <label class="text-field-label">Sewa Berakhir</label>
                                                             <input type="date" name="lease_end" class="text-field-input" value="{{ $unit->lease_end?->format('Y-m-d') }}">
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <button type="submit" class="dark-brown-button py-4 mt-2">
-                                                    Update Perubahan
+                                                    Simpan Perubahan
                                                 </button>
                                             </div>
                                         </form>
@@ -289,14 +277,12 @@
                 </button>
             </div>
             <div class="popup-header">Tambah Unit Baru</div>
-            
             <form action="{{ route('units.store') }}" method="POST">
                 @csrf
                 <div class="popup-body flex flex-col gap-6 text-left">
                     <div>
-                        {{-- CUSTOM DROPOUP TENANT --}}
                         <div class="text-field">
-                            <label class="text-field-label">Pilih Tenant</label>
+                            <label class="text-field-label">Pilih Tenant <span class="text-[#FA8327]">*</span></label>
                             <div class="custom-dropdown w-full">
                                 <div class="dropdown-selected">
                                     <span class="placeholder">-- Pilih Tenant --</span>
@@ -312,48 +298,44 @@
                                 <input type="hidden" name="tenant_id" id="tenant_id_input" required>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div class="text-field">
-                                <label class="text-field-label">Nomor Unit</label>
-                                <input type="text" name="unit_number" class="text-field-input" placeholder="e.g. 2A" required>
+                                <label class="text-field-label">Nomor Unit <span class="text-[#FA8327]">*</span></label>
+                                <input type="text" name="unit_number" class="text-field-input" placeholder="Misal: 2A" required>
                             </div>
                             <div class="text-field">
-                                <label class="text-field-label">Lantai</label>
-                                <input type="text" name="floor" class="text-field-input" placeholder="e.g. 2">
+                                <label class="text-field-label">Lantai <span class="text-[#FA8327]">*</span></label>
+                                <input type="text" name="floor" class="text-field-input" placeholder="Misal: 2" required>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div class="text-field">
-                                <label class="text-field-label">Luas Area (m²)</label>
-                                <input type="number" step="0.01" name="area_size" class="text-field-input" placeholder="0.00">
+                                <label class="text-field-label">Luas Area (m²) <span class="text-[#FA8327]">*</span></label>
+                                <input type="number" step="0.01" name="area_size" class="text-field-input" placeholder="0.00" required>
                             </div>
-                            {{-- CUSTOM DROPDOWN STATUS --}}
                             <div class="text-field">
-                                <label class="text-field-label">Status</label>
+                                <label class="text-field-label">Status <span class="text-[#FA8327]">*</span></label>
                                 <div class="custom-dropdown w-full">
                                     <div class="dropdown-selected">
-                                        <span class="placeholder">Active</span>
+                                        <span class="placeholder">Aktif</span>
                                         <i class="fa-solid fa-chevron-down text-xs"></i>
                                     </div>
                                     <div class="dropdown-options">
-                                        <div class="option" data-value="1">Active</div>
-                                        <div class="option" data-value="0">Inactive</div>
+                                        <div class="option" data-value="1">Aktif</div>
+                                        <div class="option" data-value="0">Nonaktif</div>
                                     </div>
                                     <input type="hidden" name="is_active" value="1">
                                 </div>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div class="text-field">
-                                <label class="text-field-label">Lease Start</label>
-                                <input type="date" name="lease_start" class="text-field-input">
+                                <label class="text-field-label">Mulai Sewa <span class="text-[#FA8327]">*</span></label>
+                                <input type="date" name="lease_start" class="text-field-input" required>
                             </div>
                             <div class="text-field">
-                                <label class="text-field-label">Lease End</label>
-                                <input type="date" name="lease_end" class="text-field-input">
+                                <label class="text-field-label">Sewa Berakhir <span class="text-[#FA8327]">*</span></label>
+                                <input type="date" name="lease_end" class="text-field-input" required>
                             </div>
                         </div>
                     </div>
@@ -369,21 +351,18 @@
         <div class="popup-overlay"></div>
         <div class="popup-card popup-md">
             <div class="popup-close-wrapper">
-                <button class="popup-close">
+                <button class="popup-close" data-close="delete-unit-modal">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <div class="popup-header">Hapus Unit <span id="display-unit-number" class="text-[#FA8327]"></span>?</div>
-
             <div class="popup-body">
                 <div class="btn-delete-wrapper flex gap-3">
-                    <button id="confirm-delete-btn" class="light-brown-btn flex-1">Ya</button>
-                    <button class="dark-brown-button flex-1" data-close="delete-unit-modal">Tidak</button>
+                    <button id="confirm-delete-btn" class="light-brown-btn flex-1">Ya, Hapus</button>
+                    <button class="dark-brown-button flex-1" data-close="delete-unit-modal">Batal</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @endsection

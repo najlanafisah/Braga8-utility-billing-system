@@ -21,38 +21,24 @@ public function index(Request $request)
     return view('tariffs.index', compact('tariffs'));
 }
 
-   public function store(Request $request)
+public function store(Request $request)
 {
     $validated = $request->validate([
-
-    'name' => 'required|string|max:255',
-        'water_price' => 'required|numeric',
+        'name'           => 'required|string|max:255',
+        'water_price'    => 'required|numeric',
         'electric_price' => 'required|numeric',
-        'electric_load_cost' => 'nullable|numeric',
-        'transformer_maintenance' => 'nullable|numeric',
-        'admin_fee' => 'nullable|numeric',
-        'stamp_fee' => 'nullable|numeric',
-        'tax_percent' => 'nullable|numeric',
-        
-        // Dynamic "Other Fees" validation
-        'other_fees' => 'nullable|array',
-        'other_fees.*.label' => 'nullable|string|max:255',
-        'other_fees.*.value' => 'nullable|numeric',
+        'tax_percent'    => 'required|numeric',
+        'other_fees'     => 'nullable|array',
     ]);
-
-    if ($request->has('other_fees')) {
-        $validated['other_fees'] = array_values(array_filter($request->other_fees, function ($fee) {
-            return !empty($fee['label']); 
-        }));
-    }
 
     $saved = Tariff::create($validated);
     
     if ($saved) {
         return redirect()->route('tariffs.index')->with('status', 'tariff-stored');
     }
-    return back()->with('error', 'Something went wrong while saving.');
+    return back()->with('error', 'Something went wrong.');
 }
+
 public function create()
 {
     return view('tariffs.create');
@@ -66,22 +52,14 @@ public function edit(Tariff $tariff)
 public function update(Request $request, Tariff $tariff)
 {
     $validated = $request->validate([
-
-    'name' => 'required|string|max:255',
-        'water_price' => 'required|numeric',
+        'name'           => 'required|string|max:255',
+        'water_price'    => 'required|numeric',
         'electric_price' => 'required|numeric',
-        'other_fees' => 'nullable|array',
-        'other_fees.*.label' => 'nullable|string',
-        'other_fees.*.value' => 'nullable|numeric',
+        'tax_percent'    => 'nullable|numeric',
+        'other_fees'     => 'nullable|array',
     ]);
 
-    if ($request->has('other_fees')) {
-        $validated['other_fees'] = array_filter($request->other_fees, function ($fee) {
-            return !empty($fee['label']);
-        });
-    }
-
-   $tariff->update($validated);
+    $tariff->update($validated);
     
     return redirect()->route('tariffs.index')->with('status', 'tariff-updated');
 }
