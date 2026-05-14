@@ -63,7 +63,6 @@
                         <span>Pembayaran</span>
                     </a>
                     <div class="submenu">
-                        <a href="#">Status Pembayaran</a>
                         <a href="{{ route('payments.index') }}" @class(['active' => request()->routeIs('payments.*')])>Riwayat Pembayaran</a>
                     </div>
                 </div>
@@ -134,16 +133,16 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="detail-item">
-                            <p class="text-xs uppercase text-zinc-400 font-bold">Tanggal Bergabung</p>
-                            <p class="text-zinc-700">{{ auth()->user()->created_at->format('d/m/Y') }}</p>
+                            <p>Tanggal Bergabung</p>
+                            <p>{{ auth()->user()->created_at->format('d M Y') }}</p>
                         </div>
                         <div class="detail-item">
-                            <p class="text-xs uppercase text-zinc-400 font-bold">Peran</p>
-                            <p class="text-zinc-700 capitalize">{{ auth()->user()->role }}</p>
+                            <p>Peran</p>
+                            <p>{{ auth()->user()->role }}</p>
                         </div>
-                        <div class="detail-item col-span-2">
-                            <p class="text-xs uppercase text-zinc-400 font-bold">Email</p>
-                            <p class="text-zinc-700">{{ auth()->user()->email }}</p>
+                        <div class="detail-item">
+                            <p>Email</p>
+                            <p>{{ auth()->user()->email }}</p>
                         </div>
                     </div>
 
@@ -205,15 +204,46 @@
             <div class="popup-body">
                 <div class="notification-wrapper">
                     @forelse(auth()->user()->customNotifications as $notif)
-                        <div class="notification {{ $notif->read_at ? 'opacity-50' : '' }}">
+                        <div class="notification {{ $notif->read_at ? 'is-read' : 'is-unread' }}">
                             <div class="notif-box">
-                                <p>{{ $notif->message }}</p> 
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fa-solid {{ $notif->read_at ? 'fa-envelope-open text-zinc-500' : 'fa-envelope text-[#FA8327]' }} text-xs"></i>
+                                        <h4 class="font-bold text-white text-sm">{{ $notif->title }}</h4>
+                                    </div>
+                                    
+                                    <div class="notif-actions flex gap-3">
+                                        @if(!$notif->read_at)
+                                            <form action="{{ route('notifications.read', $notif->id) }}" class="read-notif-form">
+                                                @csrf
+                                                <button type="submit" class="text-zinc-500 hover:text-zinc-300 transition-colors hover:scale-110 transition-transform" title="Tandai Baca">
+                                                    <i class="fa-solid fa-check text-xs"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <form action="{{ route('notifications.destroy', $notif->id) }}" class="delete-notif-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-zinc-500 hover:text-zinc-300 transition-colors hover:scale-110 transition-transform">
+                                                <i class="fa-solid fa-trash-can text-xs"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <p class="notif-message">{{ $notif->message }}</p>
+                                
+                                <div class="mt-3 text-[10px] text-zinc-500 text-right italic">
+                                    {{ $notif->created_at->diffForHumans() }}
+                                </div>
                             </div>
-                            <p>{{ $notif->created_at->diffForHumans() }}</p>
                         </div>
                     @empty
-                        <div class="py-10 text-center text-zinc-400 text-sm italic">
-                            Belum ada pemberitahuan
+                        <div class="py-16 text-center">
+                            <div class="text-zinc-700 mb-3">
+                                <i class="fa-solid fa-bell-slash text-4xl"></i>
+                            </div>
+                            <p class="text-zinc-500 text-sm italic">Belum ada pemberitahuan baru.</p>
                         </div>
                     @endforelse
                 </div>

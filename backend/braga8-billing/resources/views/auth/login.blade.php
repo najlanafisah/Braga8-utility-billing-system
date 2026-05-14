@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Braga 8</title>
+    <title>Masuk - Braga 8</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -14,7 +14,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #141315;
+            background-color: #141315; 
         }
 
         .auth-container {
@@ -54,7 +54,7 @@
             border-radius: 40px;
             display: flex;
             align-items: center;
-            justify-content: flex-end; 
+            justify-content: flex-end;
             position: relative;
             overflow: hidden;
         }
@@ -63,7 +63,7 @@
             width: 100%;
             height: auto;
             object-fit: contain;
-            margin-right: -15%; 
+            margin-right: -15%;
             transform: rotate(-5deg);
         }
 
@@ -111,10 +111,6 @@
             transition: 0.3s;
         }
 
-        .remember-wrapper:hover {
-            opacity: 1;
-        }
-
         .remember-wrapper input {
             display: none;
         }
@@ -129,14 +125,12 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Efek pas di-check */
         .remember-wrapper input:checked + .checkmark {
             background: #E05A00;
             border-color: #FF7A21;
             box-shadow: 0 0 10px rgba(224, 90, 0, 0.5);
         }
 
-        /* Icon centang (putih) */
         .checkmark:after {
             content: "";
             position: absolute;
@@ -167,58 +161,50 @@
                 <img src="{{ asset('logo.svg') }}" alt="Braga 8" style="height: 80px;">
             </div>
 
-            <h1 style="font-size: 34px; margin-bottom: 10px; color: white; font-weight: 500;">Welcome Back</h1>
-
+            <h1 style="font-size: 34px; margin-bottom: 10px; color: white; font-weight: 500;">Selamat Datang</h1>
+            
             <x-auth-session-status class="mb-4" :status="session('status')" />
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
-                
+
                 <div class="text-field">
-                    <label class="text-field-label">Email Address</label>
-                    <input type="email" name="email" class="text-field-input" placeholder="name@gmail.com" :value="old('email')" required autofocus>
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    <label class="text-field-label">Alamat Email</label>
+                    <input type="email" name="email" class="text-field-input" placeholder="nama@gmail.com" :value="old('email')" required autofocus>
+                    <x-input-error :messages="$errors->get('email')" class="mt-2 text-white text-xs" />
                 </div>
 
                 <div class="text-field">
-                    <label class="text-field-label">Password</label>
-                    
+                    <label class="text-field-label">Kata Sandi</label>
                     <div class="password-wrapper">
-                        <input type="password" 
-                            name="password" 
-                            class="text-field-input password-input" 
-                            placeholder="••••••••" 
-                            required>
-                            
+                        <input type="password" name="password" class="text-field-input password-input" placeholder="••••••••" required>
                         <button type="button" class="toggle-password">
                             <i class="fa-solid fa-eye"></i>
                         </button>
                     </div>
-                    
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    <x-input-error :messages="$errors->get('password')" class="mt-2 text-white text-xs" />
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                     <label class="remember-wrapper">
                         <input type="checkbox" name="remember">
-                        <span class="checkmark"></span>
-                        Remember me
+                        <span class="checkmark"></span> Ingat saya
                     </label>
-
+                    
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}" style="color: white; font-size: 13px; opacity: 0.7; text-decoration: underline;">
-                            Forgot Password?
+                            Lupa Kata Sandi?
                         </a>
                     @endif
                 </div>
 
-                <button type="submit" class="btn-braga-glass">
-                    Login
+                <button type="submit" class="btn-braga-glass" style="margin-top: 25px;">
+                    Masuk
                 </button>
 
                 <div style="margin-top: 25px; text-align: center;">
                     <a href="{{ route('register') }}" style="color: white; font-size: 14px; text-decoration: none; opacity: 0.8;">
-                        Don't have an account? <span style="text-decoration: underline; font-weight: bold;">Register</span>
+                        Belum punya akun? <span style="text-decoration: underline; font-weight: bold;">Daftar</span>
                     </a>
                 </div>
             </form>
@@ -228,6 +214,7 @@
             <div class="visual-top">
                 <img src="{{ asset('mockup-img.png') }}" alt="Mockup">
             </div>
+            
             <div class="visual-bottom">
                 <img src="{{ asset('texture-2.png') }}" alt="Texture">
             </div>

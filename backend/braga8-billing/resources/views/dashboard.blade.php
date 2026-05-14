@@ -39,7 +39,7 @@
             @endphp
 
             @if ($current)
-            <div id="universal-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl bg-[#602316] shadow-[0_10px_40px_rgba(0,0,0,0.7)] transition-all duration-500">
+            <div id="universal-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500" style="background-color: rgba(96, 35, 22, 0.6);">
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/10 shadow-inner">
                         <i class="fa-solid {{ $current['icon'] }} text-[#FA8327] text-lg"></i>
@@ -172,10 +172,10 @@
                         </div>
                     </div>
                     
-                    <button class="light-brown-btn">
+                    <a href="{{ route('audit_logs.index') }}" class="light-brown-btn">
                         Log Audit
                         <i class="fa-solid fa-angle-right"></i>
-                    </button>
+                    </a>
 
                 </div>
             </div>
@@ -244,18 +244,18 @@
             <div class="card lg:col-span-3">
                 <p class="card-label">Akses Cepat</p>
                 <div class="button-wrapper">
-                    <button class="dark-brown-button">
+                    <a href="{{ route('invoices.index') }}" class="dark-brown-button">
                         <span><i class="fa-solid fa-plus"></i></span>
                         <span>Buat Tagihan</span>
-                    </button>
-                    <button class="dark-brown-button">
+                    </a>
+                    <a href="{{ route('tenants.index') }}" class="dark-brown-button">
                         <span><i class="fa-solid fa-plus"></i></span>
-                        <span>Tambah Penyawa</span>
-                    </button>
-                    <button class="dark-brown-button">
+                        <span>Tambah Penyewa</span>
+                    </a>
+                    <a href="{{ route('tariffs.index') }}" class="dark-brown-button">
                         <span><i class="fa-solid fa-plus"></i></span>
                         <span>Ubah Tarif</span>
-                    </button>
+                    </a>
                 </div>
             </div>
 

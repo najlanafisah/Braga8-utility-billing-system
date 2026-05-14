@@ -109,19 +109,19 @@
                                             <div class="flex-1 flex flex-col gap-6">
                                                 <div class="grid grid-cols-2 gap-y-5 gap-x-4">
                                                     <div class="detail-item">
-                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Yang melapor</label>
-                                                        <p class="text-white font-medium tracking-wide">{{ $complaint->reported_by }}</p>
+                                                        <p>Yang melapor</p>
+                                                        <p>{{ $complaint->reported_by }}</p>
                                                     </div>
                                                     <div class="detail-item">
-                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Peran</label>
-                                                        <p class="text-zinc-300 font-medium">{{ ucfirst($complaint->role) }}</p>
+                                                        <p>Peran</p>
+                                                        <p>{{ ucfirst($complaint->role) }}</p>
                                                     </div>
                                                     <div class="detail-item">
-                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Tanggal</label>
-                                                        <p class="text-zinc-300 font-medium">{{ $complaint->report_date->format('d F Y') }}</p>
+                                                        <p>Tanggal</p>
+                                                        <p>{{ $complaint->report_date->format('d F Y') }}</p>
                                                     </div>
                                                     <div class="detail-item">
-                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Status</label>
+                                                        <p>Status</p>
                                                         <div>
                                                             @if($complaint->status === 'resolved')
                                                                 <span class="dark-green-btn">Solved</span>

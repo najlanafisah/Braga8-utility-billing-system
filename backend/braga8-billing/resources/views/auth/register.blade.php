@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Braga 8</title>
+    <title>Daftar Akun - Braga 8</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -31,7 +31,7 @@
             flex: 1;
             background: linear-gradient(145deg, #E05A00 0%, #8C2A00 100%);
             border-radius: 40px;
-            padding: 50px;
+            padding: 40px 50px; /* Padding disesuaikan sedikit */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -48,15 +48,15 @@
         }
 
         .visual-top {
-                flex: 1.6;
-                background-color: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                position: relative;
-                overflow: hidden;
+            flex: 1.6;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
         }
 
         .visual-top img {
@@ -109,46 +109,51 @@
                 <img src="{{ asset('logo.svg') }}" alt="Braga 8" style="height: 80px;">
             </div>
 
-            <h1 class="title-text" style="font-size: 34px; margin-bottom: 30px; color: white;">Sign Up to Continue</h1>
+            <h1 class="title-text" style="font-size: 32px; margin-bottom: 25px; color: white;">Daftar Akun Baru</h1>
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
                 
                 <div class="text-field">
-                    <label class="text-field-label">Full Name</label>
-                    <input type="text" name="name" class="text-field-input" placeholder="Your Name" required autofocus>
+                    <label class="text-field-label">Nama Lengkap</label>
+                    <input type="text" name="name" class="text-field-input" placeholder="Nama Anda" required autofocus>
                 </div>
 
                 <div class="text-field">
                     <label class="text-field-label">Email</label>
-                    <input type="email" name="email" class="text-field-input" placeholder="name@gmail.com" required>
+                    <input type="email" name="email" class="text-field-input" placeholder="nama@gmail.com" required>
                 </div>
 
-                <div class="text-field">
-                    <label class="text-field-label">Password</label>
-                    
-                    <div class="password-wrapper">
-                        <input type="password" 
-                            name="password" 
-                            class="text-field-input password-input" 
-                            placeholder="••••••••" 
-                            required>
-                            
-                        <button type="button" class="toggle-password">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
+                <div class="flex gap-4">
+                    <div class="text-field flex-1">
+                        <label class="text-field-label">Kata Sandi</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="password" class="text-field-input password-input" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <x-input-error :messages="$errors->get('password')" class="mt-2 text-white text-xs" />
                     </div>
-                    
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+
+                    <div class="text-field flex-1">
+                        <label class="text-field-label">Konfirmasi Sandi</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="password_confirmation" class="text-field-input password-input" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn-braga-glass">
-                    Register
+                <button type="submit" class="btn-braga-glass" style="margin-top: 10px;">
+                    Daftar Sekarang
                 </button>
 
-                <div style="margin-top: 25px; text-align: center;">
+                <div style="margin-top: 20px; text-align: center;">
                     <a href="{{ route('login') }}" class="subtitle-text" style="color: white; font-size: 14px; text-decoration: none;">
-                        Already have an account? <span style="text-decoration: underline; font-weight: bold;">Sign In</span>
+                        Sudah punya akun? <span style="text-decoration: underline; font-weight: bold;">Masuk</span>
                     </a>
                 </div>
             </form>
@@ -164,7 +169,6 @@
             </div>
         </div>
     </div>
-
 
     @stack('scripts')
 </body>
