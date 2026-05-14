@@ -92,6 +92,12 @@ main {
     background: rgba(255, 255, 255, 0.1);
 }
 
+.menu-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-radius: 10px;
+}
+
 .submenu {
     max-height: 0;
     overflow: hidden;
@@ -112,8 +118,22 @@ main {
     color: white;
 }
 
+.submenu a.active {
+    font-weight: bold;
+}
+
 .menu-group.active .submenu {
-    max-height: 300px;
+    max-height: 500px;
+}
+
+.menu-group.active .menu-item {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.menu-group.active > .menu-item {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
 /* DASHBOARD HEADER */
@@ -442,14 +462,16 @@ main {
 .chart {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
+    justify-content: flex-start;
 }
 
 .pie-chart {
-    width: 8rem;
-    height: 8rem;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    border: 1px solid #e4e4e475;
+    border: 1px solid rgba(228, 228, 228, 0.45);
+    flex-shrink: 0; 
 }
 
 .chart-info .item {
@@ -1369,3 +1391,18 @@ main {
     }
 }
 
+@media (max-width: 768px) {
+    .right-content {
+        padding: 1.5rem;
+    }
+    
+    .chart {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .card-value {
+        font-size: 28px;
+    }
+}

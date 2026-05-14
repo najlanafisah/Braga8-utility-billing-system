@@ -23,10 +23,8 @@
                     'active-title' => request()->routeIs('dashboard') 
                 ])>Dashboard</h1>
             </a>
-
             <nav class="sidebar-nav custom-scrollbar">
-                
-                <div class="menu-group">
+                <div @class(['menu-group', 'active' => request()->routeIs(['tenants.*', 'units.*'])])>
                     <a href="#" class="menu-item">
                         <span><i class="fa-solid fa-shop"></i></span>
                         <span>Penyewa & Unit</span>
@@ -37,7 +35,7 @@
                     </div>
                 </div>
 
-                <div class="menu-group">
+                <div @class(['menu-group', 'active' => request()->routeIs(['utility-meters.*', 'meter-readings.*'])])>
                     <a href="#" class="menu-item">
                         <span><i class="fa-solid fa-gear"></i></span>
                         <span>Utilitas</span>
@@ -48,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="menu-group">
+                <div @class(['menu-group', 'active' => request()->routeIs(['tariffs.*', 'invoices.*'])])>
                     <a href="#" class="menu-item">
                         <span><i class="fa-solid fa-money-bill"></i></span>
                         <span>Tarif & Tagihan</span>
@@ -59,14 +57,14 @@
                     </div>
                 </div>
 
-                <div class="menu-group">
+                <div @class(['menu-group', 'active' => request()->routeIs(['payments.*'])])>
                     <a href="#" class="menu-item">
                         <span><i class="fa-solid fa-credit-card"></i></span>
                         <span>Pembayaran</span>
                     </a>
                     <div class="submenu">
                         <a href="#">Status Pembayaran</a>
-                        <a href="{{ route('payments.index') }}" @class(['active' => request()->routeIs('payments.index')])>Riwayat Pembayaran</a>
+                        <a href="{{ route('payments.index') }}" @class(['active' => request()->routeIs('payments.*')])>Riwayat Pembayaran</a>
                     </div>
                 </div>
 
@@ -104,7 +102,6 @@
                         <span>Siklus Penagihan</span>
                     </a>
                 </div>
-
             </nav>
         </aside>
 

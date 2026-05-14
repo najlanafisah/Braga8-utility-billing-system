@@ -108,7 +108,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <div class="card lg:col-span-3">
+            <div class="card lg:col-span-4">
                 <p class="card-label">Ringkasan Tagihan</p>
                 
                 <div class="chart">
@@ -180,7 +180,7 @@
                 </div>
             </div>
 
-            <div class="card bar-chart-container lg:col-span-6">
+            <div class="card bar-chart-container lg:col-span-5">
                 <div class="bar-chart-content">
                     <p class="card-label">Grafik Pemakaian Bulanan</p>
                     
@@ -241,7 +241,7 @@
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-            <div class="card lg:col-span-2">
+            <div class="card lg:col-span-3">
                 <p class="card-label">Akses Cepat</p>
                 <div class="button-wrapper">
                     <button class="dark-brown-button">
@@ -259,7 +259,7 @@
                 </div>
             </div>
 
-            <div class="card-body lg:col-span-10">
+            <div class="card-body lg:col-span-9">
                 <h2 class="card-label">Pemakaian Bulanan</h2>
 
                 <div class="card-scroll">
