@@ -273,7 +273,7 @@
 
                         <div class="mt-4 flex gap-2">
                             <button type="submit" class="dark-brown-button flex-1 py-3">
-                                <i class="fa-solid fa-file-invoice-dollar mr-2"></i> Generate & Save
+                                Generate & Save
                             </button>
                         </div>
                     </div>

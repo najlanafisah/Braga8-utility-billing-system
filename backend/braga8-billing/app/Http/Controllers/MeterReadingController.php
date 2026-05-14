@@ -21,122 +21,22 @@ class MeterReadingController extends Controller
         return response()->json(['message' => $message, 'data' => $data], $status);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $tenants = Tenant::with(['units.meters.readings.user'])->get();
+        $search = $request->query('search');
+
+        $tenants = Tenant::with(['units.meters.readings.user'])
+            ->when($search, function ($query) use ($search) {
+                $query->where('tenant_name', 'LIKE', "%{$search}%")
+                    ->orWhereHas('units', function ($q) use ($search) {
+                        $q->where('unit_number', 'LIKE', "%{$search}%");
+                    });
+            })
+            ->get();
+
         $meters = UtilityMeter::with('unit')->get();
+
         return view('readings.index', compact('tenants', 'meters'));
-    }
-
-    public function create()
-    {
-        $meters = UtilityMeter::with('unit')->get();
-
-        return view('readings.create', compact('meters'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'meter_id'      => 'required|exists:utility_meters,id',
-            'reading_value' => 'required|numeric',
-            'photo'         => 'nullable|image|max:5120', 
-            'photo_base64'  => 'nullable|string',
-            'latitude'      => 'nullable|numeric',
-            'longitude'     => 'nullable|numeric',
-            'description'   => 'nullable|string',
-        ]);
-
-
-        $lastReading = MeterReading::where('meter_id', $request->meter_id)
-            ->latest('recorded_at')
-            ->first();
-
-        if ($lastReading && $request->reading_value < $lastReading->reading_value) {
-            return back()->withErrors(['reading_value' => "Input ({$request->reading_value}) lebih rendah dari sebelumnya ({$lastReading->reading_value})."])
-                        ->withInput();
-        }
-
-        $path = null;
-        if ($request->filled('photo_base64')) {
-            try {
-                $dataUri = $request->input('photo_base64');
-                $parts = explode(';base64,', $dataUri);
-                if (count($parts) == 2) {
-                    $decoded = base64_decode($parts[1]);
-                    $extension = str_contains($parts[0], 'png') ? 'png' : 'jpg';
-                    
-                    // Buat nama file dan langsung simpan ke storage
-                    $filename = 'readings/meter_' . time() . '_' . Str::random(6) . '.' . $extension;
-                    Storage::disk('public')->put($filename, $decoded);
-                    $path = $filename;
-                }
-            } catch (\Exception $e) {
-                Log::error('Base64 upload error: ' . $e->getMessage());
-                return $this->jsonResponse("Gagal memproses foto", null, 500);
-            }
-        } elseif ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('readings', 'public');
-        }
-
-        $address = $this->getAddress($request->latitude, $request->longitude);
-
-        $reading = MeterReading::create([
-            'meter_id'         => $request->meter_id,
-            'user_id'          => Auth::id() ?? 1,
-            'reading_value'    => $request->reading_value,
-            'photo_path'       => $path,
-            'latitude'         => $request->latitude,
-            'longitude'        => $request->longitude,
-            'location_address' => $address,
-            'description'      => $request->description,
-            'recorded_at'      => Carbon::now(),
-        ]);
-
-        return redirect()
-            ->route('meter-readings.index')
-            ->with('success', 'Meter reading berhasil disimpan');
-    }
-
-   public function update(Request $request, $id)
-    {
-    $reading = MeterReading::findOrFail($id);
-
-    $request->validate([
-        'reading_value' => 'required|numeric',
-        'description'   => 'nullable|string',
-        'photo'         => 'nullable|image|max:5120',
-        'photo_base64'  => 'nullable|string',
-        'latitude'      => 'nullable|numeric',
-        'longitude'     => 'nullable|numeric',
-    ]);
-
-    if ($request->filled('photo_base64')) {
-        if ($reading->photo_path) Storage::disk('public')->delete($reading->photo_path);
-        $dataUri = $request->input('photo_base64');
-        $parts = explode(';base64,', $dataUri);
-        if (count($parts) == 2) {
-            $decoded = base64_decode($parts[1]);
-            $extension = str_contains($parts[0], 'png') ? 'png' : 'jpg';
-            $filename = 'readings/meter_' . time() . '_' . Str::random(6) . '.' . $extension;
-            Storage::disk('public')->put($filename, $decoded);
-            $reading->photo_path = $filename;
-        }
-    }
-
-    $reading->reading_value = $request->reading_value;
-    $reading->description   = $request->description;
-
-    if ($request->filled('latitude') && $request->filled('longitude')) {
-        $reading->latitude = $request->latitude;
-        $reading->longitude = $request->longitude;
-        // Panggil fungsi getAddress untuk update alamat tertulisnya
-        $reading->location_address = $this->getAddress($request->latitude, $request->longitude);
-    }
-
-    $reading->save();
-
-    return $this->jsonResponse("Data berhasil diupdate", $reading);
     }
 
     public function updateStatus($id)
@@ -144,7 +44,7 @@ class MeterReadingController extends Controller
         $reading         = MeterReading::findOrFail($id);
         $reading->status = $reading->status === 'checked' ? null : 'checked';
         $reading->save();
-        return back();
+        return back()->with('status', 'reading-confirmed');
     }
 
     public function summary()

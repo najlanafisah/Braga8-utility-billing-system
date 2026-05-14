@@ -23,7 +23,9 @@ class PaymentController extends Controller
             ->where('status', '!=', 'paid')
             ->get();
 
-        $payments = Payment::with(['invoice.tenant', 'invoice.unit'])->latest()->paginate(10);
+        $payments = Payment::with(['invoice.tenant', 'invoice.unit'])
+            ->latest()
+            ->paginate(10);
 
         return view('payments.index', compact('payments', 'totalBill', 'totalCollected', 'outstandingBill', 'invoices'));
     }

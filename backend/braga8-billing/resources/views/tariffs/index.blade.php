@@ -109,10 +109,9 @@
                             
                             <div class="popup-header">{{ $tariff->name ?? 'Unnamed Tariff' }}</div>
                             
-                            <div class="popup-body user-detail-info">
+                            <div class="popup-body user-detail-info flex flex-col gap-4">
                                 <div class="flex justify-between">
                                     <div class="flex flex-col gap-4">
-                                        <p class="mb-3 font-bold text-[#a04d30] text-xs uppercase tracking-wider">Tarif Utama</p>
                                         <div class="flex flex-col gap-2">
                                             <div class="detail-item">
                                                 <p>Harga Air</p>
@@ -130,7 +129,6 @@
                                     </div>
 
                                     <div class="flex flex-col gap-4">
-                                        <p class="font-bold text-[#a04d30] text-xs uppercase tracking-wider">Biaya Tetap</p>
                                         <div class="flex flex-col gap-2">
                                             <div class="detail-item">
                                                 <p>Beban Listrik</p>
@@ -154,7 +152,7 @@
 
                                 @if(!empty($tariff->other_fees) && count($tariff->other_fees) > 4)
                                     <div class="border-t border-zinc-100">
-                                        <p class="mb-3 font-bold text-zinc-400 text-[12px] uppercase tracking-widest">Biaya Tambahan</p>
+                                        <p class="font-bold text-zinc-400 text-[12px] uppercase tracking-widest pt-2">Biaya Tambahan</p>
                                         <div class="grid grid-cols-1 gap-2">
                                             @foreach($tariff->other_fees as $key => $value)
                                                 @if(!in_array($key, ['electric_load', 'maintenance', 'admin_fee', 'stamp_fee', 'tax_percent']))
@@ -323,7 +321,7 @@
     <div class="popup" id="add-new-tariff">
         <div class="popup-overlay"></div>
 
-        <div class="popup-card popup-lg">
+        <div class="popup-card popup-md">
             <div class="popup-close-wrapper">
                 <button class="popup-close" data-close="add-new-tariff">
                     <i class="fa-solid fa-xmark"></i>

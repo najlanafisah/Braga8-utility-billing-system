@@ -1,7 +1,6 @@
 @extends('layouts.app') 
 
 @section('content') 
-
 <div class="min-h-screen"> 
     <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8"> 
         <div> 
@@ -25,44 +24,42 @@
         <div class="toolbar"> 
             <form method="GET" action="{{ route('audit_logs.index') }}" class="flex items-center gap-2 relative"> 
                 <div class="search-wrapper"> 
-                    <input type="text" name="search" placeholder="Search History.." value="{{ request('search') }}" > 
+                    <input type="text" name="search" placeholder="Cari Riwayat.." value="{{ request('search') }}" > 
                     <span> <i class="fa-solid fa-magnifying-glass"></i> </span> 
                 </div> 
-                <button type="button" class="dark-brown-button btn-small" id="filter-btn-trigger" > 
+                <button type="button" class="dark-brown-button btn-small" id="filter-btn-trigger"> 
                     <i class="fa-solid fa-filter"></i> 
                 </button> 
 
                 <div class="hidden absolute mt-2 z-50 w-[260px] bg-white border border-zinc-200 rounded-2xl shadow-xl p-4" id="filter-dropdown" style="top: 100%;"> 
                     <div class="flex flex-col gap-4"> 
                         <div> 
-                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Activity </label> 
+                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Aktivitas </label> 
                             <select name="action" class="text-field-input"> 
-                                <option value="">All Activity</option> 
-                                <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}> Created </option> 
-                                <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}> Updated </option> 
-                                <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}> Deleted </option> 
+                                <option value="">Semua Aktivitas</option> 
+                                <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}> Dibuat </option> 
+                                <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}> Diperbarui </option> 
+                                <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}> Dihapus </option> 
                             </select> 
                         </div> 
-
                         <div> 
-                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Category </label> 
-                            <select name="category" class="text-field-input">
-                                <option value="">All Category</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
+                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Kategori </label> 
+                            <select name="category" class="text-field-input"> 
+                                <option value="">Semua Kategori</option> 
+                                @foreach($categories as $category) 
+                                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}> 
                                         {{ ucfirst(str_replace('_', ' ', $category)) }} 
-                                    </option>
-                                @endforeach
-                            </select>
+                                    </option> 
+                                @endforeach 
+                            </select> 
                         </div> 
-                        <button type="submit" class="dark-brown-button w-full"> Apply Filter </button> 
+                        <button type="submit" class="dark-brown-button w-full"> Terapkan Filter </button> 
                     </div> 
                 </div> 
+            </form> 
 
-            </form>
-            
             <div class="green-btn btn-small"> 
-                <span> {{ $logs->total() }} Total Events </span> 
+                <span> Total {{ $logs->total() }} Aktivitas </span> 
             </div> 
         </div> 
 
@@ -70,19 +67,19 @@
             <div class="table-card"> 
                 <div class="table-card-header"> 
                     <div class="table-card-title"> 
-                        <span class="value">System Activity Logs</span> 
+                        <span class="value">Log Aktivitas Sistem</span> 
                     </div> 
-                    <div class="table-card-meta"> {{ $logs->count() }} Records </div> 
+                    <div class="table-card-meta"> {{ $logs->count() }} Baris </div> 
                 </div> 
                 <div class="overflow-x-auto"> 
                     <table class="table"> 
                         <thead> 
                             <tr> 
                                 <th>User</th> 
-                                <th>Activity</th> 
-                                <th>Category</th> 
+                                <th>Aktivitas</th> 
+                                <th>Kategori</th> 
                                 <th>Item</th> 
-                                <th>Activity Time</th> 
+                                <th>Waktu Aktivitas</th> 
                             </tr> 
                         </thead> 
                         <tbody> 
@@ -94,23 +91,32 @@
                                             <i class="fa-solid fa-user text-zinc-500"></i> 
                                         </div> 
                                         <div class="flex flex-col"> 
-                                            <span class="font-semibold"> {{ $log->user->name ?? 'System' }} </span> 
+                                            <span> {{ $log->user->name ?? 'Sistem' }} </span> 
                                         </div> 
                                     </div> 
                                 </td> 
                                 <td> 
-                                    @if($log->action == 'created') <div> Created </div> 
-                                    @elseif($log->action == 'deleted') <div> Deleted </div> 
-                                    @else <div> Updated </div> 
+                                    @if($log->action == 'created') 
+                                        <span class="blue-btn">Dibuat</span> 
+                                    @elseif($log->action == 'deleted') 
+                                        <span class="amber-btn">Dihapus</span> 
+                                    @else 
+                                        <span class="dark-green-btn">Diperbarui</span> 
                                     @endif 
                                 </td> 
-                                <td> <span> {{ $log->table_label }} </span> </td> 
-                                <td> <span> {{ $log->item_label }} </span> </td> 
-                                <td> <div> {{ $log->created_at->format('d M Y') }} • {{ $log->created_at->format('H:i') }} </div> </td> 
+                                <td> 
+                                    {{ $log->table_label }} 
+                                </td> 
+                                <td> 
+                                    {{ $log->item_label }} 
+                                </td> 
+                                <td>  
+                                    {{ $log->created_at->translatedFormat('d M Y') }} • {{ $log->created_at->format('H:i') }} 
+                                </td> 
                             </tr> 
                             @empty 
                             <tr> 
-                                <td colspan="7" class="text-center py-10 text-zinc-400"> No audit logs available. </td> 
+                                <td colspan="7" class="text-center py-10 text-zinc-400"> Tidak ada log audit yang tersedia. </td> 
                             </tr> 
                             @endforelse 
                         </tbody> 
@@ -131,24 +137,21 @@
             </div>
         </div>
     </div> 
-
 </div> 
 
 <script> 
     const filterBtn = document.getElementById('filter-btn-trigger'); 
     const filterDropdown = document.getElementById('filter-dropdown'); 
-
-    if (filterBtn && filterDropdown) {
+    if (filterBtn && filterDropdown) { 
         filterBtn.addEventListener('click', (e) => { 
-            e.stopPropagation();
+            e.stopPropagation(); 
             filterDropdown.classList.toggle('hidden'); 
         }); 
-
-        document.addEventListener('click', (e) => {
-            if (!filterDropdown.contains(e.target) && e.target !== filterBtn) {
-                filterDropdown.classList.add('hidden');
-            }
-        });
-    }
+        document.addEventListener('click', (e) => { 
+            if (!filterDropdown.contains(e.target) && e.target !== filterBtn) { 
+                filterDropdown.classList.add('hidden'); 
+            } 
+        }); 
+    } 
 </script> 
 @endsection

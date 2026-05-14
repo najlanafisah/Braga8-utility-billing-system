@@ -210,31 +210,33 @@
                                         @method('PUT')
                                         <div class="popup-body">
                                             <div class="flex flex-col gap-5">
-                                                <div class="text-field">
-                                                    <label class="text-field-label">Nama Tenant <span class="text-[#FA8327]">*</span></label>
-                                                    <input type="text" name="tenant_name" value="{{ $tenant->tenant_name }}" class="text-field-input" required>
-                                                </div>
-                                                <div class="grid grid-cols-2 gap-4">
+                                                <div>
                                                     <div class="text-field">
-                                                        <label class="text-field-label">PIC <span class="text-[#FA8327]">*</span></label>
-                                                        <input type="text" name="person_in_charge" value="{{ $tenant->person_in_charge }}" class="text-field-input" required>
+                                                        <label class="text-field-label">Nama Tenant <span class="text-[#FA8327]">*</span></label>
+                                                        <input type="text" name="tenant_name" value="{{ $tenant->tenant_name }}" class="text-field-input" required>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">PIC <span class="text-[#FA8327]">*</span></label>
+                                                            <input type="text" name="person_in_charge" value="{{ $tenant->person_in_charge }}" class="text-field-input" required>
+                                                        </div>
+                                                        <div class="text-field">
+                                                            <label class="text-field-label">Tipe Bisnis</label>
+                                                            <input type="text" name="business_type" value="{{ $tenant->business_type }}" class="text-field-input">
+                                                        </div>
                                                     </div>
                                                     <div class="text-field">
-                                                        <label class="text-field-label">Tipe Bisnis</label>
-                                                        <input type="text" name="business_type" value="{{ $tenant->business_type }}" class="text-field-input">
+                                                        <label class="text-field-label">No. Telepon</label>
+                                                        <input type="text" name="contact_phone" value="{{ $tenant->contact_phone }}" class="text-field-input">
                                                     </div>
-                                                </div>
-                                                <div class="text-field">
-                                                    <label class="text-field-label">No. Telepon</label>
-                                                    <input type="text" name="contact_phone" value="{{ $tenant->contact_phone }}" class="text-field-input">
-                                                </div>
-                                                <div class="text-field">
-                                                    <label class="text-field-label">Alamat Email</label>
-                                                    <input type="email" name="contact_email" value="{{ $tenant->contact_email }}" class="text-field-input">
-                                                </div>
-                                                <div class="text-field">
-                                                    <label class="text-field-label">Nama Perusahaan</label>
-                                                    <input type="text" name="company_name" value="{{ $tenant->company_name }}" class="text-field-input">
+                                                    <div class="text-field">
+                                                        <label class="text-field-label">Alamat Email</label>
+                                                        <input type="email" name="contact_email" value="{{ $tenant->contact_email }}" class="text-field-input">
+                                                    </div>
+                                                    <div class="text-field">
+                                                        <label class="text-field-label">Nama Perusahaan</label>
+                                                        <input type="text" name="company_name" value="{{ $tenant->company_name }}" class="text-field-input">
+                                                    </div>
                                                 </div>
                                                 <button type="submit" class="light-brown-btn">Simpan Perubahan</button>
                                             </div>

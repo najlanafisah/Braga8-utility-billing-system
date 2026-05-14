@@ -12,7 +12,8 @@ class UsageReportController extends Controller
 
 public function index()
 {
-    $reports = UsageReport::orderBy('month_year', 'desc')->get();
+    $reports = UsageReport::orderBy('month_year', 'desc')->paginate(10);
+    
     return view('reports.index', compact('reports'));
 }
 
