@@ -21,7 +21,10 @@ use App\Http\Controllers\{
 };
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::middleware('guest')->group(function () {

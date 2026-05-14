@@ -1,87 +1,171 @@
-@if ($errors->any())
-    <div style="color:red;">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Braga 8</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #141315; 
+        }
+
+        .auth-container {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            height: 700px;
+            gap: 24px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(145deg, #E05A00 0%, #8C2A00 100%);
+            border-radius: 40px;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-right {
+            flex: 1.8;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .visual-top {
+                flex: 1.6;
+                background-color: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                position: relative;
+                overflow: hidden;
+        }
+
+        .visual-top img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            margin-right: -15%;
+            transform: rotate(-5deg);
+        }
+
+        .visual-bottom {
+            flex: 1;
+            background-color: #1a1a1c;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-bottom img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            opacity: 0.4;
+            filter: contrast(120%);
+        }
+
+        .auth-left .text-field-input {
+            background: #E5D0C9;
+            border: none;
+            color: #131316;
+            margin-top: 6px;
+        }
+
+        .auth-left .text-field-label {
+            color: white;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .auth-right { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-left">
+            <div style="margin-bottom: 20px;">
+                <img src="{{ asset('logo.svg') }}" alt="Braga 8" style="height: 80px;">
+            </div>
+
+            <h1 class="title-text" style="font-size: 34px; margin-bottom: 30px; color: white;">Sign Up to Continue</h1>
+
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
+                
+                <div class="text-field">
+                    <label class="text-field-label">Full Name</label>
+                    <input type="text" name="name" class="text-field-input" placeholder="Your Name" required autofocus>
+                </div>
+
+                <div class="text-field">
+                    <label class="text-field-label">Email</label>
+                    <input type="email" name="email" class="text-field-input" placeholder="name@gmail.com" required>
+                </div>
+
+                <div class="text-field">
+                    <label class="text-field-label">Password</label>
+                    
+                    <div class="password-wrapper">
+                        <input type="password" 
+                            name="password" 
+                            class="text-field-input password-input" 
+                            placeholder="••••••••" 
+                            required>
+                            
+                        <button type="button" class="toggle-password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                </div>
+
+                <button type="submit" class="btn-braga-glass">
+                    Register
+                </button>
+
+                <div style="margin-top: 25px; text-align: center;">
+                    <a href="{{ route('login') }}" class="subtitle-text" style="color: white; font-size: 14px; text-decoration: none;">
+                        Already have an account? <span style="text-decoration: underline; font-weight: bold;">Sign In</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="auth-right">
+            <div class="visual-top">
+                <img src="{{ asset('mockup-img.png') }}" alt="Mockup">
+            </div>
+            
+            <div class="visual-bottom">
+                <img src="{{ asset('texture-2.png') }}" alt="Texture">
+            </div>
+        </div>
     </div>
-@endif
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
 
-        <div>
-    <x-input-label for="name" :value="__('Name')" />
-    <x-text-input id="name" 
-        class="block mt-1 w-full" 
-        type="text" 
-        name="name" 
-        :value="old('name')" 
-        required autofocus />
-    <x-input-error :messages="$errors->get('name')" class="mt-2" />
-</div>
 
-      <div class="mt-4">
-    <x-input-label for="username" :value="__('Username')" />
-    <x-text-input id="username" 
-        class="block mt-1 w-full" 
-        type="text" 
-        name="username" 
-        :value="old('username')" 
-        required />
-    <x-input-error :messages="$errors->get('username')" class="mt-2" />
-</div>
-
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-<!-- Phone Number -->
-<div class="mt-4">
-    <x-input-label for="phone_number" :value="__('Phone Number')" />
-    <x-text-input id="phone_number" 
-        class="block mt-1 w-full" 
-        type="text" 
-        name="phone_number" 
-        :value="old('phone_number')" 
-        required />
-    <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
-</div>
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    @stack('scripts')
+</body>
+</html>
