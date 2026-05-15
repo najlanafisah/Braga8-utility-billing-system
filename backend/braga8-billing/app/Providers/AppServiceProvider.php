@@ -28,7 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-       Relation::enforceMorphMap([
+    Relation::enforceMorphMap([
+        'units'          => \App\Models\Unit::class,
         'tenants'        => Tenant::class,
         'meter_readings' => MeterReading::class,
         'invoices'       => Invoice::class,
@@ -41,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
         'payments'       => Payment::class,
         'tariffs'        => Tariff::class, 
     ]);
+
+    
 
         View::composer('*', function ($view) {
             if (Auth::check()) {

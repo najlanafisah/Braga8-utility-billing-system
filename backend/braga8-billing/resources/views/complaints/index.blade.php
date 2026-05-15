@@ -66,159 +66,162 @@
                     <span><i class="fa-solid fa-magnifying-glass"></i></span> 
                 </div> 
             </form> 
-            <div class="toolbar-action"> 
-                <button class="dark-brown-button btn-small"> 
-                    <span><i class="fa-solid fa-filter"></i></span> 
-                    <span>Terbaru ke Terlama</span> 
-                </button> 
-            </div> 
+            <div class="toolbar-action">
+                @if(request('sort') === 'oldest')
+                    <a href="{{ route('complaints.index', array_merge(request()->query(), ['sort' => 'latest'])) }}" 
+                    class="dark-brown-button btn-small flex items-center gap-2 text-decoration-none">
+                        <i class="fa-solid fa-sort-amount-up"></i>
+                        <span>Terlama ke Terbaru</span>
+                    </a>
+                @else
+                    <a href="{{ route('complaints.index', array_merge(request()->query(), ['sort' => 'oldest'])) }}" 
+                    class="dark-brown-button btn-small flex items-center gap-2 text-decoration-none">
+                        <i class="fa-solid fa-sort-amount-down"></i>
+                        <span>Terbaru ke Terlama</span>
+                    </a>
+                @endif
+            </div>
         </div> 
 
-        <div class="table-wrapper"> 
-            <div class="table-card"> 
-                <div class="table-card-header"> 
-                    <div class="table-card-title"> 
-                        <span class="value">Daftar Laporan Keluhan</span> 
-                    </div> 
-                </div> 
-                <table class="table"> 
-                    <thead> 
-                        <tr> 
-                            <th>No</th> 
-                            <th>Pelapor</th> 
-                            <th>Peran</th> 
-                            <th>Tanggal</th> 
-                            <th>Status</th> 
-                            <th class="text-center">Aksi</th> 
-                        </tr> 
-                    </thead> 
-                    <tbody> 
-                        @forelse($complaints as $index => $complaint) 
-                            {{-- MODAL DETAIL KELUHAN --}}
-                            <div class="popup" id="view-complaint-{{ $complaint->id }}"> 
-                                <div class="popup-overlay"></div> 
-                                <div class="popup-card popup-lg text-left"> 
-                                    <div class="popup-close-wrapper"> 
-                                        <button class="popup-close" data-close="view-complaint-{{ $complaint->id }}"> 
-                                            <i class="fa-solid fa-xmark"></i> 
-                                        </button> 
-                                    </div> 
-                                    <div class="popup-header">{{ $complaint->subject ?? 'Keluhan Umum' }}</div> 
-                                    <div class="popup-body flex flex-col gap-6 pt-2"> 
-                                        <div class="flex flex-col lg:flex-row gap-8"> 
-                                            <div class="flex-1 flex flex-col gap-6"> 
-                                                <div class="grid grid-cols-2 gap-y-5 gap-x-4"> 
-                                                    <div class="detail-item"> 
-                                                        <p>Pelapor</p> 
-                                                        <p>{{ $complaint->reported_by }}</p> 
-                                                    </div> 
-                                                    <div class="detail-item"> 
-                                                        <p>Peran</p> 
-                                                        <p>{{ $complaint->role == 'tenant' ? 'Penyewa' : ucfirst($complaint->role) }}</p> 
-                                                    </div> 
-                                                    <div class="detail-item"> 
-                                                        <p>Tanggal</p> 
-                                                        <p>{{ $complaint->report_date->translatedFormat('d F Y') }}</p> 
-                                                    </div> 
-                                                    <div class="detail-item"> 
-                                                        <p>Status</p> 
-                                                        <div> 
-                                                            @if($complaint->status === 'resolved') 
-                                                                <span class="dark-green-btn">Selesai</span> 
-                                                            @else 
-                                                                <span class="red-btn">Belum Selesai</span> 
-                                                            @endif 
-                                                        </div> 
-                                                    </div> 
-                                                </div> 
-                                                <div class="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm"> 
-                                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Detail Keluhan</label> 
-                                                    <p class="text-zinc-300 text-sm leading-relaxed italic font-light"> 
-                                                        "{{ $complaint->description }}" 
-                                                    </p> 
-                                                </div> 
-                                            </div> 
-                                            @if($complaint->image) 
-                                                <div class="w-full lg:w-[220px] flex flex-col gap-2"> 
-                                                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center lg:text-left">Bukti Foto</label> 
-                                                    <div class="relative group aspect-square rounded-2xl overflow-hidden border border-white/10 bg-black/20 backdrop-blur-md"> 
-                                                        <img src="{{ asset('storage/' . $complaint->image) }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onclick="window.open(this.src, '_blank')"> 
-                                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none"> 
-                                                            <i class="fa-solid fa-magnifying-glass-plus text-white text-xl cursor-zoom-in"></i> 
-                                                        </div> 
-                                                    </div> 
-                                                </div> 
-                                            @endif 
-                                        </div> 
+        <div class="table-wrapper">
+            <div class="table-card">
+                @if($complaints->count() > 0)
+                    <div class="table-card-header">
+                        <div class="table-card-title">
+                            <span class="label">Total Keluhan:</span>
+                            <span class="value">{{ $complaints->total() }}</span>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Pelapor</th>
+                                <th>Peran</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($complaints as $index => $complaint)
+                                <tr>
+                                    <td>{{ $complaints->firstItem() + $index }}</td>
+                                    <td class="font-bold text-zinc-800">{{ $complaint->reported_by }}</td>
+                                    <td>{{ $complaint->role == 'tenant' ? 'Penyewa' : ucfirst($complaint->role) }}</td>
+                                    <td>{{ $complaint->report_date->translatedFormat('d M Y') }}</td>
+                                    <td>
+                                        @if($complaint->status === 'resolved')
+                                            <span class="dark-green-btn text-[10px]">Selesai</span>
+                                        @else
+                                            <span class="amber-btn text-[10px]">Diproses</span>
+                                        @endif
+                                    </td>
+                                    <td class="actions">
+                                        <div class="flex justify-center gap-2">
+                                            <button class="light-green-btn-action" data-popup="view-complaint-{{ $complaint->id }}">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Buka</span>
+                                            </button>
+                                            <form id="delete-form-{{ $complaint->id }}" action="{{ route('complaints.destroy', $complaint->id) }}" method="POST" class="m-0 p-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="dark-brown-btn-action border-0" data-popup="delete-complaint" data-id="{{ $complaint->id }}">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
 
-                                        <div class="border-t border-white/5 pt-6"> 
-                                            @if($complaint->status !== 'resolved') 
-                                                <form action="{{ route('complaints.action', $complaint->id) }}" method="POST" class="flex flex-col gap-4"> 
-                                                    @csrf 
-                                                    <div class="flex flex-col gap-6"> 
-                                                        <div class="flex flex-col gap-2 group"> 
-                                                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Input Resolusi</label> 
-                                                            <textarea name="solution" class="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#FA8327]/50 focus:bg-white/[0.08] transition-all min-h-[100px] resize-none" placeholder="Tulis langkah penyelesaian di sini..." required>{{ old('solution', $complaint->solution) }}</textarea> 
-                                                        </div> 
-                                                        <button type="submit" class="dark-brown-button w-full"> 
-                                                            Simpan Solusi 
-                                                        </button> 
-                                                    </div> 
-                                                </form> 
-                                            @else 
-                                                <div class="bg-zinc-500/5 border border-zinc-500/20 p-5 rounded-2xl"> 
-                                                    <div class="flex justify-between items-center mb-2"> 
-                                                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Catatan Penyelesaian</label> 
-                                                        <span class="text-[9px] text-zinc-500">Diperbarui {{ $complaint->updated_at->diffForHumans() }}</span> 
-                                                    </div> 
-                                                    <p class="text-zinc-300 text-sm font-light leading-relaxed"> 
-                                                        {{ $complaint->solution ?? 'Keluhan ini telah diselesaikan.' }} 
-                                                    </p> 
-                                                </div> 
-                                            @endif 
-                                        </div> 
-                                    </div> 
-                                </div> 
-                            </div> 
+                                <div class="popup" id="view-complaint-{{ $complaint->id }}">
+                                    <div class="popup-overlay"></div>
+                                    <div class="popup-card popup-lg text-left">
+                                        <div class="popup-close-wrapper">
+                                            <button class="popup-close" data-close="view-complaint-{{ $complaint->id }}">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                        <div class="popup-header">{{ $complaint->subject ?? 'Keluhan Umum' }}</div>
+                                        <div class="popup-body flex flex-col gap-6 pt-2">
+                                            {{-- Flex Row buat Konten & Foto --}}
+                                            <div class="flex flex-col lg:flex-row gap-8">
+                                                <div class="flex-1 flex flex-col gap-4">
+                                                    <div class="grid grid-cols-2 gap-y-5 gap-x-4">
+                                                        <div class="detail-item">
+                                                            <p class="text-xs text-zinc-500">Pelapor</p>
+                                                            <p class="font-bold text-zinc-200">{{ $complaint->reported_by }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p class="text-xs text-zinc-500">Peran</p>
+                                                            <p class="text-zinc-300">{{ $complaint->role == 'tenant' ? 'Penyewa' : ucfirst($complaint->role) }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p class="text-xs text-zinc-500">Tanggal</p>
+                                                            <p class="text-zinc-300">{{ $complaint->report_date->translatedFormat('d F Y') }}</p>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <p class="text-xs text-zinc-500">Status</p>
+                                                            <div>
+                                                                @if($complaint->status === 'resolved')
+                                                                    <span class="dark-green-btn">Selesai</span>
+                                                                @else
+                                                                    <span class="red-btn">Belum Selesai</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="bg-white/5 border border-zinc-700 p-5 rounded-2xl">
+                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Detail Keluhan</label>
+                                                        <p class="text-zinc-300 text-sm leading-relaxed">"{{ $complaint->description }}"</p>
+                                                    </div>
+                                                </div>
 
-                            <tr> 
-                                <td>{{ $complaints->firstItem() + $index }}</td> 
-                                <td class="font-bold text-zinc-800">{{ $complaint->reported_by }}</td> 
-                                <td>{{ $complaint->role == 'tenant' ? 'Penyewa' : ucfirst($complaint->role) }}</td> 
-                                <td>{{ $complaint->report_date->translatedFormat('d M Y') }}</td> 
-                                <td> 
-                                    @if($complaint->status === 'resolved') 
-                                        <span class="dark-green-btn text-[10px]">Selesai</span> 
-                                    @else 
-                                        <span class="amber-btn text-[10px]">Diproses</span> 
-                                    @endif 
-                                </td> 
-                                <td class="actions"> 
-                                    <div class="flex justify-center gap-2"> 
-                                        <button class="light-green-btn-action" data-popup="view-complaint-{{ $complaint->id }}"> 
-                                            <i class="fa-solid fa-eye"></i> 
-                                            <span class="">Buka</span> 
-                                        </button> 
-                                        <form id="delete-form-{{ $complaint->id }}" action="{{ route('complaints.destroy', $complaint->id) }}" method="POST" class="m-0 p-0"> 
-                                            @csrf 
-                                            @method('DELETE') 
-                                            <button type="button" class="dark-brown-btn-action border-0" data-popup="delete-complaint" data-id="{{ $complaint->id }}"> 
-                                                <i class="fa-solid fa-trash "></i> 
-                                                <span class="">Hapus</span> 
-                                            </button> 
-                                        </form> 
-                                    </div> 
-                                </td> 
-                            </tr> 
-                        @empty 
-                            <tr> 
-                                <td colspan="6" class="text-center py-10 text-zinc-400 font-medium">Tidak ada keluhan yang ditemukan.</td> 
-                            </tr> 
-                        @endforelse 
-                    </tbody> 
-                </table> 
-            </div> 
-        </div> 
+                                                @if($complaint->image)
+                                                    <div class="w-full lg:w-[220px] flex flex-col gap-2">
+                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Bukti Foto</label>
+                                                        <div class="aspect-square rounded-2xl overflow-hidden border border-zinc-700 bg-zinc-800">
+                                                            <img src="{{ asset('storage/' . $complaint->image) }}" class="w-full h-full object-cover cursor-zoom-in" onclick="window.open(this.src, '_blank')">
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="border-t border-zinc-800 pt-4">
+                                                @if($complaint->status !== 'resolved')
+                                                    <form action="{{ route('complaints.action', $complaint->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="flex flex-col gap-4 w-full m-0 p-0">
+                                                            <div class="flex flex-col gap-2">
+                                                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Input Resolusi</label>
+                                                                <textarea name="solution" class="w-full bg-white/5 border border-zinc-700 rounded-2xl px-5 py-4 text-zinc-200 text-sm focus:outline-none focus:border-[#FA8327]/50 transition-all min-h-[120px] resize-none" placeholder="Tulis langkah penyelesaian..." required>{{ old('solution', $complaint->solution) }}</textarea>
+                                                            </div>
+                                                            <button type="submit" class="dark-brown-button w-full py-3">
+                                                                Simpan Solusi
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                @else
+                                                    <div class="bg-white/5 border border-zinc-700 p-5 rounded-2xl">
+                                                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Catatan Penyelesaian</label>
+                                                        <p class="text-zinc-300 text-sm leading-relaxed">{{ $complaint->solution }}</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="table-card p-10 text-center text-zinc-400 italic">
+                        Belum ada keluhan
+                    </div>
+                @endif
+            </div>
+        </div>
 
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 px-2"> 
             <div class="text-sm text-zinc-500"> 

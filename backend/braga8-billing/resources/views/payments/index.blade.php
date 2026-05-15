@@ -63,10 +63,10 @@
 
     <div class="flex flex-col gap-6"> 
         <div class="toolbar"> 
-            <div class="search-wrapper"> 
-                <input type="text" placeholder="Cari Pembayaran.."> 
-                <span><i class="fa-solid fa-magnifying-glass"></i></span> 
-            </div> 
+            <form method="GET" action="{{ route('payments.index') }}" class="search-wrapper"> 
+                <input type="text" name="search" placeholder="Cari Pembayaran.." value="{{ request('search') }}"> 
+                <span><i class="fa-solid fa-magnifying-glass"></i></span>
+            </form>
             <div class="toolbar-action"> 
                 <button type="button" class="light-brown-btn btn-small" data-popup="add-payment-modal"> 
                     <i class="fa-solid fa-plus"></i> <span>Tambah Pembayaran</span> 
@@ -175,12 +175,17 @@
             </div> 
             @empty
             <div class="table-card p-10 text-center text-zinc-400 italic">
-                Belum ada log pembayaran.
+                Belum ada riwayat pembayaran.
             </div>
-        @endforelse
+            @endforelse
 
-        <div class="mt-6 pagination-wrapper">
-            {{ $payments->links() }}
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 px-2">
+            <div class="text-sm text-zinc-500">
+                Menampilkan <span class="text-white">{{ $payments->firstItem() }}</span> sampai <span class="text-white">{{ $payments->lastItem() }}</span> dari <span class="text-white">{{ $payments->total() }}</span> hasil
+            </div>
+            <div class="braga-pagination">
+                {{ $payments->links() }}
+            </div>
         </div>
     </div>
 
@@ -294,7 +299,7 @@
                     <div class="flex flex-col gap-6"> 
                         <div>
                             <div class="text-field"> 
-                                <label class="text-field-label text-left">Pilih Invoice</label> 
+                                <label class="text-field-label text-left">Pilih Invoice <span class="text-[#FA8327]">*</span></label> 
                                 <div class="custom-dropdown"> 
                                     <div class="dropdown-selected"> 
                                         <span class="placeholder">-- Pilih Nomor Invoice --</span> 
@@ -314,18 +319,18 @@
                             </div> 
                             <div class="grid grid-cols-2 gap-4"> 
                                 <div class="text-field"> 
-                                    <label class="text-field-label text-left">Jumlah Bayar</label> 
+                                    <label class="text-field-label text-left">Jumlah Bayar <span class="text-[#FA8327]">*</span></label> 
                                     <input type="number" name="amount_paid" class="text-field-input" placeholder="0" required step="any"> 
                                     <p class="text-[9px] text-zinc-500 mt-1 italic text-left">Pilih invoice untuk melihat total.</p> 
                                 </div> 
                                 <div class="text-field"> 
-                                    <label class="text-field-label text-left">Tanggal Bayar</label> 
+                                    <label class="text-field-label text-left">Tanggal Bayar <span class="text-[#FA8327]">*</span></label> 
                                     <input type="date" name="payment_date" class="text-field-input" value="{{ date('Y-m-d') }}" required> 
                                 </div> 
                             </div> 
                             <div class="grid grid-cols-2 gap-4"> 
                                 <div class="text-field"> 
-                                    <label class="text-field-label text-left">Metode Pembayaran</label> 
+                                    <label class="text-field-label text-left">Metode Pembayaran <span class="text-[#FA8327]">*</span></label> 
                                     <div class="custom-dropdown"> 
                                         <div class="dropdown-selected"> <span class="placeholder">Bank Transfer</span> <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> </div> 
                                         <div class="dropdown-options"> <div class="option">Bank Transfer</div> <div class="option">Cash</div> <div class="option">E-Wallet</div> </div> 
@@ -333,7 +338,7 @@
                                     </div> 
                                 </div> 
                                 <div class="text-field"> 
-                                    <label class="text-field-label text-left">Status Awal</label> 
+                                    <label class="text-field-label text-left">Status Awal <span class="text-[#FA8327]">*</span></label> 
                                     <div class="custom-dropdown"> 
                                         <div class="dropdown-selected"> <span class="placeholder">Pending</span> <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> </div> 
                                         <div class="dropdown-options"> <div class="option" data-value="pending">Pending</div> <div class="option" data-value="rejected">Rejected</div> <div class="option" data-value="verified">Verified</div> </div> 

@@ -273,7 +273,7 @@
                                 <label class="text-field-label text-left">Password</label> 
                                 <div class="relative w-full"> 
                                     <input type="password" name="password" class="text-field-input pr-12 password-input" placeholder="••••••••" required> 
-                                    <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#FA8327]"> 
+                                    <button type="button" class="toggle-password text-zinc-500 hover:text-[#FA8327]"> 
                                         <i class="fa-solid fa-eye"></i> 
                                     </button> 
                                 </div> 

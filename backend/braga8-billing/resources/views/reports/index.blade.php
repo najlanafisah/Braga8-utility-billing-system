@@ -22,12 +22,12 @@
 
     <div class="flex flex-col gap-6"> 
         <div class="toolbar flex items-end justify-between"> 
-            <div class="flex flex-col w-64"> 
-                <div class="search-wrapper !mb-0 w-full"> 
-                    <input type="text" placeholder="Cari laporan (Contoh: April 2026)..." id="tableSearch"> 
-                    <span><i class="fa-solid fa-magnifying-glass"></i></span> 
-                </div> 
-            </div> 
+        <div class="flex flex-col"> 
+                <form method="GET" action="{{ route('reports.index') }}" class="search-wrapper"> 
+                    <input type="text" name="search" placeholder="Cari (Contoh: 2026-04)..." id="tableSearch" value="{{ request('search') }}"> 
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+                </form> 
+            </div>
             <div class="toolbar-action"> 
                 <button type="button" class="light-brown-btn btn-small" data-popup="generate-report-modal"> 
                     <i class="fa-solid fa-plus mr-2"></i> <span>Buat Laporan Baru</span> 
@@ -65,56 +65,56 @@
             </div> 
         @endif 
 
-        <div class="table-wrapper"> 
-            <div class="table-card mb-8"> 
-                <div class="table-card-header"> 
-                    <div class="table-card-title"> 
-                        <span class="label">Total Laporan:</span> 
-                        <span class="value">{{ $reports->count() }}</span> 
-                    </div> 
-                </div> 
-                <table class="table"> 
-                    <thead> 
-                        <tr> 
-                            <th>Bulan / Tahun</th> 
-                            <th>Unit Ditagih</th> 
-                            <th>Listrik (kWh)</th> 
-                            <th>Air (m³)</th> 
-                            <th>Total Pendapatan</th> 
-                            <th class="text-center">Aksi</th> 
-                        </tr> 
-                    </thead> 
-                    <tbody> 
-                        @forelse($reports as $report) 
-                            <tr> 
-                                <td class="font-bold text-zinc-800"> 
-                                    {{ \Carbon\Carbon::parse($report->month_year)->translatedFormat('F Y') }} 
-                                </td> 
-                                <td><span class="blue-btn pointer-events-none">{{ $report->total_units_billed }} Unit</span></td> 
-                                <td class="text-zinc-600 font-medium">{{ number_format($report->total_electric_usage) }}</td> 
-                                <td class="text-zinc-600 font-medium">{{ number_format($report->total_water_usage) }}</td> 
-                                <td class="font-bold text-[#602316]"> 
-                                    Rp {{ number_format($report->total_revenue_expected, 0, ',', '.') }} 
-                                </td> 
-                                <td class="actions"> 
-                                    <div class="flex justify-center"> 
-                                        <a href="{{ route('reports.pdf', $report->id) }}" class="light-green-btn-action px-4 py-2 flex items-center gap-2 relative z-[999]" download> 
-                                            <i class="fa-solid fa-file-pdf"></i> <span>Ekspor PDF</span> 
-                                        </a> 
-                                    </div> 
-                                </td> 
-                            </tr> 
-                        @empty 
-                            <tr> 
-                                <td colspan="6" class="p-10 text-center text-zinc-400 italic"> 
-                                    Belum ada laporan. Silakan buat laporan baru untuk melihat data. 
-                                </td> 
-                            </tr> 
-                        @endforelse 
-                    </tbody> 
-                </table> 
-            </div> 
-        </div> 
+        <div class="table-wrapper">
+            @if($reports->count() > 0)
+                <div class="table-card mb-8">
+                    <div class="table-card-header">
+                        <div class="table-card-title">
+                            <span class="label">Total Laporan:</span>
+                            <span class="value">{{ $reports->total() }}</span>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Bulan / Tahun</th>
+                                <th>Unit Ditagih</th>
+                                <th>Listrik (kWh)</th>
+                                <th>Air (m³)</th>
+                                <th>Total Pendapatan</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($reports as $report)
+                            <tr>
+                                <td class="font-bold text-zinc-800">
+                                    {{ \Carbon\Carbon::parse($report->month_year)->translatedFormat('F Y') }}
+                                </td>
+                                <td><span class="blue-btn pointer-events-none">{{ $report->total_units_billed }} Unit</span></td>
+                                <td class="text-zinc-600 font-medium">{{ number_format($report->total_electric_usage) }}</td>
+                                <td class="text-zinc-600 font-medium">{{ number_format($report->total_water_usage) }}</td>
+                                <td class="font-bold text-[#602316]">
+                                    Rp {{ number_format($report->total_revenue_expected, 0, ',', '.') }}
+                                </td>
+                                <td class="actions">
+                                    <div class="flex justify-center">
+                                        <a href="{{ route('reports.pdf', $report->id) }}" class="light-green-btn-action px-4 py-2 flex items-center gap-2 relative z-[999]" download>
+                                            <i class="fa-solid fa-file-pdf"></i> <span>Ekspor PDF</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="table-card p-10 text-center text-zinc-400 italic">
+                    Belum ada riwayat laporan penggunaan.
+                </div>
+            @endif
+        </div>
 
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
             <div class="text-sm text-zinc-500">
@@ -145,7 +145,7 @@
                 <div class="flex flex-col gap-6"> 
                     <div> 
                         <div class="text-field"> 
-                            <label class="text-field-label text-left text-zinc-700">Pilih Periode Laporan</label> 
+                            <label class="text-field-label text-left text-zinc-700">Pilih Periode Laporan <span class="text-[#FA8327]">*</span></label> 
                             <input type="month" name="month" required class="text-field-input [color-scheme:light] cursor-pointer text-zinc-800 border-zinc-300"> 
                         </div> 
                         <p class="text-xs text-zinc-400 italic"> 

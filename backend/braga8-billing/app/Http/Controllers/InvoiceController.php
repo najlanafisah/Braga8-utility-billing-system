@@ -15,10 +15,25 @@ use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
-    public function index() {
-        $invoices = Invoice::with(['tenant', 'unit'])->latest()->paginate(10);
+    public function index(Request $request) {
+        $query = Invoice::with(['tenant', 'unit']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                ->orWhereHas('tenant', function($q) use ($search) {
+                    $q->where('tenant_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('unit', function($q) use ($search) {
+                    $q->where('unit_number', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $invoices = $query->latest()->paginate(10)->appends($request->all());
+        
         $tenants = Tenant::orderBy('tenant_name')->get();
-        // Penting: Load meters dan tariff agar dropdown/filter lancar
         $units = Unit::with('meters.tariff')->get(); 
 
         return view('invoices.index', compact('invoices', 'tenants', 'units'));

@@ -5,7 +5,7 @@
     <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8"> 
         <div> 
             <h1 class="title-text">Log Audit</h1> 
-            <p class="subtitle-text">Braga8 Utility Billing Management</p> 
+            <p class="subtitle-text">Manajemen Riwayat Aktivitas Braga8</p> 
         </div> 
         <div class="header-user"> 
             <div class="icon-wrapper" data-popup="notif-popup"> 
@@ -21,115 +21,133 @@
     </div> 
 
     <div class="flex flex-col gap-6"> 
-        <div class="toolbar"> 
-            <form method="GET" action="{{ route('audit_logs.index') }}" class="flex items-center gap-2 relative"> 
-                <div class="search-wrapper"> 
-                    <input type="text" name="search" placeholder="Cari Riwayat.." value="{{ request('search') }}" > 
-                    <span> <i class="fa-solid fa-magnifying-glass"></i> </span> 
-                </div> 
-                <button type="button" class="dark-brown-button btn-small" id="filter-btn-trigger"> 
-                    <i class="fa-solid fa-filter"></i> 
-                </button> 
+        <div class="toolbar">
+            <form method="GET" action="{{ route('audit_logs.index') }}" class="flex items-center gap-2 relative w-full md:w-auto">
+                <div class="search-wrapper">
+                    <input type="text" name="search" placeholder="Cari aktivitas.." value="{{ request('search') }}">
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
 
-                <div class="hidden absolute mt-2 z-50 w-[260px] bg-white border border-zinc-200 rounded-2xl shadow-xl p-4" id="filter-dropdown" style="top: 100%;"> 
-                    <div class="flex flex-col gap-4"> 
-                        <div> 
-                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Aktivitas </label> 
-                            <select name="action" class="text-field-input"> 
-                                <option value="">Semua Aktivitas</option> 
-                                <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}> Dibuat </option> 
-                                <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}> Diperbarui </option> 
-                                <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}> Dihapus </option> 
-                            </select> 
-                        </div> 
-                        <div> 
-                            <label class="text-xs font-semibold text-zinc-500 mb-1 block"> Kategori </label> 
-                            <select name="category" class="text-field-input"> 
-                                <option value="">Semua Kategori</option> 
-                                @foreach($categories as $category) 
-                                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}> 
-                                        {{ ucfirst(str_replace('_', ' ', $category)) }} 
-                                    </option> 
-                                @endforeach 
-                            </select> 
-                        </div> 
-                        <button type="submit" class="dark-brown-button w-full"> Terapkan Filter </button> 
-                    </div> 
-                </div> 
-            </form> 
+                <button type="button" class="dark-brown-button btn-small {{ request()->filled('category') || request()->filled('action') ? 'ring-2 ring-amber-500' : '' }}" id="filter-btn-trigger">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
 
-            <div class="green-btn btn-small"> 
-                <span> Total {{ $logs->total() }} Aktivitas </span> 
-            </div> 
-        </div> 
+                <div class="hidden absolute mt-2 z-50 w-[280px] filter-dropdown-container p-5" id="filter-dropdown" style="top: 100%; right: 0;">
+                    <div class="flex flex-col gap-5">
+                        
+                        <div class="flex flex-col gap-3">
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Jenis Aktivitas</label>
+                                <div class="custom-dropdown w-full">
+                                    <div class="filter-select-box flex justify-between items-center cursor-pointer">
+                                        <span>
+                                            @if(request('action') == 'created') Dibuat 
+                                            @elseif(request('action') == 'updated') Diperbarui 
+                                            @elseif(request('action') == 'deleted') Dihapus 
+                                            @else Semua Aktivitas @endif
+                                        </span>
+                                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                    </div>
+                                    <div class="dropdown-options filter-options-list shadow-xl">
+                                        <div class="option filter-option-item" data-value="">Semua Aktivitas</div>
+                                        <div class="option filter-option-item" data-value="created">Dibuat</div>
+                                        <div class="option filter-option-item" data-value="updated">Diperbarui</div>
+                                        <div class="option filter-option-item" data-value="deleted">Dihapus</div>
+                                    </div>
+                                    <input type="hidden" name="action" value="{{ request('action') }}">
+                                </div>
+                            </div>
 
-        <div class="table-wrapper"> 
-            <div class="table-card"> 
-                <div class="table-card-header"> 
-                    <div class="table-card-title"> 
-                        <span class="value">Log Aktivitas Sistem</span> 
-                    </div> 
-                    <div class="table-card-meta"> {{ $logs->count() }} Baris </div> 
-                </div> 
-                <div class="overflow-x-auto"> 
-                    <table class="table"> 
-                        <thead> 
-                            <tr> 
-                                <th>User</th> 
-                                <th>Aktivitas</th> 
-                                <th>Kategori</th> 
-                                <th>Item</th> 
-                                <th>Waktu Aktivitas</th> 
-                            </tr> 
-                        </thead> 
-                        <tbody> 
-                            @forelse($logs as $index => $log) 
-                            <tr> 
-                                <td> 
-                                    <div class="flex items-center gap-3"> 
-                                        <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center"> 
-                                            <i class="fa-solid fa-user text-zinc-500"></i> 
-                                        </div> 
-                                        <div class="flex flex-col"> 
-                                            <span> {{ $log->user->name ?? 'Sistem' }} </span> 
-                                        </div> 
-                                    </div> 
-                                </td> 
-                                <td> 
-                                    @if($log->action == 'created') 
-                                        <span class="blue-btn">Dibuat</span> 
-                                    @elseif($log->action == 'deleted') 
-                                        <span class="amber-btn">Dihapus</span> 
-                                    @else 
-                                        <span class="dark-green-btn">Diperbarui</span> 
-                                    @endif 
-                                </td> 
-                                <td> 
-                                    {{ $log->table_label }} 
-                                </td> 
-                                <td> 
-                                    {{ $log->item_label }} 
-                                </td> 
-                                <td>  
-                                    {{ $log->created_at->translatedFormat('d M Y') }} • {{ $log->created_at->format('H:i') }} 
-                                </td> 
-                            </tr> 
-                            @empty 
-                            <tr> 
-                                <td colspan="7" class="text-center py-10 text-zinc-400"> Tidak ada log audit yang tersedia. </td> 
-                            </tr> 
-                            @endforelse 
-                        </tbody> 
-                    </table> 
-                </div> 
-            </div> 
-        </div> 
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Kategori Data</label>
+                                <div class="custom-dropdown w-full">
+                                    <div class="filter-select-box flex justify-between items-center cursor-pointer">
+                                        <span>{{ request('category') ? ucfirst(str_replace('_', ' ', request('category'))) : 'Semua Kategori' }}</span>
+                                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                    </div>
+                                    <div class="dropdown-options filter-options-list max-h-[200px] overflow-y-auto">
+                                        <div class="option filter-option-item" data-value="">Semua Kategori</div>
+                                        @foreach($categories as $category)
+                                            <div class="option filter-option-item" data-value="{{ $category }}">
+                                                {{ ucfirst(str_replace('_', ' ', $category)) }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <input type="hidden" name="category" value="{{ request('category') }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <a href="{{ route('audit_logs.index') }}" class="light-grey-btn-action flex-1 text-center">
+                                Reset
+                            </a>
+                            <button type="submit" class="dark-brown-btn-action flex-1">
+                                Terapkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-card">
+                <div class="table-card-header">
+                    <div class="table-card-title">
+                        <span class="value">Riwayat Aktivitas Sistem</span>
+                    </div>
+                    <div class="table-card-meta">
+                        {{ $logs->total() }} Total Aktivitas
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="w-[20%]">Pengguna</th>
+                                <th class="w-[55%]">Detail Aktivitas</th>
+                                <th class="w-[25%] text-right">Waktu Kejadian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($logs as $log)
+                            <tr>
+                                <td class="text-zinc-300">
+                                    {{ $log->user->name ?? 'Sistem' }}
+                                </td>
+
+                                <td>
+                                    {!! $log->formatted_action !!} 
+                                </td>
+
+                                <td class="text-right text-zinc-500 text-sm">
+                                    {{ $log->created_at->translatedFormat('d M Y') }} 
+                                    <span class="text-zinc-300 mx-1">•</span> 
+                                    {{ $log->created_at->format('H:i') }}
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center py-12 text-zinc-400 italic">
+                                    <i class="fa-solid fa-clock-rotate-left mb-2 block text-xl"></i>
+                                    Belum ada riwayat aktivitas yang tercatat.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2">
             <div class="text-sm text-zinc-500">
-                Showing <span class="text-white">{{ $logs->firstItem() }}</span> 
-                to <span class="text-white">{{ $logs->lastItem() }}</span> 
-                of <span class="text-white">{{ $logs->total() }}</span> results
+                Menampilkan <span class="text-white">{{ $logs->firstItem() }}</span> 
+                sampai <span class="text-white">{{ $logs->lastItem() }}</span> 
+                dari <span class="text-white">{{ $logs->total() }}</span> hasil
             </div>
 
             <div class="braga-pagination">
@@ -139,19 +157,55 @@
     </div> 
 </div> 
 
-<script> 
-    const filterBtn = document.getElementById('filter-btn-trigger'); 
-    const filterDropdown = document.getElementById('filter-dropdown'); 
-    if (filterBtn && filterDropdown) { 
-        filterBtn.addEventListener('click', (e) => { 
-            e.stopPropagation(); 
-            filterDropdown.classList.toggle('hidden'); 
-        }); 
-        document.addEventListener('click', (e) => { 
-            if (!filterDropdown.contains(e.target) && e.target !== filterBtn) { 
-                filterDropdown.classList.add('hidden'); 
-            } 
-        }); 
-    } 
-</script> 
+<script>
+    const filterBtn = document.getElementById('filter-btn-trigger');
+    const filterDropdown = document.getElementById('filter-dropdown');
+
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            filterDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!filterDropdown.contains(e.target) && !filterBtn.contains(e.target)) {
+                filterDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const selectBox = dropdown.querySelector('.filter-select-box');
+        const optionsList = dropdown.querySelector('.filter-options-list');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const displaySpan = selectBox.querySelector('span');
+
+        selectBox.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.filter-options-list').forEach(list => {
+                if(list !== optionsList) list.classList.add('hidden'); 
+            });
+            optionsList.classList.toggle('hidden');
+            dropdown.classList.toggle('active');
+        });
+
+        dropdown.querySelectorAll('.filter-option-item').forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.getAttribute('data-value');
+                const text = option.textContent;
+
+                displaySpan.textContent = text;
+                hiddenInput.value = value;     
+                
+                optionsList.classList.add('hidden');
+                dropdown.classList.remove('active');
+            });
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.filter-options-list').forEach(list => list.classList.add('hidden'));
+        document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
+    });
+</script>
 @endsection

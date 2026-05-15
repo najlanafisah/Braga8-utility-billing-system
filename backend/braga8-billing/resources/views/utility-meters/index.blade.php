@@ -348,7 +348,7 @@
                 <div class="flex flex-col gap-6"> 
                     <div> 
                         <div class="text-field"> 
-                            <label class="text-field-label">Pilih Unit</label> 
+                            <label class="text-field-label">Pilih Unit <span class="text-[#FA8327]">*</span></label> 
                             <div class="custom-dropdown"> 
                                 <div class="dropdown-selected"> 
                                     <span class="placeholder"> -- Pilih Unit -- </span> 
@@ -365,7 +365,7 @@
                             </div> 
                         </div> 
                         <div class="text-field"> 
-                            <label class="text-field-label"> Tipe Meteran </label> 
+                            <label class="text-field-label"> Tipe Meteran <span class="text-[#FA8327]">*</span> </label> 
                             <div class="custom-dropdown"> 
                                 <div class="dropdown-selected"> 
                                     <span class="placeholder"> -- Pilih Tipe -- </span> 
@@ -379,7 +379,7 @@
                             </div> 
                         </div> 
                         <div class="text-field"> 
-                            <label class="text-field-label"> Kategori </label> 
+                            <label class="text-field-label"> Kategori <span class="text-[#FA8327]">*</span></label> 
                             <div class="custom-dropdown"> 
                                 <div class="dropdown-selected"> 
                                     <span class="placeholder"> -- Pilih Kategori -- </span> 
@@ -394,7 +394,7 @@
                         </div> 
                         <div class="grid grid-cols-2 gap-4"> 
                             <div class="text-field"> 
-                                <label class="text-field-label"> Nomor Meteran </label> 
+                                <label class="text-field-label"> Nomor Meteran <span class="text-[#FA8327]">*</span></label> 
                                 <input type="text" name="meter_number" class="text-field-input" placeholder="Misal: MTR-001" required > 
                             </div> 
                             <div class="text-field"> 
@@ -412,7 +412,7 @@
                             </div> 
                         </div> 
                         <div class="text-field"> 
-                            <label class="text-field-label"> Golongan Tarif </label> 
+                            <label class="text-field-label"> Golongan Tarif <span class="text-[#FA8327]">*</span></label> 
                             <div class="custom-dropdown"> 
                                 <div class="dropdown-selected"> 
                                     <span class="placeholder"> -- Pilih Tarif -- </span> 

@@ -21,7 +21,6 @@
     </div>
 
     <div class="flex flex-col gap-6">
-        {{-- Alert System --}}
         @if (session('status'))
             @php
                 $alerts = [
@@ -47,6 +46,17 @@
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
+                <script>
+                function closeUniversalAlert() {
+                    const alert = document.getElementById('universal-alert');
+                    if (alert) {
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateX(30px)';
+                        setTimeout(() => alert.remove(), 500);
+                    }
+                }
+                setTimeout(closeUniversalAlert, 4500);
+            </script>
             @endif
         @endif
 
@@ -223,11 +233,11 @@
                     <div class="flex flex-col gap-6">
                         <div class="space-y-5">
                             <div class="text-field">
-                                <label class="text-field-label">Judul</label>
+                                <label class="text-field-label">Judul <span class="text-[#FA8327]">*</span></label>
                                 <input type="text" name="title" class="text-field-input" placeholder="Misal: Tagihan Listrik Maret" required>
                             </div>
                             <div class="text-field">
-                                <label class="text-field-label">Target Role</label>
+                                <label class="text-field-label">Target Role <span class="text-[#FA8327]">*</span></label>
                                 <div class="custom-dropdown">
                                     <div class="dropdown-selected">
                                         <span class="placeholder">Pilih Role</span>
@@ -244,11 +254,11 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="text-field">
-                                    <label class="text-field-label">Tgl Diingatkan</label>
+                                    <label class="text-field-label">Tgl Diingatkan <span class="text-[#FA8327]">*</span></label>
                                     <input type="date" name="reminder_date" class="text-field-input" required>
                                 </div>
                                 <div class="text-field">
-                                    <label class="text-field-label">Tenggat Waktu</label>
+                                    <label class="text-field-label">Tenggat Waktu <span class="text-[#FA8327]">*</span></label>
                                     <input type="date" name="due_date" class="text-field-input" required>
                                 </div>
                             </div>

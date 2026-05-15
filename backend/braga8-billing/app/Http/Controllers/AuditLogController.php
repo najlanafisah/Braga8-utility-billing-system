@@ -11,36 +11,48 @@ class AuditLogController extends Controller
     public function index(Request $request)
     {
         $latestIds = AuditLog::latest()->limit(50)->pluck('id');
+        AuditLog::whereNotIn('id', $latestIds)->update(['is_archived' => true]);
 
-        AuditLog::whereNotIn('id', $latestIds)
-            ->update(['is_archived' => true]);
+        $query = AuditLog::with('user')->where('is_archived', false);
 
-        $query = AuditLog::with('user')
-            ->where('is_archived', false);
+    if ($request->filled('search')) {
+        $search = strtolower($request->search);
 
-        if ($request->search) {
+        $actionMap = [
+            'tambah'  => 'created',
+            'menambah'  => 'created',
+            'buat'    => 'created',
+            'ubah'    => 'updated',
+            'edit'    => 'updated',
+            'perbarui' => 'updated',
+            'hapus'   => 'deleted',
+        ];
 
-            $search = $request->search;
+        $query->where(function ($q) use ($search, $actionMap) {
+            foreach ($actionMap as $key => $value) {
+                if (str_contains($search, $key)) {
+                    $q->orWhere('action', $value);
+                }
+            }
 
-            $query->where(function ($q) use ($search) {
-
-                $q->where('action', 'like', "%{$search}%")
-
-                    ->orWhereHas('user', function ($userQuery) use ($search) {
-
-                        $userQuery->where('name', 'like', "%{$search}%");
-
-                    });
-
+            $q->orWhere('action', 'like', "%{$search}%")
+            ->orWhere('table_name', 'like', "%{$search}%")
+            ->orWhere('record_id', 'like', "%{$search}%")
+            ->orWhereHas('user', function ($userQuery) use ($search) {
+                $userQuery->where('name', 'like', "%{$search}%");
             });
+        });
+    }
 
+        if ($request->filled('category')) {
+        $query->where('table_name', $request->category);
         }
 
-        if ($request->has('category') && $request->category != '') {
-            $query->where('table_name', $request->category);
+        if ($request->filled('action')) {
+            $query->where('action', $request->action);
         }
 
-        $logs = $query->latest()->paginate(10);
+        $logs = $query->latest()->paginate(10)->withQueryString();
 
         $categories = AuditLog::where('is_archived', false)
             ->select('table_name')

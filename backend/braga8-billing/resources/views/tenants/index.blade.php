@@ -166,11 +166,11 @@
                                             <div class="grid grid-cols-1 gap-5">
                                                 <div class="grid grid-cols-2 gap-y-6 text-left">
                                                     <div class="detail-item">
-                                                        <p>Penanggung Jawab (PIC)</p>
+                                                        <p>Penanggung Jawab</p>
                                                         <p>{{ $tenant->person_in_charge }}</p>
                                                     </div>
                                                     <div class="detail-item">
-                                                        <p>Badan Hukum</p>
+                                                        <p>Nama Perusahaan</p>
                                                         <p>{{ $tenant->company_name ?? '-' }}</p>
                                                     </div>
                                                     <div class="detail-item">

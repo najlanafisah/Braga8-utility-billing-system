@@ -12,7 +12,7 @@ use App\Models\User;
 
 class PaymentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $totalBill = Invoice::sum('total_amount');
         $totalCollected = Payment::where('status', 'verified')->sum('amount_paid');
@@ -23,9 +23,22 @@ class PaymentController extends Controller
             ->where('status', '!=', 'paid')
             ->get();
 
-        $payments = Payment::with(['invoice.tenant', 'invoice.unit'])
-            ->latest()
-            ->paginate(10);
+        $query = Payment::with(['invoice.tenant', 'invoice.unit']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('paid_using', 'like', "%{$search}%") // Cari berdasarkan metode bayar
+                ->orWhereHas('invoice', function($inv) use ($search) {
+                    $inv->where('invoice_number', 'like', "%{$search}%") // Cari nomor invoice
+                        ->orWhereHas('tenant', function($tn) use ($search) {
+                            $tn->where('tenant_name', 'like', "%{$search}%"); // Cari nama penyewa
+                        });
+                });
+            });
+        }
+
+        $payments = $query->latest()->paginate(10)->appends($request->all());
 
         return view('payments.index', compact('payments', 'totalBill', 'totalCollected', 'outstandingBill', 'invoices'));
     }
