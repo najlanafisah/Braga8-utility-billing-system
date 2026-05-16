@@ -13,7 +13,10 @@
         <div class="header-user">
             <div class="icon-wrapper" data-popup="notif-popup">
                 <i class="fa-solid fa-bell"></i>
-                <span class="notif-dot"></span>
+                
+                @if(auth()->user()->customNotifications()->whereNull('read_at')->exists())
+                    <span class="notif-dot"></span>
+                @endif
             </div>
 
             <div class="profile-container" data-popup="detail-profile-popup">

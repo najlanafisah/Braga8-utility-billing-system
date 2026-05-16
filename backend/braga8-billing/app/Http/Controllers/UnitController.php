@@ -8,69 +8,80 @@ use Illuminate\Http\Request;
 
 class UnitController extends Controller
 {
-    public function index()
-{
-    $tenants = Tenant::with('units')->get();
-
-    return view('units.index', compact('tenants'));
-}
-    public function create()
-{
-    $tenants = Tenant::all();
-    return view('units.create', compact('tenants'));
-}
-  public function store(Request $request)
-{
-$request->validate([
-    'tenant_id' => 'required|exists:tenants,id',
-    'unit_number' => 'required|string|max:50',
-    'floor' => 'required|string|max:50',
-    'area_size' => 'nullable|numeric',
-    'is_active' => 'required|boolean',
-    'lease_start' => 'nullable|date',
-    'lease_end' => 'nullable|date',
-]);
-
-Unit::create($request->all());
-
-    return redirect()->route('units.index')
-        ->with('success', 'Unit berhasil ditambahkan.');
-}
-public function edit(Unit $unit)
-{
-    $tenants = Tenant::all();
-    return view('units.edit', compact('unit', 'tenants'));
-}
-    public function update(Request $request, Unit $unit)
+    public function index(Request $request)
     {
-        $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'unit_number' => 'required|string|max:50',
-            'floor' => 'required|string|max:50',
-            'area_size' => 'nullable|numeric',
-            'is_active' => 'required|boolean',
-            'lease_start' => 'nullable|date',
-            'lease_end' => 'nullable|date',
-        ]);
+        $search = $request->query('search');
 
-        $unit->update($request->all());
+        $tenants = Tenant::with('units')
+            ->when($search, function($query) use ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('tenant_name', 'like', "%{$search}%")
+                    ->orWhereHas('units', function($unitQuery) use ($search) {
+                        $unitQuery->where('unit_number', 'like', "%{$search}%");
+                    });
+                });
+            })
+            ->get();
+
+        return view('units.index', compact('tenants'));
+    }
+        public function create()
+    {
+        $tenants = Tenant::all();
+        return view('units.create', compact('tenants'));
+    }
+    public function store(Request $request)
+    {
+    $request->validate([
+        'tenant_id' => 'required|exists:tenants,id',
+        'unit_number' => 'required|string|max:50',
+        'floor' => 'required|string|max:50',
+        'area_size' => 'nullable|numeric',
+        'is_active' => 'required|boolean',
+        'lease_start' => 'nullable|date',
+        'lease_end' => 'nullable|date',
+    ]);
+
+    Unit::create($request->all());
 
         return redirect()->route('units.index')
-            ->with('success', 'Unit berhasil diperbarui.');
+            ->with('success', 'Unit berhasil ditambahkan.');
     }
-
-    public function destroy(Unit $unit)
+    public function edit(Unit $unit)
     {
-        $unit->delete();
-
-        return redirect()->route('units.index')
-            ->with('success', 'Unit berhasil dihapus.');
+        $tenants = Tenant::all();
+        return view('units.edit', compact('unit', 'tenants'));
     }
-    
-    public function show(Unit $unit)
-{
-    $unit->load('tenant');
+        public function update(Request $request, Unit $unit)
+        {
+            $request->validate([
+                'tenant_id' => 'required|exists:tenants,id',
+                'unit_number' => 'required|string|max:50',
+                'floor' => 'required|string|max:50',
+                'area_size' => 'nullable|numeric',
+                'is_active' => 'required|boolean',
+                'lease_start' => 'nullable|date',
+                'lease_end' => 'nullable|date',
+            ]);
 
-    return view('units.show', compact('unit'));
-}
+            $unit->update($request->all());
+
+            return redirect()->route('units.index')
+                ->with('success', 'Unit berhasil diperbarui.');
+        }
+
+        public function destroy(Unit $unit)
+        {
+            $unit->delete();
+
+            return redirect()->route('units.index')
+                ->with('success', 'Unit berhasil dihapus.');
+        }
+        
+        public function show(Unit $unit)
+    {
+        $unit->load('tenant');
+
+        return view('units.show', compact('unit'));
+    }
 }

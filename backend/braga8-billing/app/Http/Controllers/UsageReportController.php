@@ -12,18 +12,17 @@ class UsageReportController extends Controller
 
     public function index(Request $request)
     {
-        $query = UsageReport::query();
+        $search = $request->query('search');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('month_year', 'like', "%{$search}%");
-        }
+        $latestReport = UsageReport::orderBy('month_year', 'desc')->first();
 
-        $reports = $query->orderBy('month_year', 'desc')
-                        ->paginate(10)
-                        ->appends($request->all());
-        
-        return view('reports.index', compact('reports'));
+        $reports = UsageReport::when($search, function($query) use ($search) {
+                $query->where('month_year', 'like', "%{$search}%");
+            })
+            ->orderBy('month_year', 'desc')
+            ->paginate(10);
+
+        return view('reports.index', compact('reports', 'latestReport'));
     }
 
     public function generate(Request $request)

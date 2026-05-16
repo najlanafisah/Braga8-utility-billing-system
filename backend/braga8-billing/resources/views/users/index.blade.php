@@ -7,10 +7,17 @@
             <h1 class="title-text">Manajemen User</h1> 
             <p class="subtitle-text">Braga8 Utility Billing Management</p> 
         </div> 
-        <div class="header-user"> 
-            <div class="icon-wrapper"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></div> 
-            <div class="profile-container"><div class="profile-icon"><i class="fa-solid fa-user text-[#a04d30]"></i></div></div> 
-        </div> 
+        <div class="header-user">
+            <div class="icon-wrapper" data-popup="notif-popup">
+                <i class="fa-solid fa-bell"></i>
+                <span class="notif-dot"></span>
+            </div>
+            <div class="profile-container" data-popup="detail-profile-popup">
+                <div class="profile-icon">
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i>
+                </div>
+            </div>
+        </div>
     </div> 
 
     <div class="flex flex-col gap-6"> 

@@ -202,11 +202,6 @@
                     Masuk
                 </button>
 
-                <div style="margin-top: 25px; text-align: center;">
-                    <a href="{{ route('register') }}" style="color: white; font-size: 14px; text-decoration: none; opacity: 0.8;">
-                        Belum punya akun? <span style="text-decoration: underline; font-weight: bold;">Daftar</span>
-                    </a>
-                </div>
             </form>
         </div>
 

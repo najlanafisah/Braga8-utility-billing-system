@@ -176,7 +176,7 @@
 
                 <div class="popup" id="update-tariff-{{ $tariff->id }}">
                     <div class="popup-overlay"></div>
-                    <div class="popup-card popup-lg">
+                    <div class="popup-card popup-md">
                         <div class="popup-close-wrapper">
                             <button class="popup-close" data-close="update-tariff-{{ $tariff->id }}">
                                 <i class="fa-solid fa-xmark"></i>

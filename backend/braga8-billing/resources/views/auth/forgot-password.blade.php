@@ -70,7 +70,7 @@
                 {{ __('Jangan panik. Masukkan alamat email kamu dan kami akan kirimkan link reset password biar kamu bisa bikin password baru.') }}
             </p>
 
-            <x-auth-session-status class="mb-4" :status="session('status')" style="color: #69ff91; font-size: 14px; font-weight: bold;" />
+            <x-auth-session-status class="mb-4" :status="session('status')" style="color: #993d00; font-size: 14px; font-weight: bold;" />
 
             <form method="POST" action="{{ route('password.email') }}">
                 @csrf

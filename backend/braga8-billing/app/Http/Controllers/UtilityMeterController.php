@@ -89,7 +89,7 @@ class UtilityMeterController extends Controller
         $utilityMeter->delete();
 
         return redirect()->route('utility-meters.index')
-            ->with('status', 'meter-updated');
+            ->with('status', 'meter-deleted');
     }
     public function show(UtilityMeter $utilityMeter)
 {
