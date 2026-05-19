@@ -11,17 +11,17 @@ export function initPopups() {
           if (trigger.dataset.id) {
               selectedDeleteId = trigger.dataset.id;
               
-              // Logika Unit
+              // Logika Teks Dinamis Unit
               const unitName = trigger.getAttribute('data-unit');
               const displayUnit = document.getElementById('display-unit-number');
               if (displayUnit && unitName) displayUnit.innerText = unitName;
 
-              // Logika Tenant
+              // Logika Teks Dinamis Tenant
               const tenantName = trigger.getAttribute('data-name');
               const displayTenant = document.getElementById('display-tenant-name');
               if (displayTenant && tenantName) displayTenant.innerText = tenantName;
 
-              // Logika Invoice (Tambahan Baru)
+              // Logika Teks Dinamis Invoice
               const invNo = trigger.getAttribute('data-invoice');
               const displayInv = document.getElementById('display-invoice-number');
               if (displayInv && invNo) displayInv.innerText = invNo;
@@ -44,6 +44,7 @@ export function initPopups() {
     });
   });
 
+  // Menutup popup menggunakan tombol ber-atribut data-close
   document.querySelectorAll("[data-close]").forEach(btn => {
     btn.addEventListener("click", () => {
       const target = btn.getAttribute("data-close");
@@ -53,8 +54,8 @@ export function initPopups() {
     });
   });
 
+  // Tombol konfirmasi hapus massal untuk data tabel (Unit, Tenant, Invoice)
   const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-
   if (confirmDeleteBtn) {
     confirmDeleteBtn.addEventListener("click", () => {
       if (!selectedDeleteId) {
@@ -62,10 +63,7 @@ export function initPopups() {
         return;
       }
 
-      const form = document.getElementById(
-        "delete-form-" + selectedDeleteId
-      );
-
+      const form = document.getElementById("delete-form-" + selectedDeleteId);
       if (form) {
         form.submit();
       } else {
@@ -75,18 +73,20 @@ export function initPopups() {
   }
 }
 
+// Fitur Toggle Intip Password (Mata)
 export function initPasswordToggle() {
     const toggleBtns = document.querySelectorAll(".toggle-password");
 
     toggleBtns.forEach(btn => {
         btn.addEventListener("click", function() {
-            const input = this.parentElement.querySelector(".password-input");
+            // Mengambil input password di dalam wrapper pembungkus yang sama
+            const input = this.parentElement.querySelector("input");
             const icon = this.querySelector("i");
 
-            if (input.type === "password") {
+            if (input && input.type === "password") {
                 input.type = "text";
                 icon.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
+            } else if (input) {
                 input.type = "password";
                 icon.classList.replace("fa-eye-slash", "fa-eye");
             }

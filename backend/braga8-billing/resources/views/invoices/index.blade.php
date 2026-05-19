@@ -7,31 +7,35 @@
             <h1 class="title-text">Tagihan</h1> 
             <p class="subtitle-text">Manajemen Penagihan Utilitas Braga8</p> 
         </div> 
-        <div class="header-user"> 
-            <div class="icon-wrapper" data-popup="notif-popup"> 
-                <i class="fa-solid fa-bell"></i> 
-                <span class="notif-dot"></span> 
-            </div> 
-            <div class="profile-container" data-popup="detail-profile-popup"> 
-                <div class="profile-icon"> 
-                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i> 
-                </div> 
-            </div> 
+        <div class="header-user">
+            <div class="icon-wrapper" data-popup="notif-popup">
+                <i class="fa-solid fa-bell"></i>
+                
+                @if(auth()->user()->customNotifications()->whereNull('read_at')->exists())
+                    <span class="notif-dot"></span>
+                @endif
+            </div>
+
+            <div class="profile-container" data-popup="detail-profile-popup">
+                <div class="profile-icon">
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i>
+                </div>
+            </div>
         </div> 
     </div> 
 
     @if (session('success')) 
-    <div id="universal-success-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500" style="background-color: rgba(6, 78, 59, 0.6);"> 
+    <div id="universal-success-alert" class="fixed top-6 right-6 z-[9999] flex items-center justify-between p-5 min-w-[380px] text-white border border-white/20 rounded-2xl backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-all duration-500" style="background-color: rgba(96, 35, 22, 0.6);"> 
         <div class="flex items-center gap-4"> 
             <div class="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/10 shadow-inner"> 
-                <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> 
+                <i class="fa-solid fa-circle-check text-[#FA8327] text-lg"></i> 
             </div> 
             <div class="flex flex-col gap-0.5"> 
                 <p class="text-sm font-bold tracking-wide">Berhasil!</p> 
                 <p class="text-xs text-white/50 font-light">{{ session('success') }}</p> 
             </div> 
         </div> 
-        <button type="button" onclick="closeSuccessAlert()" class="p-2 text-white/20 hover:text-emerald-400 transition-colors"> 
+        <button type="button" onclick="closeSuccessAlert()" class="p-2 text-white/20 hover:text-[#FA8327] transition-colors"> 
             <i class="fa-solid fa-xmark text-lg"></i> 
         </button> 
     </div> 
@@ -130,10 +134,20 @@
                             </td> 
                             <td class="actions"> 
                                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 w-full"> 
-                                    <a href="{{ route('invoices.notify', $invoice->id) }}" target="_blank" onclick="setTimeout(() => { window.location.reload(); }, 1000);" class="light-grey-btn-action"> 
-                                        <span><i class="fa-brands fa-whatsapp"></i></span> 
-                                        <span>Kirim</span> 
-                                    </a> 
+                                    @if($invoice->notified_at)
+                                        <button type="button" class="dark-grey-btn-action opacity-60 cursor-not-allowed pointer-events-none flex items-center justify-center gap-1.5" disabled>
+                                            <span><i class="fa-brands fa-whatsapp"></i></span>
+                                            <span>Kirim</span>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('invoices.notify', $invoice->id) }}" 
+                                        target="_blank" 
+                                        onclick="setTimeout(() => { window.location.reload(); }, 1000);" 
+                                        class="light-grey-btn-action flex items-center justify-center gap-1.5">
+                                            <span><i class="fa-brands fa-whatsapp"></i></span>
+                                            <span>Kirim</span>
+                                        </a>
+                                    @endif 
                                     <a href="{{ route('invoices.show', $invoice) }}" class="light-green-btn-action"> 
                                         <span><i class="fa-solid fa-eye"></i></span> 
                                         <span>Lihat</span> 
@@ -214,15 +228,16 @@
                                     </div> 
                                     <div class="dropdown-options" id="unitOptionsContainer"> 
                                         @foreach($units as $unit) 
-                                        <div class="option" data-value="{{ $unit->id }}" data-tenant="{{ $unit->tenant_id }}"> 
-                                            {{ $unit->unit_number }} (Lantai {{ $unit->floor }}) 
-                                        </div> 
+                                            {{-- Ambil tenant_id langsung dari properti unit atau relasinya --}}
+                                            <div class="option" data-value="{{ $unit->id }}" data-tenant="{{ $unit->tenant_id ?? ($unit->tenant->id ?? '') }}"> 
+                                                {{ $unit->unit_number }} (Lantai {{ $unit->floor }}) 
+                                            </div> 
                                         @endforeach 
                                     </div> 
                                     <input type="hidden" name="unit_id" id="unit_id_input" required> 
                                 </div> 
                                 <p class="text-[10px] text-zinc-400 mt-1 italic">Pastikan meteran sudah di-input untuk unit ini.</p> 
-                            </div> 
+                            </div>
                             <div class="grid grid-cols-2 gap-4 mt-2"> 
                                 <div class="text-field"> 
                                     <label class="text-field-label">Periode Tagihan</label> 

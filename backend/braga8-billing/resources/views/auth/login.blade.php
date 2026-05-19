@@ -176,12 +176,15 @@
 
                 <div class="text-field">
                     <label class="text-field-label">Kata Sandi</label>
-                    <div class="password-wrapper">
-                        <input type="password" name="password" class="text-field-input password-input" placeholder="••••••••" required>
-                        <button type="button" class="toggle-password">
-                            <i class="fa-solid fa-eye"></i>
+                    
+                    <div class="password-wrapper relative flex items-center w-full">
+                        <input type="password" name="password" class="text-field-input password-input w-full" placeholder="••••••••" required>
+                        
+                        <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 flex items-center justify-center">
+                            <i class="fa-solid fa-eye text-sm"></i>
                         </button>
                     </div>
+                    
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-white text-xs" />
                 </div>
 

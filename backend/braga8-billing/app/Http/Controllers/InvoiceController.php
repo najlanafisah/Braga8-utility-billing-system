@@ -34,7 +34,7 @@ class InvoiceController extends Controller
         $invoices = $query->latest()->paginate(10)->appends($request->all());
         
         $tenants = Tenant::orderBy('tenant_name')->get();
-        $units = Unit::with('meters.tariff')->get(); 
+        $units = Unit::with(['meters.tariff', 'tenant'])->get(); 
 
         return view('invoices.index', compact('invoices', 'tenants', 'units'));
     }
@@ -51,48 +51,53 @@ class InvoiceController extends Controller
         $startDate = Carbon::now()->startOfMonth();
         $endDate   = Carbon::now()->endOfMonth();
 
+        // 1. Hitung pemakaian dengan logic baru yang toleran data minim
         $readings = $this->calculateUsage($unit);
         
         if (isset($readings['error'])) {
             return back()->withErrors($readings['error'])->withInput();
         }
 
-        // 3. Pastikan Meteran & Tariff Lengkap
         $elecMeter  = $unit->meters->where('meter_type', 'electricity')->first();
         $waterMeter = $unit->meters->where('meter_type', 'water')->first();
 
-        if (!$elecMeter || !$waterMeter || !$elecMeter->tariff || !$waterMeter->tariff) {
-            return back()->withErrors('Error: Meteran atau Data Tariff (Listrik/Air) belum di-set untuk unit ini.')->withInput();
+        // Ambil tarif masing-masing meteran jika tersedia
+        $elecTariff  = $elecMeter ? $elecMeter->tariff : null;
+        $waterTariff = $waterMeter ? $waterMeter->tariff : null;
+
+        // Ambil salah satu tarif yang tersedia untuk komponen biaya admin/beban bersama
+        $activeTariff = $elecTariff ?? $waterTariff;
+
+        if (!$activeTariff) {
+            return back()->withErrors('Error: Data Master Tarif belum di-set untuk meteran di unit ini.')->withInput();
         }
 
-        $elecTariff  = $elecMeter->tariff;
-        $waterTariff = $waterMeter->tariff;
-
-        // 4. Perhitungan Biaya
+        // 2. Perhitungan Biaya Utilitas
         $waterUsage    = $readings['water_usage'];
         $electricUsage = $readings['electric_usage'];
 
         $waterCost    = $waterUsage * ($waterTariff->water_price ?? 0);
         $electricCost = $electricUsage * ($elecTariff->electric_price ?? 0);
         
-        $otherFee = $request->filled('manual_other_fee') ? $request->manual_other_fee : ($elecTariff->other_fee ?? 0);
+        $otherFee = $request->filled('manual_other_fee') ? $request->manual_other_fee : ($activeTariff->other_fee ?? 0);
 
+        // Akumulasi subtotal tagihan gedung
         $subtotal = $waterCost + $electricCost +
-                    ($elecTariff->electric_load_cost ?? 0) +
-                    ($elecTariff->transformer_maintenance ?? 0) +
-                    ($elecTariff->admin_fee ?? 0) +
-                    ($elecTariff->stamp_fee ?? 0) +
+                    ($activeTariff->electric_load_cost ?? 0) +
+                    ($activeTariff->transformer_maintenance ?? 0) +
+                    ($activeTariff->admin_fee ?? 0) +
+                    ($activeTariff->stamp_fee ?? 0) +
                     $otherFee;
 
-        $taxRaw = ($subtotal * ($elecTariff->tax_percent ?? 0)) / 100;
+        $taxRaw = ($subtotal * ($activeTariff->tax_percent ?? 0)) / 100;
         
-        // 5. Pembulatan 1000
+        // Pembulatan ke kelipatan 1000 terdekat
         $grandTotalRaw = $subtotal + $taxRaw;
         $totalRounded  = round($grandTotalRaw / 1000) * 1000;
         $roundingAdjustment = $totalRounded - $grandTotalRaw;
 
-        // 6. Eksekusi Database
-        return DB::transaction(function () use ($tenant, $unit, $startDate, $endDate, $totalRounded, $waterCost, $electricCost, $elecTariff, $otherFee, $taxRaw, $waterUsage, $electricUsage, $roundingAdjustment) {
+        // 3. Eksekusi Database Transaction
+        return DB::transaction(function () use ($tenant, $unit, $startDate, $endDate, $totalRounded, $waterCost, $electricCost, $activeTariff, $otherFee, $taxRaw, $waterUsage, $electricUsage, $roundingAdjustment) {
             
             $invoice = Invoice::create([
                 'tenant_id'            => $tenant->id,
@@ -101,10 +106,10 @@ class InvoiceController extends Controller
                 'billing_period_start' => $startDate,
                 'billing_period_end'   => $endDate,
                 'total_amount'         => $totalRounded,
-                'status'               => 'unpaid' // Pastikan ini ada di $fillable Model!
+                'status'               => 'unpaid'
             ]);
 
-            // Notification
+            // Buat Notifikasi Sistem Aplikasi Penghuni
             Notification::create([
                 'user_id' => $tenant->user_id,
                 'title'   => 'New Invoice',
@@ -112,16 +117,16 @@ class InvoiceController extends Controller
                 'type'    => 'invoice'
             ]);
 
-            // Create Items
+            // Rincian Item Invoice untuk cetakan PDF & WA
             $items = [
                 ['description' => "Pemakaian Air ($waterUsage m3)", 'amount' => $waterCost],
                 ['description' => "Pemakaian Listrik ($electricUsage kWh)", 'amount' => $electricCost],
-                ['description' => 'Biaya Beban Listrik', 'amount' => $elecTariff->electric_load_cost ?? 0],
-                ['description' => 'Pemeliharaan Trafo',  'amount' => $elecTariff->transformer_maintenance ?? 0],
-                ['description' => 'Administrasi',        'amount' => $elecTariff->admin_fee ?? 0],
-                ['description' => 'Materai',             'amount' => $elecTariff->stamp_fee ?? 0],
+                ['description' => 'Biaya Beban Listrik', 'amount' => $activeTariff->electric_load_cost ?? 0],
+                ['description' => 'Pemeliharaan Trafo',  'amount' => $activeTariff->transformer_maintenance ?? 0],
+                ['description' => 'Administrasi',        'amount' => $activeTariff->admin_fee ?? 0],
+                ['description' => 'Materai',             'amount' => $activeTariff->stamp_fee ?? 0],
                 ['description' => 'Lain-lain',           'amount' => $otherFee],
-                ['description' => 'PPN ('.($elecTariff->tax_percent ?? 0).'%)', 'amount' => $taxRaw],
+                ['description' => 'PPN ('.($activeTariff->tax_percent ?? 0).'%)', 'amount' => $taxRaw],
             ];
 
             if ($roundingAdjustment != 0) {
@@ -141,28 +146,43 @@ class InvoiceController extends Controller
         $elecMeter  = $unit->meters->where('meter_type', 'electricity')->first();
         $waterMeter = $unit->meters->where('meter_type', 'water')->first();
 
-        if (!$elecMeter || !$waterMeter) {
-            return ['error' => "Meteran Listrik/Air tidak ditemukan untuk unit ini."];
+        // Minimal salah satu jenis meteran harus terpasang di unit gedung
+        if (!$elecMeter && !$waterMeter) {
+            return ['error' => "Unit ini belum dikonfigurasi memiliki meteran air maupun listrik."];
         }
 
+        // Helper untuk mengambil 2 riwayat checklist pembacaan terakhir
         $getReadings = function($meterId) {
+            if (!$meterId) return collect();
             return MeterReading::where('meter_id', $meterId)
                                 ->where('status', 'checked')
-                                ->orderBy('reading_value', 'desc')
+                                ->orderBy('recorded_at', 'desc')
                                 ->limit(2)
                                 ->get();
         };
 
-        $eReadings = $getReadings($elecMeter->id);
-        $wReadings = $getReadings($waterMeter->id);
+        $eReadings = $elecMeter ? $getReadings($elecMeter->id) : collect();
+        $wReadings = $waterMeter ? $getReadings($waterMeter->id) : collect();
 
-        if ($eReadings->count() < 2 || $wReadings->count() < 2) {
-            return ['error' => "Data meteran (checked) masih kurang. Butuh minimal 2 data pembacaan terakhir."];
+        // --- Perhitungan Toleran & Fleksibel ---
+        // 1. Perhitungan Sektor Listrik
+        $electricUsage = 0;
+        if ($eReadings->count() > 0) {
+            $eDiff = ($eReadings->count() >= 2) ? ($eReadings[0]->reading_value - $eReadings[1]->reading_value) : $eReadings[0]->reading_value;
+            // Gunakan properti power_capacity yang sesuai dengan Model UtilityMeter kamu
+            $electricUsage = $eDiff * ($elecMeter->power_capacity ?? 1);
+        }
+
+        // 2. Perhitungan Sektor Air
+        $waterUsage = 0;
+        if ($wReadings->count() > 0) {
+            $wDiff = ($wReadings->count() >= 2) ? ($wReadings[0]->reading_value - $wReadings[1]->reading_value) : $wReadings[0]->reading_value;
+            $waterUsage = $wDiff * ($waterMeter->multiplier ?? 1); // fallback ke pengali/multiplier meteran air
         }
 
         return [
-            'electric_usage' => ($eReadings[0]->reading_value - $eReadings[1]->reading_value) * ($elecMeter->capacity ?? 1),
-            'water_usage'    => ($wReadings[0]->reading_value - $wReadings[1]->reading_value) * ($waterMeter->capacity ?? 1),
+            'electric_usage' => max(0, $electricUsage),
+            'water_usage'    => max(0, $waterUsage),
         ];
     }
 
@@ -188,52 +208,42 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.index')->with('success', 'Invoice deleted.');
     }
 
-
     public function notifyTenant(Invoice $invoice)
-{
-    $tenant = $invoice->tenant;
-    
-    // Using 'contact_phone' and 'person_in_charge' from your Tenant model
-    $phone = $tenant->contact_phone;
-    $picName = $tenant->person_in_charge;
+    {
+        $tenant = $invoice->tenant;
+        $phone = $tenant->contact_phone;
+        $picName = $tenant->person_in_charge;
 
-    if (!$phone) {
-        return back()->with('error', 'No PIC phone number found for this tenant.');
+        if (!$phone) {
+            return back()->with('error', 'No PIC phone number found for this tenant.');
+        }
+
+        $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+        if (str_starts_with($cleanPhone, '0')) {
+            $cleanPhone = '62' . substr($cleanPhone, 1);
+        }
+
+        $itemsList = "";
+        foreach ($invoice->items as $item) {
+            $itemsList .= "• " . $item->description . ": Rp " . number_format($item->amount) . "\n";
+        }
+
+        $message = "*TAGIHAN INVOICE: " . $invoice->invoice_number . "*\n" .
+                   "Gedung Braga 8\n" .
+                   "--------------------------\n" .
+                   "*PIC:* " . $picName . "\n" .
+                   "*Unit:* " . $invoice->unit->unit_number . "\n" .
+                   "--------------------------\n" .
+                   "*Detail Pemakaian:*\n" . 
+                   $itemsList .
+                   "--------------------------\n" .
+                   "*TOTAL TAGIHAN: Rp " . number_format($invoice->total_amount) . "*\n" .
+                   "--------------------------\n\n" .
+                   "Silahkan cek detail lengkap di aplikasi. Terima kasih.";
+
+        $invoice->update(['notified_at' => now()]);
+        $waUrl = "https://wa.me/" . $cleanPhone . "?text=" . urlencode($message);
+
+        return redirect()->away($waUrl);
     }
-
-    // 1. Clean the phone number for WhatsApp
-    $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
-    if (str_starts_with($cleanPhone, '0')) {
-        $cleanPhone = '62' . substr($cleanPhone, 1);
-    }
-
-    // 2. Build the message with the items table
-    $itemsList = "";
-    foreach ($invoice->items as $item) {
-        $itemsList .= "• " . $item->description . ": Rp " . number_format($item->amount) . "\n";
-    }
-
-    $message = "*TAGIHAN INVOICE: " . $invoice->invoice_number . "*\n" .
-               "Gedung Braga 8\n" .
-               "--------------------------\n" .
-               "*PIC:* " . $picName . "\n" .
-               "*Unit:* " . $invoice->unit->unit_number . "\n" .
-               "--------------------------\n" .
-               "*Detail Pemakaian:*\n" . 
-               $itemsList .
-               "--------------------------\n" .
-               "*TOTAL TAGIHAN: Rp " . number_format($invoice->total_amount) . "*\n" .
-               "--------------------------\n\n" .
-               "Silahkan cek detail lengkap di aplikasi. Terima kasih.";
-
-    // 3. Update the System (mark as notified)
-    // Note: Make sure you ran the migration for 'notified_at'
-    $invoice->update(['notified_at' => now()]);
-
-    // 4. Redirect to WhatsApp
-    $waUrl = "https://wa.me/" . $cleanPhone . "?text=" . urlencode($message);
-
-    return redirect()->away($waUrl);
-}
-
 }

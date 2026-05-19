@@ -192,31 +192,32 @@
                         
                         <div class="bar-chart-bars">
                             @forelse($chartData as $data)
-                                <div class="relative flex flex-col items-center h-full">
+                            <div class="relative flex flex-col items-center h-full">
+                                <div class="flex items-end gap-1 h-full w-12 justify-center">
                                     
-                                    <div class="flex items-end gap-1 h-full">
-                                        <div class="bar-chart-bar bar-chart-bar-electricity group" 
-                                            style="height: {{ max(($data['electricity'] / $maxVal) * 100, 5) }}%">
-                                            <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-[10px] text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">
-                                                <i class="fa-solid fa-bolt-lightning text-orange-400"></i> {{ $data['electricity'] }}
-                                            </span>
-                                        </div>
-                                        <div class="bar-chart-bar bar-chart-bar-water group" 
-                                            style="height: {{ max(($data['water'] / $maxVal) * 100, 5) }}%">
-                                            <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-[10px] text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">
-                                                <i class="fa-solid fa-droplet text-orange-400"></i> {{ $data['water'] }}
-                                            </span>
-                                        </div>
+                                    <div class="bar-chart-bar bar-chart-bar-electricity group min-h-[8px]" 
+                                        style="height: {{ $maxVal > 0 ? min(max(($data['electricity'] / $maxVal) * 100, 8), 100) : 8 }}%">
+                                        <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-[10px] text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 transition-opacity">
+                                            <i class="fa-solid fa-bolt-lightning text-orange-400"></i> {{ number_format($data['electricity'], 0, ',', '.') }} kWh
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="bar-chart-bar bar-chart-bar-water group min-h-[8px]" 
+                                        style="height: {{ $maxVal > 0 ? min(max(($data['water'] / $maxVal) * 100, 8), 100) : 8 }}%">
+                                        <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-[10px] text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 transition-opacity">
+                                            <i class="fa-solid fa-droplet text-orange-400"></i> {{ number_format($data['water'], 0, ',', '.') }} m³
+                                        </span>
                                     </div>
 
-                                    <span class="absolute top-[calc(100%+8px)] bar-chart-labels">
-                                        {{ $data['month'] }}
-                                    </span>
                                 </div>
+                                <span class="absolute top-[calc(100%+8px)] bar-chart-labels">
+                                    {{ $data['month'] }}
+                                </span>
+                            </div>
                             @empty
-                                <div class="w-full flex items-center justify-center h-full text-zinc-500 italic text-xs">
-                                    Belum ada data laporan penggunaan.
-                                </div>
+                            <div class="w-full flex items-center justify-center h-full text-zinc-500 italic text-xs">
+                                Belum ada data laporan penggunaan.
+                            </div>
                             @endforelse
                         </div>
                     </div>

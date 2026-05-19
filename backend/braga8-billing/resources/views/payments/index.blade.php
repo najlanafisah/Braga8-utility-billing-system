@@ -48,16 +48,20 @@
             <h1 class="title-text">Riwayat Pembayaran</h1> 
             <p class="subtitle-text">Braga8 Utility Billing Management</p> 
         </div> 
-        <div class="header-user"> 
-            <div class="icon-wrapper" data-popup="notif-popup"> 
-                <i class="fa-solid fa-bell"></i> 
-                <span class="notif-dot"></span> 
-            </div> 
-            <div class="profile-container" data-popup="detail-profile-popup"> 
-                <div class="profile-icon"> 
-                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i> 
-                </div> 
-            </div> 
+        <div class="header-user">
+            <div class="icon-wrapper" data-popup="notif-popup">
+                <i class="fa-solid fa-bell"></i>
+                
+                @if(auth()->user()->customNotifications()->whereNull('read_at')->exists())
+                    <span class="notif-dot"></span>
+                @endif
+            </div>
+
+            <div class="profile-container" data-popup="detail-profile-popup">
+                <div class="profile-icon">
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i>
+                </div>
+            </div>
         </div> 
     </div> 
 
@@ -298,36 +302,38 @@
                     @csrf 
                     <div class="flex flex-col gap-6"> 
                         <div>
-                            <div class="text-field"> 
-                                <label class="text-field-label text-left">Pilih Invoice <span class="text-[#FA8327]">*</span></label> 
-                                <div class="custom-dropdown"> 
-                                    <div class="dropdown-selected"> 
-                                        <span class="placeholder">-- Pilih Nomor Invoice --</span> 
-                                        <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> 
-                                    </div> 
-                                    <div class="dropdown-options"> 
-                                        @forelse($invoices as $inv) 
-                                            <div class="option" data-value="{{ $inv->id }}" data-total="{{ $inv->total_amount }}"> 
-                                                {{ $inv->invoice_number }} - {{ $inv->tenant->tenant_name }} 
-                                            </div> 
+                            <div class="text-field">
+                                <label class="text-field-label text-left">Pilih Invoice <span class="text-[#FA8327]">*</span></label>
+                                <div class="custom-dropdown" id="addInvoiceDropdown">
+                                    <div class="dropdown-selected">
+                                        <span class="placeholder">-- Pilih Nomor Invoice --</span>
+                                        <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i>
+                                    </div>
+                                    <div class="dropdown-options">
+                                        @forelse($invoices as $inv)
+                                            <div class="option" data-value="{{ $inv->id }}" data-total="{{ $inv->total_amount }}">
+                                                {{ $inv->invoice_number }} - {{ $inv->tenant->tenant_name }}
+                                            </div>
                                         @empty
                                             <div class="option disabled text-zinc-400 italic">Belum ada invoice tersedia</div>
-                                        @endforelse 
+                                        @endforelse
                                     </div>
-                                    <input type="hidden" name="invoice_id" required> 
-                                </div> 
-                            </div> 
-                            <div class="grid grid-cols-2 gap-4"> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Jumlah Bayar <span class="text-[#FA8327]">*</span></label> 
-                                    <input type="number" name="amount_paid" class="text-field-input" placeholder="0" required step="any"> 
-                                    <p class="text-[9px] text-zinc-500 mt-1 italic text-left">Pilih invoice untuk melihat total.</p> 
-                                </div> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Tanggal Bayar <span class="text-[#FA8327]">*</span></label> 
-                                    <input type="date" name="payment_date" class="text-field-input" value="{{ date('Y-m-d') }}" required> 
-                                </div> 
-                            </div> 
+                                    <input type="hidden" name="invoice_id" id="add_invoice_id_input" required>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="text-field">
+                                    <label class="text-field-label text-left">Jumlah Bayar <span class="text-[#FA8327]">*</span></label>
+                                    <input type="number" name="amount_paid" id="add_amount_paid" class="text-field-input" placeholder="0" required step="any">
+                                    <p id="add_invoice_hint" class="text-[9px] text-zinc-500 mt-1 italic text-left">Pilih invoice untuk melihat total.</p>
+                                </div>
+                                
+                                <div class="text-field">
+                                    <label class="text-field-label text-left">Tanggal Bayar <span class="text-[#FA8327]">*</span></label>
+                                    <input type="date" name="payment_date" class="text-field-input" value="{{ date('Y-m-d') }}" required>
+                                </div>
+                            </div>
                             <div class="grid grid-cols-2 gap-4"> 
                                 <div class="text-field"> 
                                     <label class="text-field-label text-left">Metode Pembayaran <span class="text-[#FA8327]">*</span></label> 
@@ -365,6 +371,45 @@
             </div> 
         </div> 
     </div> 
-
 </div> 
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const invoiceDropdown = document.getElementById('addInvoiceDropdown');
+    const amountInput = document.getElementById('add_amount_paid');
+    const hintText = document.getElementById('add_invoice_hint');
+
+    if (invoiceDropdown) {
+        const options = invoiceDropdown.querySelectorAll('.dropdown-options .option:not(.disabled)');
+        const selectedSpan = invoiceDropdown.querySelector('.dropdown-selected .placeholder');
+        const hiddenInput = document.getElementById('add_invoice_id_input');
+
+        options.forEach(option => {
+            option.addEventListener('click', function () {
+                const invoiceId = this.getAttribute('data-value');
+                const totalAmount = this.getAttribute('data-total');
+                const textDisplay = this.textContent.trim();
+
+                hiddenInput.value = invoiceId;
+                selectedSpan.textContent = textDisplay;
+                selectedSpan.classList.remove('placeholder');
+
+                if (totalAmount) {
+                    amountInput.value = totalAmount;
+                    
+                    const formatted = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        maximumFractionDigits: 0
+                    }).format(totalAmount);
+                    
+                    hintText.innerHTML = `Total tagihan: <span class="text-emerald-600 font-bold">${formatted}</span>`;
+                }
+
+                invoiceDropdown.querySelector('.dropdown-options').classList.remove('show');
+            });
+        });
+    }
+});
+</script>
 @endsection

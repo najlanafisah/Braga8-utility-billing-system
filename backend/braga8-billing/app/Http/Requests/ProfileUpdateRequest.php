@@ -25,6 +25,10 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            // TAMBAHKAN VALIDASI INI AGAR PASWORD MAU LEWAT
+            'current_password' => ['nullable', 'string'],
+            'password' => ['nullable', 'string'],
+            'password_confirmation' => ['nullable', 'string'],
         ];
     }
 }

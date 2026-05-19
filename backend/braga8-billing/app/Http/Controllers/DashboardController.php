@@ -20,11 +20,13 @@ public function index()
     $newTenantsThisMonth = Tenant::whereMonth('created_at', Carbon::now()->month)->count();
 
     $totalInvoiceValue = Invoice::sum('total_amount');
-    $totalPaidAmount = Payment::where('status', 'success')->sum('amount_paid');
-    $paidCount = Payment::where('status', 'success')->count();
+    
+    $totalPaidAmount = Payment::where('status', 'verified')->sum('amount_paid');
+    $paidCount = Payment::where('status', 'verified')->count();
+    
     $totalUnpaidAmount = max($totalInvoiceValue - $totalPaidAmount, 0);
     $unpaidCount = Invoice::whereDoesntHave('payments', function ($query) {
-        $query->where('status', 'success');
+        $query->where('status', 'verified');
     })->count();
 
     $baseValue = max($totalInvoiceValue, 1);
@@ -33,7 +35,7 @@ public function index()
     
     $overdueCount = Invoice::where('created_at', '<', Carbon::now()->subDays(30))
         ->whereDoesntHave('payments', function ($query) {
-            $query->where('status', 'success');
+            $query->where('status', 'verified');
         })->count();
     $totalInvoicesCount = max(Invoice::count(), 1);
     $percentOverdue = round(($overdueCount / $totalInvoicesCount) * 100);
@@ -57,7 +59,7 @@ public function index()
     foreach ($reports as $report) {
         $chartData[] = [
             'month' => Carbon::parse($report->month_year)->format('M'),
-            'electricity' => $report->total_electricity_usage ?? 0,
+            'electricity' => $report->total_electric_usage ?? 0, // FIX: Ganti dari total_electricity_usage
             'water' => $report->total_water_usage ?? 0,
         ];
     }
@@ -72,7 +74,9 @@ public function index()
         'paidCount' => $paidCount,
         'totalUnpaidAmount' => $totalUnpaidAmount,
         'unpaidCount' => $unpaidCount,
-        'totalComplaints' => Complaint::where('status', '!=', 'resolved')->count(),
+        
+        'totalComplaints' => Complaint::where('status', '!=', 'resolved')->count(), 
+        
         'percentPaid' => $percentPaid,
         'percentUnpaid' => $percentUnpaid,
         'percentOverdue' => min($percentOverdue, 100),
