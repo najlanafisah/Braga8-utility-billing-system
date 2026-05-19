@@ -172,7 +172,7 @@
                                         <div class="flex flex-col gap-6"> 
                                             <div> 
                                                 <div class="text-field"> 
-                                                    <label class="text-field-label">Pilih Unit</label> 
+                                                    <label class="text-field-label">Pilih Unit <span class="text-[#FA8327]">*</span></label> 
                                                     <div class="custom-dropdown"> 
                                                         <div class="dropdown-selected"> 
                                                             <span class="placeholder">{{ $meter->unit->unit_number }} - Lantai {{ $meter->unit->floor ?? '-' }}</span> 
@@ -189,38 +189,37 @@
                                                     </div> 
                                                 </div> 
                                                 <div class="grid grid-cols-2 gap-4"> 
-                                                    <div class="text-field"> 
-                                                        <label class="text-field-label">Tipe Meteran</label> 
-                                                        <div class="custom-dropdown"> 
-                                                            <div class="dropdown-selected"> 
-                                                                <span class="placeholder">{{ $meter->meter_type == 'electricity' ? 'Listrik' : 'Air' }}</span> 
-                                                                <i class="fa-solid fa-angle-down"></i> 
-                                                            </div> 
-                                                            <div class="dropdown-options"> 
-                                                                <div class="option" data-value="electricity">Listrik</div> 
-                                                                <div class="option" data-value="water">Air</div> 
-                                                            </div> 
-                                                            <input type="hidden" name="meter_type" value="{{ $meter->meter_type }}" required> 
-                                                        </div> 
-                                                    </div> 
-                                                    <div class="text-field"> 
-                                                        <label class="text-field-label">Kategori</label> 
-                                                        <div class="custom-dropdown"> 
-                                                            <div class="dropdown-selected"> 
-                                                                <span class="placeholder">{{ $meter->meter_category == 'postpaid' ? 'Pascabayar' : 'Prabayar' }}</span> 
-                                                                <i class="fa-solid fa-angle-down"></i> 
-                                                            </div> 
-                                                            <div class="dropdown-options"> 
-                                                                <div class="option" data-value="postpaid">Pascabayar</div> 
-                                                                <div class="option" data-value="prepaid">Prabayar</div> 
-                                                            </div> 
-                                                            <input type="hidden" name="meter_category" value="{{ $meter->meter_category }}" required> 
-                                                        </div> 
-                                                    </div> 
+                                                    <div class="text-field">
+                                                        <label class="text-field-label">Tipe Meteran <span class="text-[#FA8327]">*</span></label>
+                                                        <div class="custom-dropdown relative">
+                                                            <div class="dropdown-selected">
+                                                                <span class="placeholder">{{ $meter->meter_type == 'electricity' ? 'Listrik' : 'Air' }}</span>
+                                                                <i class="fa-solid fa-angle-down"></i>
+                                                            </div>
+                                                            <div class="dropdown-options">
+                                                                <div class="option" data-value="electricity">Listrik</div>
+                                                                <div class="option" data-value="water">Air</div>
+                                                            </div>
+                                                            <input type="hidden" name="meter_type" id="edit_meter_type_{{ $meter->id }}" value="{{ $meter->meter_type }}">
+                                                            
+                                                            <input type="text" class="absolute bottom-0 left-1/2 w-0 h-0 opacity-0 pointer-events-none" value="{{ $meter->meter_type }}" required data-dropdown-fake="edit_meter_type_{{ $meter->id }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-field">
+                                                    <label class="text-field-label"> Kategori</label>
+                                                    <div class="custom-dropdown pointer-events-none opacity-80">
+                                                        <div class="dropdown-selected border border-zinc-700 bg-zinc-800">
+                                                            <span class="font-medium text-zinc-400">Pascabayar</span>
+                                                            <i class="fa-solid fa-lock text-zinc-600 text-xs"></i>
+                                                        </div>
+                                                        
+                                                        <input type="hidden" name="meter_category" value="postpaid" required>
+                                                    </div>
+                                                </div>
                                                 </div> 
                                                 <div class="grid grid-cols-2 gap-4"> 
                                                     <div class="text-field"> 
-                                                        <label class="text-field-label">Nomor Meteran</label> 
+                                                        <label class="text-field-label">Nomor Meteran <span class="text-[#FA8327]">*</span></label> 
                                                         <input type="text" name="meter_number" class="text-field-input" value="{{ $meter->meter_number }}" required> 
                                                     </div> 
                                                     <div class="text-field"> 
@@ -237,23 +236,25 @@
                                                         </button> 
                                                     </div> 
                                                 </div> 
-                                                <div class="text-field"> 
-                                                    <label class="text-field-label">Golongan Tarif</label> 
-                                                    <div class="custom-dropdown"> 
-                                                        <div class="dropdown-selected"> 
-                                                            <span class="placeholder">{{ $meter->tariff->name ?? '-- Pilih Tarif --' }}</span> 
-                                                            <i class="fa-solid fa-angle-down"></i> 
-                                                        </div> 
-                                                        <div class="dropdown-options"> 
-                                                            @foreach($tariffs as $tariff) 
-                                                                <div class="option" data-value="{{ $tariff->id }}"> 
-                                                                    {{ $tariff->name }} (Rp {{ number_format($tariff->electric_price) }}) 
-                                                                </div> 
-                                                            @endforeach 
-                                                        </div> 
-                                                        <input type="hidden" name="tariff_id" value="{{ $meter->tariff_id }}"> 
-                                                    </div> 
-                                                </div> 
+                                                <div class="text-field">
+                                                    <label class="text-field-label">Golongan Tarif <span class="text-[#FA8327]">*</span></label>
+                                                    <div class="custom-dropdown relative">
+                                                        <div class="dropdown-selected">
+                                                            <span class="placeholder">{{ $meter->tariff->name ?? '-- Pilih Tarif --' }}</span>
+                                                            <i class="fa-solid fa-angle-down"></i>
+                                                        </div>
+                                                        <div class="dropdown-options">
+                                                            @foreach($tariffs as $tariff)
+                                                                <div class="option" data-value="{{ $tariff->id }}">
+                                                                    {{ $tariff->name }} (Rp {{ number_format($tariff->electric_price) }})
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                        <input type="hidden" name="tariff_id" id="edit_tariff_id_{{ $meter->id }}" value="{{ $meter->tariff_id }}">
+                                                        
+                                                        <input type="text" class="absolute bottom-0 left-1/2 w-0 h-0 opacity-0 pointer-events-none" value="{{ $meter->tariff_id }}" required data-dropdown-fake="edit_tariff_id_{{ $meter->id }}">
+                                                    </div>
+                                                </div>
                                             </div> 
                                             <button type="submit" class="light-brown-btn mt-4 py-3">Simpan Perubahan</button> 
                                         </div> 
@@ -368,34 +369,35 @@
                                 <input type="hidden" name="unit_id" required > 
                             </div> 
                         </div> 
-                        <div class="text-field"> 
-                            <label class="text-field-label"> Tipe Meteran <span class="text-[#FA8327]">*</span> </label> 
-                            <div class="custom-dropdown"> 
-                                <div class="dropdown-selected"> 
-                                    <span class="placeholder"> -- Pilih Tipe -- </span> 
-                                    <i class="fa-solid fa-angle-down"></i> 
-                                </div> 
-                                <div class="dropdown-options"> 
-                                    <div class="option" data-value="electricity"> Listrik </div> 
-                                    <div class="option" data-value="water"> Air </div> 
-                                </div> 
-                                <input type="hidden" name="meter_type" required > 
-                            </div> 
-                        </div> 
-                        <div class="text-field"> 
-                            <label class="text-field-label"> Kategori <span class="text-[#FA8327]">*</span></label> 
-                            <div class="custom-dropdown"> 
-                                <div class="dropdown-selected"> 
-                                    <span class="placeholder"> -- Pilih Kategori -- </span> 
-                                    <i class="fa-solid fa-angle-down"></i> 
-                                </div> 
-                                <div class="dropdown-options"> 
-                                    <div class="option" data-value="postpaid"> Pascabayar </div> 
-                                    <div class="option" data-value="prepaid"> Prabayar </div> 
-                                </div> 
-                                <input type="hidden" name="meter_category" required > 
-                            </div> 
-                        </div> 
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-field">
+                                <label class="text-field-label"> Tipe Meteran <span class="text-[#FA8327]">*</span> </label>
+                                <div class="custom-dropdown relative">
+                                    <div class="dropdown-selected">
+                                        <span class="placeholder"> -- Pilih Tipe -- </span>
+                                        <i class="fa-solid fa-angle-down"></i>
+                                    </div>
+                                    <div class="dropdown-options">
+                                        <div class="option" data-value="electricity"> Listrik </div>
+                                        <div class="option" data-value="water"> Air </div>
+                                    </div>
+                                    <input type="hidden" name="meter_type" id="add_meter_type">
+                                    
+                                    <input type="text" class="absolute bottom-0 left-1/2 w-0 h-0 opacity-0 pointer-events-none" required data-dropdown-fake="add_meter_type">
+                                </div>
+                            </div>
+                            <div class="text-field">
+                                <label class="text-field-label"> Kategori <span class="text-[#FA8327]">*</span></label>
+                                <div class="custom-dropdown pointer-events-none opacity-80">
+                                    <div class="dropdown-selected border border-zinc-700 bg-zinc-800">
+                                        <span class="font-medium text-zinc-400">Pascabayar</span>
+                                        <i class="fa-solid fa-lock text-zinc-600 text-xs"></i>
+                                    </div>
+                                    
+                                    <input type="hidden" name="meter_category" value="postpaid" required>
+                                </div>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-2 gap-4"> 
                             <div class="text-field"> 
                                 <label class="text-field-label"> Nomor Meteran <span class="text-[#FA8327]">*</span></label> 
@@ -415,22 +417,24 @@
                                 </button> 
                             </div> 
                         </div> 
-                        <div class="text-field"> 
-                            <label class="text-field-label"> Golongan Tarif <span class="text-[#FA8327]">*</span></label> 
-                            <div class="custom-dropdown"> 
-                                <div class="dropdown-selected"> 
-                                    <span class="placeholder"> -- Pilih Tarif -- </span> 
-                                    <i class="fa-solid fa-angle-down"></i> 
-                                </div> 
-                                <div class="dropdown-options"> 
-                                    @foreach($tariffs as $tariff) 
-                                        <div class="option" data-value="{{ $tariff->id }}" > 
-                                            {{ $tariff->name }} (Rp {{ number_format($tariff->electric_price) }}) 
-                                        </div> 
-                                    @endforeach 
-                                </div> 
-                                <input type="hidden" name="tariff_id" required > 
-                            </div> 
+                        <div class="text-field">
+                            <label class="text-field-label"> Golongan Tarif <span class="text-[#FA8327]">*</span></label>
+                            <div class="custom-dropdown relative">
+                                <div class="dropdown-selected">
+                                    <span class="placeholder"> -- Pilih Tarif -- </span>
+                                    <i class="fa-solid fa-angle-down"></i>
+                                </div>
+                                <div class="dropdown-options">
+                                    @foreach($tariffs as $tariff)
+                                        <div class="option" data-value="{{ $tariff->id }}">
+                                            {{ $tariff->name }} (Rp {{ number_format($tariff->electric_price) }})
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" name="tariff_id" id="add_tariff_id">
+                                
+                                <input type="text" class="absolute bottom-0 left-1/2 w-0 h-0 opacity-0 pointer-events-none" required data-dropdown-fake="add_tariff_id">
+                            </div>
                         </div> 
                     </div> 
                     <button type="submit" class="light-brown-btn mt-4 py-3" > Simpan Data Meteran </button> 
