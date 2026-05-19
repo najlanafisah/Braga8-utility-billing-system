@@ -69,7 +69,10 @@
                 <span><i class="fa-solid fa-magnifying-glass"></i></span> 
             </form> 
             <div class="toolbar-action"> 
-                <button class="light-brown-btn btn-small" data-popup="add-new-tariff"> <span><i class="fa-solid fa-plus"></i></span> <span>Tambah Jenis Tarif Baru</span> </button> 
+                <button class="light-brown-btn btn-small" data-popup="add-new-tariff"> 
+                    <span><i class="fa-solid fa-plus"></i></span> 
+                    <span>Tambah Jenis Tarif Baru</span> 
+                </button> 
             </div> 
         </div> 
 
@@ -79,10 +82,11 @@
                     <div class="popup-overlay"></div> 
                     <div class="popup-card popup-md"> 
                         <div class="popup-close-wrapper"> 
-                            <button class="popup-close" data-close="detail-tariff-{{ $tariff->id }}"> <i class="fa-solid fa-xmark"></i> </button> 
+                            <button class="popup-close" data-close="detail-tariff-{{ $tariff->id }}"> 
+                                <i class="fa-solid fa-xmark"></i> 
+                            </button> 
                         </div> 
                         <div class="popup-header">{{ $tariff->name ?? 'Unnamed Tariff' }}</div> 
-                        
                         <div class="popup-body user-detail-info flex flex-col gap-5"> 
                             <div class="grid grid-cols-2 gap-x-6 gap-y-4"> 
                                 <div class="detail-item"> 
@@ -91,7 +95,7 @@
                                 </div> 
                                 <div class="detail-item"> 
                                     <p>Beban Listrik</p> 
-                                    <p>Rp {{ number_format($tariff->other_fees['electric_load'] ?? 0, 0, ',', '.') }}</p> 
+                                    <p>Rp {{ number_format($tariff->electric_load_cost ?? 0, 0, ',', '.') }}</p> 
                                 </div> 
                                 <div class="detail-item"> 
                                     <p>Harga Listrik</p> 
@@ -99,19 +103,19 @@
                                 </div> 
                                 <div class="detail-item"> 
                                     <p>Pemeliharaan</p> 
-                                    <p>Rp {{ number_format($tariff->other_fees['maintenance'] ?? 0, 0, ',', '.') }}</p> 
+                                    <p>Rp {{ number_format($tariff->transformer_maintenance ?? 0, 0, ',', '.') }}</p> 
                                 </div> 
                                 <div class="detail-item"> 
                                     <p>Tarif Pajak</p> 
-                                    <p >{{ $tariff->tax_percent }}%</p> 
+                                    <p>{{ $tariff->tax_percent }}%</p> 
                                 </div> 
                                 <div class="detail-item"> 
                                     <p>Biaya Administrasi</p> 
-                                    <p>Rp {{ number_format($tariff->other_fees['admin_fee'] ?? 0, 0, ',', '.') }}</p> 
+                                    <p>Rp {{ number_format($tariff->admin_fee ?? 0, 0, ',', '.') }}</p> 
                                 </div> 
                                 <div class="detail-item col-span-2"> 
                                     <p>Pajak Materai</p> 
-                                    <p>Rp {{ number_format($tariff->other_fees['stamp_fee'] ?? 0, 0, ',', '.') }}</p> 
+                                    <p>Rp {{ number_format($tariff->stamp_fee ?? 0, 0, ',', '.') }}</p> 
                                 </div> 
                             </div> 
 
@@ -153,7 +157,9 @@
                     <div class="popup-overlay"></div> 
                     <div class="popup-card popup-md"> 
                         <div class="popup-close-wrapper"> 
-                            <button class="popup-close" data-close="update-tariff-{{ $tariff->id }}"> <i class="fa-solid fa-xmark"></i> </button> 
+                            <button class="popup-close" data-close="update-tariff-{{ $tariff->id }}"> 
+                                <i class="fa-solid fa-xmark"></i> 
+                            </button> 
                         </div> 
                         <div class="popup-header">Edit Tarif: {{ $tariff->name }}</div> 
                         <form action="{{ route('tariffs.update', $tariff->id) }}" method="POST"> 
@@ -169,15 +175,14 @@
                                         <div class="column"> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Listrik (per kWh) <span class="text-[#FA8327]">*</span></label> 
-                                                <input type="number" name="electric_price" class="text-field-input" step="0.01" value="{{ old('electric_price', $tariff->electric_price) }}" required> 
-                                            </div> 
+                                                <input type="number" name="electric_price" class="text-field-input" step="0.01" value="{{ old('electric_price', $tariff->electric_price) }}" required> </div> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Beban Listrik</label> 
-                                                <input type="number" name="other_fees[electric_load]" class="text-field-input" step="0.01" value="{{ old('other_fees.electric_load', $tariff->other_fees['electric_load'] ?? 0) }}"> 
+                                                <input type="number" name="other_fees[electric_load]" class="text-field-input" step="0.01" value="{{ old('other_fees.electric_load', $tariff->electric_load_cost ?? 0) }}"> 
                                             </div> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Administrasi</label> 
-                                                <input type="number" name="other_fees[admin_fee]" class="text-field-input" step="0.01" value="{{ old('other_fees.admin_fee', $tariff->other_fees['admin_fee'] ?? 0) }}"> 
+                                                <input type="number" name="other_fees[admin_fee]" class="text-field-input" step="0.01" value="{{ old('other_fees.admin_fee', $tariff->admin_fee ?? 0) }}"> 
                                             </div> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label text-[#FA8327] font-bold">Persentase Pajak (%) <span class="text-[#FA8327]">*</span></label> 
@@ -191,15 +196,14 @@
                                             </div> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Pemeliharaan</label> 
-                                                <input type="number" name="other_fees[maintenance]" class="text-field-input" step="0.01" value="{{ old('other_fees.maintenance', $tariff->other_fees['maintenance'] ?? 0) }}"> 
+                                                <input type="number" name="other_fees[maintenance]" class="text-field-input" step="0.01" value="{{ old('other_fees.maintenance', $tariff->transformer_maintenance ?? 0) }}"> 
                                             </div> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Materai</label> 
-                                                <input type="number" name="other_fees[stamp_fee]" class="text-field-input" step="0.01" value="{{ old('other_fees.stamp_fee', $tariff->other_fees['stamp_fee'] ?? 0) }}"> 
+                                                <input type="number" name="other_fees[stamp_fee]" class="text-field-input" step="0.01" value="{{ old('other_fees.stamp_fee', $tariff->stamp_fee ?? 0) }}"> 
                                             </div> 
                                         </div> 
                                     </div> 
-                                    
                                     <div class="flex flex-col mt-4 gap-4 border-t border-dashed border-white/10 pt-4"> 
                                         <div class="flex flex-col gap-2"> 
                                             <label class="text-[11px] uppercase font-bold tracking-wider text-zinc-500 block mb-3">Biaya Kustom Tambahan</label> 
@@ -259,22 +263,31 @@
                                 <tr> 
                                     <td>Rp {{ number_format($tariff->water_price, 0, ',', '.') }}</td> 
                                     <td>Rp {{ number_format($tariff->electric_price, 0, ',', '.') }}</td> 
-                                    <td>Rp {{ number_format($tariff->other_fees['electric_load'] ?? 0, 0, ',', '.') }}</td> 
-                                    <td>Rp {{ number_format($tariff->other_fees['maintenance'] ?? 0, 0, ',', '.') }}</td> 
-                                    <td>Rp {{ number_format($tariff->other_fees['admin_fee'] ?? 0, 0, ',', '.') }}</td> 
+                                    <td>Rp {{ number_format($tariff->electric_load_cost ?? 0, 0, ',', '.') }}</td> 
+                                    <td>Rp {{ number_format($tariff->transformer_maintenance ?? 0, 0, ',', '.') }}</td> 
+                                    <td>Rp {{ number_format($tariff->admin_fee ?? 0, 0, ',', '.') }}</td> 
                                     <td class="actions"> 
                                         <div class="grid grid-cols-3 gap-2 w-full"> 
                                             <button type="button" class="light-green-btn-action w-full justify-center" data-popup="detail-tariff-{{ $tariff->id }}"> 
-                                                <div class="flex items-center gap-2"> <i class="fa-solid fa-eye text-xs"></i> <span class="text-xs">Lihat</span> </div> 
+                                                <div class="flex items-center gap-2"> 
+                                                    <i class="fa-solid fa-eye text-xs"></i> 
+                                                    <span class="text-xs">Lihat</span> 
+                                                </div> 
                                             </button> 
                                             <button type="button" class="light-brown-btn-action w-full justify-center" data-popup="update-tariff-{{ $tariff->id }}"> 
-                                                <div class="flex items-center gap-2"> <i class="fa-solid fa-pen text-xs"></i> <span class="text-xs">Edit</span> </div> 
+                                                <div class="flex items-center gap-2"> 
+                                                    <i class="fa-solid fa-pen text-xs"></i> 
+                                                    <span class="text-xs">Edit</span> 
+                                                </div> 
                                             </button> 
                                             <form id="delete-form-{{ $tariff->id }}" action="{{ route('tariffs.destroy', $tariff->id) }}" method="POST" class="m-0 p-0 w-full"> 
                                                 @csrf 
                                                 @method('DELETE') 
                                                 <button type="button" class="dark-brown-btn-action border-0 w-full justify-center" data-popup="delete-tariff" data-id="{{ $tariff->id }}"> 
-                                                    <div class="flex items-center gap-2"> <i class="fa-solid fa-trash text-xs"></i> <span class="text-xs">Hapus</span> </div> 
+                                                    <div class="flex items-center gap-2"> 
+                                                        <i class="fa-solid fa-trash text-xs"></i> 
+                                                        <span class="text-xs">Hapus</span> 
+                                                    </div> 
                                                 </button> 
                                             </form> 
                                         </div> 
@@ -295,7 +308,9 @@
     <div class="popup-overlay"></div> 
     <div class="popup-card popup-md"> 
         <div class="popup-close-wrapper"> 
-            <button class="popup-close" data-close="add-new-tariff"> <i class="fa-solid fa-xmark"></i> </button> 
+            <button class="popup-close" data-close="add-new-tariff"> 
+                <i class="fa-solid fa-xmark"></i> 
+            </button> 
         </div> 
         <div class="popup-header">Tambah Tarif Baru</div> 
         <form action="{{ route('tariffs.store') }}" method="POST"> 

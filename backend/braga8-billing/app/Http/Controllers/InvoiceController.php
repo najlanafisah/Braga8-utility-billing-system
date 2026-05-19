@@ -15,12 +15,45 @@ use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
-    public function index(Request $request) {
+
+public function index(Request $request) 
+    {
         $query = Invoice::with(['tenant', 'unit']);
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            
+            $bulanIndo = [
+                'januari'   => 1, 'jan' => 1,
+                'februari'  => 2, 'feb' => 2,
+                'maret'     => 3, 'mar' => 3,
+                'april'     => 4, 'apr' => 4,
+                'mei'       => 5,
+                'juni'      => 6, 'jun' => 6,
+                'juli'      => 7, 'jul' => 7,
+                'agustus'   => 8, 'agu' => 8, 'ags' => 8,
+                'september' => 9, 'sep' => 9,
+                'oktober'   => 10, 'okt' => 10,
+                'november'  => 11, 'nov' => 11,
+                'desember'  => 12, 'des' => 12,
+            ];
+
+            $searchLower = strtolower($search);
+            $targetMonth = null;
+            $targetYear = null;
+
+            foreach ($bulanIndo as $namaBulan => $angkaBulan) {
+                if (str_contains($searchLower, $namaBulan)) {
+                    $targetMonth = $angkaBulan;
+                    break;
+                }
+            }
+
+            if (preg_match('/\b\d{4}\b/', $search, $matches)) {
+                $targetYear = $matches[0];
+            }
+
+            $query->where(function($q) use ($search, $targetMonth, $targetYear) {
                 $q->where('invoice_number', 'like', "%{$search}%")
                 ->orWhereHas('tenant', function($q) use ($search) {
                     $q->where('tenant_name', 'like', "%{$search}%");
@@ -28,6 +61,16 @@ class InvoiceController extends Controller
                 ->orWhereHas('unit', function($q) use ($search) {
                     $q->where('unit_number', 'like', "%{$search}%");
                 });
+
+                if ($targetMonth) {
+                    $q->orWhere(function($subQuery) use ($targetMonth, $targetYear) {
+                        $subQuery->whereMonth('created_at', $targetMonth);
+                        
+                        if ($targetYear) {
+                            $subQuery->whereYear('created_at', $targetYear);
+                        }
+                    });
+                }
             });
         }
 
@@ -51,7 +94,6 @@ class InvoiceController extends Controller
         $startDate = Carbon::now()->startOfMonth();
         $endDate   = Carbon::now()->endOfMonth();
 
-        // 1. Hitung pemakaian dengan logic baru yang toleran data minim
         $readings = $this->calculateUsage($unit);
         
         if (isset($readings['error'])) {
@@ -61,18 +103,15 @@ class InvoiceController extends Controller
         $elecMeter  = $unit->meters->where('meter_type', 'electricity')->first();
         $waterMeter = $unit->meters->where('meter_type', 'water')->first();
 
-        // Ambil tarif masing-masing meteran jika tersedia
         $elecTariff  = $elecMeter ? $elecMeter->tariff : null;
         $waterTariff = $waterMeter ? $waterMeter->tariff : null;
 
-        // Ambil salah satu tarif yang tersedia untuk komponen biaya admin/beban bersama
         $activeTariff = $elecTariff ?? $waterTariff;
 
         if (!$activeTariff) {
             return back()->withErrors('Error: Data Master Tarif belum di-set untuk meteran di unit ini.')->withInput();
         }
 
-        // 2. Perhitungan Biaya Utilitas
         $waterUsage    = $readings['water_usage'];
         $electricUsage = $readings['electric_usage'];
 
@@ -81,7 +120,6 @@ class InvoiceController extends Controller
         
         $otherFee = $request->filled('manual_other_fee') ? $request->manual_other_fee : ($activeTariff->other_fee ?? 0);
 
-        // Akumulasi subtotal tagihan gedung
         $subtotal = $waterCost + $electricCost +
                     ($activeTariff->electric_load_cost ?? 0) +
                     ($activeTariff->transformer_maintenance ?? 0) +
@@ -91,12 +129,10 @@ class InvoiceController extends Controller
 
         $taxRaw = ($subtotal * ($activeTariff->tax_percent ?? 0)) / 100;
         
-        // Pembulatan ke kelipatan 1000 terdekat
         $grandTotalRaw = $subtotal + $taxRaw;
         $totalRounded  = round($grandTotalRaw / 1000) * 1000;
         $roundingAdjustment = $totalRounded - $grandTotalRaw;
 
-        // 3. Eksekusi Database Transaction
         return DB::transaction(function () use ($tenant, $unit, $startDate, $endDate, $totalRounded, $waterCost, $electricCost, $activeTariff, $otherFee, $taxRaw, $waterUsage, $electricUsage, $roundingAdjustment) {
             
             $invoice = Invoice::create([
@@ -109,7 +145,6 @@ class InvoiceController extends Controller
                 'status'               => 'unpaid'
             ]);
 
-            // Buat Notifikasi Sistem Aplikasi Penghuni
             Notification::create([
                 'user_id' => $tenant->user_id,
                 'title'   => 'New Invoice',
@@ -117,7 +152,6 @@ class InvoiceController extends Controller
                 'type'    => 'invoice'
             ]);
 
-            // Rincian Item Invoice untuk cetakan PDF & WA
             $items = [
                 ['description' => "Pemakaian Air ($waterUsage m3)", 'amount' => $waterCost],
                 ['description' => "Pemakaian Listrik ($electricUsage kWh)", 'amount' => $electricCost],
@@ -146,12 +180,10 @@ class InvoiceController extends Controller
         $elecMeter  = $unit->meters->where('meter_type', 'electricity')->first();
         $waterMeter = $unit->meters->where('meter_type', 'water')->first();
 
-        // Minimal salah satu jenis meteran harus terpasang di unit gedung
         if (!$elecMeter && !$waterMeter) {
             return ['error' => "Unit ini belum dikonfigurasi memiliki meteran air maupun listrik."];
         }
 
-        // Helper untuk mengambil 2 riwayat checklist pembacaan terakhir
         $getReadings = function($meterId) {
             if (!$meterId) return collect();
             return MeterReading::where('meter_id', $meterId)
@@ -164,20 +196,16 @@ class InvoiceController extends Controller
         $eReadings = $elecMeter ? $getReadings($elecMeter->id) : collect();
         $wReadings = $waterMeter ? $getReadings($waterMeter->id) : collect();
 
-        // --- Perhitungan Toleran & Fleksibel ---
-        // 1. Perhitungan Sektor Listrik
         $electricUsage = 0;
         if ($eReadings->count() > 0) {
             $eDiff = ($eReadings->count() >= 2) ? ($eReadings[0]->reading_value - $eReadings[1]->reading_value) : $eReadings[0]->reading_value;
-            // Gunakan properti power_capacity yang sesuai dengan Model UtilityMeter kamu
             $electricUsage = $eDiff * ($elecMeter->power_capacity ?? 1);
         }
 
-        // 2. Perhitungan Sektor Air
         $waterUsage = 0;
         if ($wReadings->count() > 0) {
             $wDiff = ($wReadings->count() >= 2) ? ($wReadings[0]->reading_value - $wReadings[1]->reading_value) : $wReadings[0]->reading_value;
-            $waterUsage = $wDiff * ($waterMeter->multiplier ?? 1); // fallback ke pengali/multiplier meteran air
+            $waterUsage = $wDiff * ($waterMeter->multiplier ?? 1);
         }
 
         return [

@@ -13,6 +13,10 @@ class Tariff extends Model
         'name', 
         'water_price',
         'electric_price',
+        'electric_load_cost',
+        'transformer_maintenance',
+        'admin_fee',
+        'stamp_fee',
         'tax_percent', 
         'other_fees',  
     ];
