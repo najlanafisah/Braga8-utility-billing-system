@@ -45,7 +45,7 @@
 <div class="min-h-screen"> 
     <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8"> 
         <div> 
-            <h1 class="title-text">Riwayat Pembayaran</h1> 
+            <h1 class="title-text">Pembayaran</h1> 
             <p class="subtitle-text">Braga8 Utility Billing Management</p> 
         </div> 
         <div class="header-user">
@@ -70,12 +70,7 @@
             <form method="GET" action="{{ route('payments.index') }}" class="search-wrapper"> 
                 <input type="text" name="search" placeholder="Cari Pembayaran.." value="{{ request('search') }}"> 
                 <span><i class="fa-solid fa-magnifying-glass"></i></span>
-            </form>
-            <div class="toolbar-action"> 
-                <button type="button" class="light-brown-btn btn-small" data-popup="add-payment-modal"> 
-                    <i class="fa-solid fa-plus"></i> <span>Tambah Pembayaran</span> 
-                </button> 
-            </div> 
+            </form> 
         </div> 
 
         <div class="card-image-container mb-2"> 
@@ -291,74 +286,6 @@
     </div> 
     @endif
     @endforeach
-
-    <div class="popup" id="add-payment-modal"> 
-        <div class="popup-overlay"></div> 
-        <div class="popup-card popup-md" style="overflow: visible !important;"> 
-            <div class="popup-close-wrapper"> <button class="popup-close" data-close="add-payment-modal"> <i class="fa-solid fa-xmark"></i> </button> </div> 
-            <div class="popup-header">Tambah Pembayaran Baru</div> 
-            <div class="popup-body"> 
-                <form action="{{ route('payments.store') }}" method="POST" enctype="multipart/form-data"> 
-                    @csrf 
-                    <div class="flex flex-col gap-6"> 
-                        <div>
-                            <div class="text-field">
-                                <label class="text-field-label text-left">Pilih Invoice <span class="text-[#FA8327]">*</span></label>
-                                <div class="custom-dropdown" id="addInvoiceDropdown">
-                                    <div class="dropdown-selected">
-                                        <span class="placeholder">-- Pilih Nomor Invoice --</span>
-                                        <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i>
-                                    </div>
-                                    <div class="dropdown-options">
-                                        @forelse($invoices as $inv)
-                                            <div class="option" data-value="{{ $inv->id }}" data-total="{{ $inv->total_amount }}">
-                                                {{ $inv->invoice_number }} - {{ $inv->tenant->tenant_name }}
-                                            </div>
-                                        @empty
-                                            <div class="option disabled text-zinc-400 italic">Belum ada invoice tersedia</div>
-                                        @endforelse
-                                    </div>
-                                    <input type="hidden" name="invoice_id" id="add_invoice_id_input" required>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="text-field">
-                                    <label class="text-field-label text-left">Jumlah Bayar <span class="text-[#FA8327]">*</span></label>
-                                    <input type="number" name="amount_paid" id="add_amount_paid" class="text-field-input" placeholder="0" required step="any">
-                                    <p id="add_invoice_hint" class="text-[9px] text-zinc-500 mt-1 italic text-left">Pilih invoice untuk melihat total.</p>
-                                </div>
-                                
-                                <div class="text-field">
-                                    <label class="text-field-label text-left">Tanggal Bayar <span class="text-[#FA8327]">*</span></label>
-                                    <input type="date" name="payment_date" class="text-field-input" value="{{ date('Y-m-d') }}" required>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4"> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Metode Pembayaran <span class="text-[#FA8327]">*</span></label> 
-                                    <div class="custom-dropdown"> 
-                                        <div class="dropdown-selected"> <span class="placeholder">Bank Transfer</span> <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> </div> 
-                                        <div class="dropdown-options"> <div class="option">Bank Transfer</div> <div class="option">Cash</div> <div class="option">E-Wallet</div> </div> 
-                                        <input type="hidden" name="paid_using" value="Bank Transfer"> 
-                                    </div> 
-                                </div> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Status Awal <span class="text-[#FA8327]">*</span></label> 
-                                    <div class="custom-dropdown"> 
-                                        <div class="dropdown-selected"> <span class="placeholder">Pending</span> <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> </div> 
-                                        <div class="dropdown-options"> <div class="option" data-value="pending">Pending</div> <div class="option" data-value="rejected">Rejected</div> <div class="option" data-value="verified">Verified</div> </div> 
-                                        <input type="hidden" name="status" value="pending"> 
-                                    </div> 
-                                </div> 
-                            </div> 
-                        </div>
-                        <button type="submit" class="dark-brown-button w-full mt-2"> Simpan Pembayaran </button> 
-                    </div> 
-                </form> 
-            </div> 
-        </div> 
-    </div>
 
     <div class="popup" id="delete-tariff"> 
         <div class="popup-overlay"></div> 
