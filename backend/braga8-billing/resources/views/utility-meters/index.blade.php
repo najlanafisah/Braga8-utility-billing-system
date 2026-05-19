@@ -121,9 +121,9 @@
                             <td class="font-medium text-zinc-300">{{ $meter->meter_number }}</td> 
                             <td> 
                                 @if($meter->meter_type == 'electricity') 
-                                    <span class="dark-green-btn !w-fit px-3">Listrik</span> 
+                                    <span class="amber-btn">Listrik</span> 
                                 @else 
-                                    <span class="blue-btn !w-fit px-3">Air</span> 
+                                    <span class="blue-btn">Air</span> 
                                 @endif 
                             </td> 
                             <td>{{ $meter->power_capacity ?? '-' }}</td> 
@@ -282,7 +282,7 @@
                                             <div class="flex flex-col gap-2 items-end"> 
                                                 <p class="text-right text-xs tracking-wider text-zinc-400 font-semibold uppercase">Tipe Meteran</p> 
                                                 @if($meter->meter_type == 'electricity') 
-                                                    <span class="dark-green-btn !w-fit px-4 py-1.5 text-xs">LISTRIK</span> 
+                                                    <span class="amber-btn !w-fit px-4 py-1.5 text-xs">LISTRIK</span> 
                                                 @else 
                                                     <span class="blue-btn !w-fit px-4 py-1.5 text-xs">AIR</span> 
                                                 @endif 
