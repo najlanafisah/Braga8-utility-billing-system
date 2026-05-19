@@ -111,7 +111,7 @@
                     <table class="table"> 
                         <thead> 
                             <tr> 
-                                <th>Bulan</th>
+                                <th>Bulan</th> 
                                 <th>No. Invoice</th> 
                                 <th>Unit</th> 
                                 <th>Total</th> 
@@ -122,8 +122,8 @@
                         <tbody> 
                             @foreach($groupedInvoices as $invoice) 
                                 <tr> 
-                                    <td>
-                                        {{ $invoice->created_at ? $invoice->created_at->translatedFormat('F Y') : '-' }}
+                                    <td> 
+                                        {{ $invoice->created_at ? $invoice->created_at->translatedFormat('F Y') : '-' }} 
                                     </td> 
                                     <td>{{ $invoice->invoice_number }}</td> 
                                     <td>{{ $invoice->unit->unit_number }}</td> 
@@ -137,12 +137,11 @@
                                     </td> 
                                     <td class="actions"> 
                                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 w-full"> 
-                                            
+                                            {{-- WHATSAPP LOGIC --}}
                                             @if($invoice->notified_at) 
                                                 @php 
                                                     $isCooldown = $invoice->notified_at && $invoice->notified_at->diffInDays(now()) < 2; 
                                                 @endphp 
-
                                                 @if($isCooldown) 
                                                     <div class="light-grey-btn-action opacity-50 cursor-not-allowed flex items-center justify-center gap-1 py-1"> 
                                                         <i class="fa-solid fa-clock-rotate-left text-zinc-400"></i> 
@@ -165,10 +164,12 @@
                                                 <span><i class="fa-solid fa-eye"></i></span> 
                                                 <span>Lihat</span> 
                                             </a> 
-                                            <a href="{{ route('invoices.pdf', $invoice) }}" class="light-brown-btn-action"> 
+
+                                            <a href="{{ route('invoices.pdf', $invoice) }}" target="_blank" class="light-brown-btn-action"> 
                                                 <span><i class="fa-solid fa-file-pdf"></i></span> 
                                                 <span>Ekspor PDF</span> 
                                             </a> 
+
                                             <form id="delete-form-{{ $invoice->id }}" action="{{ route('invoices.destroy', $invoice) }}" method="POST" class="inline"> 
                                                 @csrf 
                                                 @method('DELETE') 
@@ -185,7 +186,9 @@
                     </table> 
                 </div> 
             @empty 
-                <div class="table-card p-10 text-center text-zinc-400 italic"> Data tagihan tidak ditemukan </div> 
+                <div class="table-card p-10 text-center text-zinc-400 italic"> 
+                    Data tagihan tidak ditemukan 
+                </div> 
             @endforelse 
         </div> 
 
@@ -199,12 +202,13 @@
         </div> 
     </div> 
 
-    <!-- POPUP BUAT TAGIHAN -->
     <div class="popup" id="add-invoices"> 
         <div class="popup-overlay"></div> 
         <div class="popup-card popup-md text-left"> 
             <div class="popup-close-wrapper"> 
-                <button class="popup-close" data-close="add-invoices"> <i class="fa-solid fa-xmark"></i> </button> 
+                <button class="popup-close" data-close="add-invoices"> 
+                    <i class="fa-solid fa-xmark"></i> 
+                </button> 
             </div> 
             <div class="popup-header">Buat Tagihan Baru</div> 
             <div class="popup-body"> 
@@ -221,7 +225,9 @@
                                     </div> 
                                     <div class="dropdown-options"> 
                                         @foreach($tenants as $tenant) 
-                                            <div class="option" data-value="{{ $tenant->id }}"> {{ $tenant->tenant_name }} </div> 
+                                            <div class="option" data-value="{{ $tenant->id }}"> 
+                                                {{ $tenant->tenant_name }} 
+                                            </div> 
                                         @endforeach 
                                     </div> 
                                     <input type="hidden" name="tenant_id" id="tenant_id_input" required> 
@@ -263,12 +269,13 @@
         </div> 
     </div> 
 
-    <!-- POPUP KONFIRMASI HAPUS -->
     <div class="popup" id="delete-invoice"> 
         <div class="popup-overlay"></div> 
         <div class="popup-card popup-md"> 
             <div class="popup-close-wrapper"> 
-                <button class="popup-close"> <i class="fa-solid fa-xmark"></i> </button> 
+                <button class="popup-close" data-close="delete-invoice"> 
+                    <i class="fa-solid fa-xmark"></i> 
+                </button> 
             </div> 
             <div class="popup-header">Hapus Invoice <span id="display-invoice-number" class="text-[#FA8327]"></span>?</div> 
             <div class="popup-body btn-delete-wrapper"> 

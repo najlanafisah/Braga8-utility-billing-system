@@ -94,14 +94,33 @@ public function index(Request $request)
         $startDate = Carbon::now()->startOfMonth();
         $endDate   = Carbon::now()->endOfMonth();
 
+        $elecMeter  = $unit->meters->where('meter_type', 'electricity')->first();
+        $waterMeter = $unit->meters->where('meter_type', 'water')->first();
+
+        $checkReadingExists = function($meterId) {
+            if (!$meterId) return false;
+            return \App\Models\MeterReading::where('meter_id', $meterId)
+                                ->where('status', 'checked')
+                                ->exists();
+        };
+
+        $errorsList = [];
+        if ($elecMeter && !$checkReadingExists($elecMeter->id)) {
+            $errorsList[] = "Data meteran LISTRIK belum di-input atau belum dikonfirmasi oleh admin untuk unit ini.";
+        }
+        if ($waterMeter && !$checkReadingExists($waterMeter->id)) {
+            $errorsList[] = "Data meteran AIR belum di-input atau belum dikonfirmasi oleh admin untuk unit ini.";
+        }
+
+        if (!empty($errorsList)) {
+            return back()->withErrors($errorsList)->withInput();
+        }
+
         $readings = $this->calculateUsage($unit);
         
         if (isset($readings['error'])) {
             return back()->withErrors($readings['error'])->withInput();
         }
-
-        $elecMeter  = $unit->meters->where('meter_type', 'electricity')->first();
-        $waterMeter = $unit->meters->where('meter_type', 'water')->first();
 
         $elecTariff  = $elecMeter ? $elecMeter->tariff : null;
         $waterTariff = $waterMeter ? $waterMeter->tariff : null;

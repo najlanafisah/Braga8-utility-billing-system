@@ -13,14 +13,13 @@ class MeterReading extends Model
     'user_id', 
     'reading_value', 
     'photo_path', 
-    'latitude',       // Tambahkan ini
-    'longitude',      // Tambahkan ini
-    'location_address', // Tambahkan ini
+    'latitude',       
+    'longitude',      
+    'location_address',
     'recorded_at', 
     'description', 
     'status',
 ];
-    // Use $casts instead of $dates (Laravel 10+ style)
     protected $casts = [
         'recorded_at' => 'datetime',
     ];
