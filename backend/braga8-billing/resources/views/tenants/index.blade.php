@@ -225,17 +225,17 @@
                                                             <input type="text" name="person_in_charge" value="{{ $tenant->person_in_charge }}" class="text-field-input" required>
                                                         </div>
                                                         <div class="text-field">
-                                                            <label class="text-field-label">Tipe Bisnis</label>
-                                                            <input type="text" name="business_type" value="{{ $tenant->business_type }}" class="text-field-input">
+                                                            <label class="text-field-label">Tipe Bisnis <span class="text-[#FA8327]">*</span></label>
+                                                            <input type="text" name="business_type" value="{{ $tenant->business_type }}" class="text-field-input" required>
                                                         </div>
                                                     </div>
                                                     <div class="text-field">
-                                                        <label class="text-field-label">No. Telepon</label>
-                                                        <input type="text" name="contact_phone" value="{{ $tenant->contact_phone }}" class="text-field-input">
+                                                        <label class="text-field-label">No. Telepon PIC <span class="text-[#FA8327]">*</span></label>
+                                                        <input type="text" name="contact_phone" value="{{ $tenant->contact_phone }}" class="text-field-input" required>
                                                     </div>
                                                     <div class="text-field">
-                                                        <label class="text-field-label">Alamat Email</label>
-                                                        <input type="email" name="contact_email" value="{{ $tenant->contact_email }}" class="text-field-input">
+                                                        <label class="text-field-label">Alamat Email PIC <span class="text-[#FA8327]">*</span></label>
+                                                        <input type="email" name="contact_email" value="{{ $tenant->contact_email }}" class="text-field-input" required>
                                                     </div>
                                                     <div class="text-field">
                                                         <label class="text-field-label">Nama Perusahaan</label>
@@ -293,27 +293,27 @@
                             <input type="text" name="company_name" value="{{ old('company_name') }}" class="text-field-input" placeholder="PT / CV (Opsional)">
                             @error('company_name') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="text-field">
+                        <div class="text-field">
+                            <label class="text-field-label">Tipe Bisnis <span class="text-[#FA8327]">*</span></label>
+                            <input type="text" name="business_type" value="{{ old('business_type') }}" class="text-field-input" placeholder="Contoh: Café, Retail, Kantor" required>
+                            @error('business_type') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="text-field">
                                 <label class="text-field-label">PIC <span class="text-[#FA8327]">*</span></label>
                                 <input type="text" name="person_in_charge" value="{{ old('person_in_charge') }}" class="text-field-input" placeholder="Nama Penanggung Jawab" required>
                                 @error('person_in_charge') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="text-field">
+                                <label class="text-field-label">No. Telepon PIC <span class="text-[#FA8327]">*</span></label>
+                                <input type="text" name="contact_phone" value="{{ old('contact_phone') }}" class="text-field-input" placeholder="08xxxxxxxxxx" required>
+                                @error('contact_phone') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
                             </div>
                             <div class="text-field">
-                                <label class="text-field-label">Tipe Bisnis</label>
-                                <input type="text" name="business_type" value="{{ old('business_type') }}" class="text-field-input" placeholder="Contoh: Café, Retail, Kantor">
-                                @error('business_type') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
+                                <label class="text-field-label">Alamat Email PIC <span class="text-[#FA8327]">*</span></label>
+                                <input type="email" name="contact_email" value="{{ old('contact_email') }}" class="text-field-input" placeholder="alamat@email.com" required>
+                                @error('contact_email') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
                             </div>
-                        </div>
-                        <div class="text-field">
-                            <label class="text-field-label">No. Telepon</label>
-                            <input type="text" name="contact_phone" value="{{ old('contact_phone') }}" class="text-field-input" placeholder="08xxxxxxxxxx">
-                            @error('contact_phone') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
-                        </div>
-                        <div class="text-field">
-                            <label class="text-field-label">Alamat Email</label>
-                            <input type="email" name="contact_email" value="{{ old('contact_email') }}" class="text-field-input" placeholder="alamat@email.com">
-                            @error('contact_email') <p class="text-[10px] text-[#FA8327] mt-1 italic">{{ $message }}</p> @enderror
                         </div>
                     </div>
                     <button type="submit" class="light-brown-btn py-4">Simpan Data Tenant</button>

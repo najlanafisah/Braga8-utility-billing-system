@@ -6,13 +6,37 @@ export function initDropdown() {
         const options = dropdown.querySelectorAll(".option");
         const placeholder = dropdown.querySelector(".placeholder");
         const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const optionsContainer = dropdown.querySelector(".dropdown-options");
 
         selected.addEventListener("click", (e) => {
             e.stopPropagation();
+            
+            // Tutup semua dropdown lain yang sedang terbuka
             document.querySelectorAll(".custom-dropdown").forEach(d => {
-                if (d !== dropdown) d.classList.remove("active");
+                if (d !== dropdown) {
+                    d.classList.remove("active");
+                    const otherContainer = d.querySelector(".dropdown-options");
+                    if (otherContainer) otherContainer.style.overflowY = 'hidden'; // Reset yang lain
+                }
             });
+
+            // Toggle dropdown saat ini
             dropdown.classList.toggle("active");
+
+            // LOGIKA IF ELSE: Atur overflow berdasarkan status active
+            if (optionsContainer) {
+                if (dropdown.classList.contains("active")) {
+                    // IF terbukan: tunggu transisi CSS selesai (250ms), baru aktifkan scroll
+                    setTimeout(() => {
+                        if (dropdown.classList.contains("active")) {
+                            optionsContainer.style.overflowY = 'auto';
+                        }
+                    }, 250);
+                } else {
+                    // ELSE tertutup: langsung amankan overflow ke hidden
+                    optionsContainer.style.overflowY = 'hidden';
+                }
+            }
         });
 
         options.forEach(option => {
@@ -60,12 +84,19 @@ export function initDropdown() {
                     }
                 }
 
+                // Saat opsi dipilih, pastikan dropdown ditutup dan reset overflow ke hidden
                 dropdown.classList.remove("active");
+                if (optionsContainer) optionsContainer.style.overflowY = 'hidden';
             });
         });
     });
 
+    // Event global ketika user klik di luar area mana pun
     document.addEventListener("click", () => {
-        document.querySelectorAll(".custom-dropdown").forEach(d => d.classList.remove("active"));
+        document.querySelectorAll(".custom-dropdown").forEach(d => {
+            d.classList.remove("active");
+            const container = d.querySelector(".dropdown-options");
+            if (container) container.style.overflowY = 'hidden'; // Kelola semua saat di luar klik
+        });
     });
 }

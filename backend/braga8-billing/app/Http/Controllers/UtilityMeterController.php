@@ -50,7 +50,7 @@ class UtilityMeterController extends Controller
             'meter_number' => 'required|string|max:100',
             'power_capacity' => 'nullable|string|max:100',
             'tariff_id' => 'nullable|exists:tariffs,id',
-            'meter_category' => 'required|in:postpaid,prepaid' // Tambahkan ini
+            'meter_category' => 'required|in:postpaid,prepaid'
         ]);
 
         UtilityMeter::create($validated);

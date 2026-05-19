@@ -745,7 +745,7 @@ main {
 }
 
 .custom-dropdown.active .dropdown-options {
-    max-height: 200px;
+    max-height: 210px;
 }
 
 .option {
