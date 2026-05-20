@@ -155,12 +155,6 @@
                             </button>
                         </form>
                     </div>
-                    
-                    <div class="mt-2 pt-2 border-t border-dashed border-rose-100 flex justify-end">
-                        <button type="button" class="text-xs font-medium text-rose-500 hover:text-rose-700 hover:underline transition-colors flex items-center gap-1.5" data-popup="delete-account-popup">
-                            <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus Akun Permanen
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
