@@ -203,13 +203,14 @@ main {
 
 /* POPUP NOTIFICATION */
 .notification-wrapper {
-    max-height: 300px;
+    max-height: 350px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 12px;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    padding-right: 6px; 
 }
 
 .notification-wrapper::-webkit-scrollbar {
@@ -230,6 +231,7 @@ main {
         inset 0 -3px 10px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
+    width: 100%;
 }
 
 .notification {

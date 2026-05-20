@@ -11,6 +11,7 @@ import { initDropdown } from "./dropdown.js";
 import { initPayment } from "./payment.js";
 import { initUtilityFeatures } from './utility.js';
 import { initPasswordToggle } from './popup.js';
+import { initNotifications } from "./notification.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     initSidebar();
@@ -20,10 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     initPayment();
     initUtilityFeatures();
     initPasswordToggle();
+    initNotifications();
 
     const detailPopup = document.getElementById("detail-profile-popup");
 
-const openEdit = document.getElementById("openEdit");
+    const openEdit = document.getElementById("openEdit");
     if (openEdit) {
         openEdit.addEventListener("click", () => {
             detailPopup?.classList.remove("active");
@@ -31,7 +33,6 @@ const openEdit = document.getElementById("openEdit");
         });
     }
 
-    // Ketika tombol 'Hapus Akun' di klik, tutup detail dan buka popup hapus
     const openDeleteAccount = document.querySelector('[data-popup="delete-account-popup"]');
     if (openDeleteAccount) {
         openDeleteAccount.addEventListener("click", () => {
@@ -39,15 +40,8 @@ const openEdit = document.getElementById("openEdit");
         });
     }
 
-    // =========================================================================
-    // AUTOMATIC POPUP TRIGGER (SUPER SPECIFIC PROTECTION)
-    // =========================================================================
-    
-    // 1. Cek error untuk Edit Profil & Password
     const editPopup = document.getElementById('edit-profile-popup');
     if (editPopup) {
-        // Hanya deteksi jika di dalamnya ada tag <x-input-error> (biasanya berupa tag <ul> atau <li> bawaan Laravel)
-        // yang memiliki anak teks pesan error nyata
         const hasValidationError = Array.from(editPopup.querySelectorAll('.text-red-600, .text-rose-600'))
             .some(el => el.tagName !== 'P' && el.textContent.trim().length > 0);
 
@@ -56,11 +50,8 @@ const openEdit = document.getElementById("openEdit");
         }
     }
 
-    // 2. Cek error untuk Verifikasi Hapus Akun
     const deletePopup = document.getElementById('delete-account-popup');
     if (deletePopup) {
-        // Kita pastikan ia HANYA mendeteksi error jika elemennya berada di bawah form (.text-field)
-        // Ini memblokir segala jenis teks paragraf deskripsi (<p>) di luar form agar tidak memicu modal
         const errorInForm = deletePopup.querySelector('.text-field .text-red-600, .text-field .text-rose-600');
         const hasValidationError = errorInForm && errorInForm.textContent.trim().length > 0;
 

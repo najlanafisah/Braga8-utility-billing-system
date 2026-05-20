@@ -286,39 +286,37 @@
             <div class="popup-body">
                 <div class="notification-wrapper">
                     @forelse(auth()->user()->customNotifications as $notif)
-                        <div class="notification {{ $notif->read_at ? 'is-read' : 'is-unread' }}">
-                            <div class="notif-box">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="flex items-center gap-2">
-                                        <i class="fa-solid {{ $notif->read_at ? 'fa-envelope-open text-zinc-500' : 'fa-envelope text-[#FA8327]' }} text-xs"></i>
-                                        <h4 class="font-bold text-white text-sm">{{ $notif->title }}</h4>
-                                    </div>
-                                    
-                                    <div class="notif-actions flex gap-3">
-                                        @if(!$notif->read_at)
-                                            <form action="{{ route('notifications.read', $notif->id) }}" class="read-notif-form">
-                                                @csrf
-                                                <button type="submit" class="text-zinc-500 hover:text-zinc-300 transition-colors hover:scale-110 transition-transform" title="Tandai Baca">
-                                                    <i class="fa-solid fa-check text-xs"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <form action="{{ route('notifications.destroy', $notif->id) }}" class="delete-notif-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-zinc-500 hover:text-zinc-300 transition-colors hover:scale-110 transition-transform">
-                                                <i class="fa-solid fa-trash-can text-xs"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-
-                                <p class="notif-message">{{ $notif->message }}</p>
-                                
-                                <div class="mt-3 text-[10px] text-zinc-500 text-right italic">
-                                    {{ $notif->created_at->diffForHumans() }}
-                                </div>
-                            </div>
+                        <div class="notification {{ $notif->read_at ? 'is-read' : 'is-unread' }}" id="notif-{{ $notif->id }}"> 
+                            <div class="notif-box"> 
+                                <div class="flex justify-between items-start mb-2"> 
+                                    <div class="flex items-center gap-2"> 
+                                        <i class="notif-icon fa-solid {{ $notif->read_at ? 'fa-envelope-open text-zinc-500' : 'fa-envelope text-[#FA8327]' }} text-xs"></i> 
+                                        <h4 class="font-bold text-white text-sm">{{ $notif->title }}</h4> 
+                                    </div> 
+                                    <div class="notif-actions flex gap-3"> 
+                                        @if(!$notif->read_at) 
+                                        <form action="{{ route('notifications.read', $notif->id) }}" method="POST" class="read-notif-form"> 
+                                            @csrf 
+                                            <button type="submit" class="text-zinc-500 hover:text-zinc-300 transition-colors hover:scale-110" title="Tandai Baca"> 
+                                                <i class="fa-solid fa-check text-xs"></i> 
+                                            </button> 
+                                        </form> 
+                                        @endif 
+                                        
+                                        <form action="{{ route('notifications.destroy', $notif->id) }}" method="POST" class="delete-notif-form"> 
+                                            @csrf 
+                                            @method('DELETE') 
+                                            <button type="submit" class="text-zinc-500 hover:text-zinc-300 transition-colors hover:scale-110"> 
+                                                <i class="fa-solid fa-trash-can text-xs"></i> 
+                                            </button> 
+                                        </form> 
+                                    </div> 
+                                </div> 
+                                <p class="notif-message">{{ $notif->message }}</p> 
+                                <div class="mt-3 text-[10px] text-zinc-500 text-right italic"> 
+                                    {{ $notif->created_at->diffForHumans() }} 
+                                </div> 
+                            </div> 
                         </div>
                     @empty
                         <div class="py-16 text-center">

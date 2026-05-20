@@ -8,24 +8,24 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    public function markAsRead($notification)
+    public function markAsRead(Request $request, $notification)
     {
-        $notif = \App\Models\Notification::where('user_id', auth()->id())->findOrFail($notification);
+        $notif = Notification::where('user_id', auth()->id())->findOrFail($notification);
         $notif->update(['read_at' => now()]);
 
-        if (request()->ajax()) {
+        if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true]);
         }
 
         return back();
     }
 
-    public function destroy($notification)
+    public function destroy(Request $request, $notification)
     {
-        $notif = \App\Models\Notification::where('user_id', auth()->id())->findOrFail($notification);
+        $notif = Notification::where('user_id', auth()->id())->findOrFail($notification);
         $notif->delete();
 
-        if (request()->ajax()) {
+        if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true]);
         }
 
