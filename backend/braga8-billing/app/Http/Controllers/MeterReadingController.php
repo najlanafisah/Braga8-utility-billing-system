@@ -25,6 +25,7 @@ class MeterReadingController extends Controller
     {
         $search = $request->query('search');
 
+        // Menggunakan paginate() menggantikan get() agar data tenant terbagi rapi
         $tenants = Tenant::with(['units.meters.readings.user'])
             ->when($search, function ($query) use ($search) {
                 $query->where('tenant_name', 'LIKE', "%{$search}%")
@@ -32,7 +33,8 @@ class MeterReadingController extends Controller
                         $q->where('unit_number', 'LIKE', "%{$search}%");
                     });
             })
-            ->get();
+            ->paginate(5)
+            ->appends($request->all());
 
         $meters = UtilityMeter::with('unit')->get();
 
@@ -70,24 +72,24 @@ class MeterReadingController extends Controller
         ]);
     }
 
-   private function getAddress($lat, $lon)
-{
-    if (!$lat || !$lon || ($lat == 0 && $lon == 0)) {
-        return "Koordinat tidak valid (GPS tidak terkunci)";
-    }
+    private function getAddress($lat, $lon)
+    {
+        if (!$lat || !$lon || ($lat == 0 && $lon == 0)) {
+            return "Koordinat tidak valid (GPS tidak terkunci)";
+        }
 
-    try {
-        $response = Http::withHeaders([
-            'User-Agent' => 'Braga8-Ujikom-App-Student-Project', 
-            'Accept' => 'application/json',
-        ])
-        ->timeout(10) // Tambah durasi timeout
-        ->get("https://nominatim.openstreetmap.org/reverse", [
-            'format' => 'jsonv2', // Gunakan v2 lebih stabil
-            'lat'    => $lat,
-            'lon'    => $lon,
-            'addressdetails' => 1,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'Braga8-Ujikom-App-Student-Project', 
+                'Accept' => 'application/json',
+            ])
+            ->timeout(10)
+            ->get("https://nominatim.openstreetmap.org/reverse", [
+                'format' => 'jsonv2', 
+                'lat'    => $lat,
+                'lon'    => $lon,
+                'addressdetails' => 1,
+            ]);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -97,9 +99,9 @@ class MeterReadingController extends Controller
         Log::error("Nominatim Error: " . $response->status() . " - " . $response->body());
         return "Gagal melacak alamat (Server Map Error)";
         
-    } catch (\Exception $e) {
-        Log::error("Geo Error: " . $e->getMessage());
-        return "Gagal melacak alamat (Koneksi Timeout)";
+        } catch (\Exception $e) {
+            Log::error("Geo Error: " . $e->getMessage());
+            return "Gagal melacak alamat (Koneksi Timeout)";
+        }
     }
-}
 }

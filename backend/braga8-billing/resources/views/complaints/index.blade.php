@@ -227,12 +227,12 @@
             </div>
         </div>
 
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 px-2"> 
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2"> 
             <div class="text-sm text-zinc-500"> 
-                Menampilkan <span class="text-white font-bold">{{ $complaints->firstItem() ?? 0 }}</span> sampai <span class="text-white font-bold">{{ $complaints->lastItem() ?? 0 }}</span> dari <span class="text-white font-bold">{{ $complaints->total() }}</span> hasil 
+                Menampilkan <span class="text-white">{{ $complaints->firstItem() ?? 0 }}</span> sampai <span class="text-white">{{ $complaints->lastItem() ?? 0 }}</span> dari <span class="text-white">{{ $complaints->total() }}</span> hasil 
             </div> 
             <div class="braga-pagination"> 
-                {{ $complaints->links() }} 
+                {{ $complaints->links('pagination::bootstrap-4') }} 
             </div> 
         </div> 
     </div> 

@@ -21,64 +21,69 @@ class UnitController extends Controller
                     });
                 });
             })
-            ->get();
+            ->paginate(5) // Menggunakan paginate alih-alih get() agar kompatibel dengan view index kamu
+            ->withQueryString(); // Memastikan parameter ?search= tetap terbawa saat pindah halaman pagination
 
         return view('units.index', compact('tenants'));
     }
-        public function create()
+
+    public function create()
     {
         $tenants = Tenant::all();
         return view('units.create', compact('tenants'));
     }
+
     public function store(Request $request)
     {
-    $request->validate([
-        'tenant_id' => 'required|exists:tenants,id',
-        'unit_number' => 'required|string|max:50',
-        'floor' => 'required|string|max:50',
-        'area_size' => 'nullable|numeric',
-        'is_active' => 'required|boolean',
-        'lease_start' => 'nullable|date',
-        'lease_end' => 'nullable|date',
-    ]);
+        $request->validate([
+            'tenant_id' => 'required|exists:tenants,id',
+            'unit_number' => 'required|string|max:50',
+            'floor' => 'required|string|max:50',
+            'area_size' => 'nullable|numeric',
+            'is_active' => 'required|boolean',
+            'lease_start' => 'nullable|date',
+            'lease_end' => 'nullable|date',
+        ]);
 
-    Unit::create($request->all());
+        Unit::create($request->all());
 
         return redirect()->route('units.index')
             ->with('success', 'Unit berhasil ditambahkan.');
     }
+
     public function edit(Unit $unit)
     {
         $tenants = Tenant::all();
         return view('units.edit', compact('unit', 'tenants'));
     }
-        public function update(Request $request, Unit $unit)
-        {
-            $request->validate([
-                'tenant_id' => 'required|exists:tenants,id',
-                'unit_number' => 'required|string|max:50',
-                'floor' => 'required|string|max:50',
-                'area_size' => 'nullable|numeric',
-                'is_active' => 'required|boolean',
-                'lease_start' => 'nullable|date',
-                'lease_end' => 'nullable|date',
-            ]);
 
-            $unit->update($request->all());
+    public function update(Request $request, Unit $unit)
+    {
+        $request->validate([
+            'tenant_id' => 'required|exists:tenants,id',
+            'unit_number' => 'required|string|max:50',
+            'floor' => 'required|string|max:50',
+            'area_size' => 'nullable|numeric',
+            'is_active' => 'required|boolean',
+            'lease_start' => 'nullable|date',
+            'lease_end' => 'nullable|date',
+        ]);
 
-            return redirect()->route('units.index')
-                ->with('success', 'Unit berhasil diperbarui.');
-        }
+        $unit->update($request->all());
 
-        public function destroy(Unit $unit)
-        {
-            $unit->delete();
+        return redirect()->route('units.index')
+            ->with('success', 'Unit berhasil diperbarui.');
+    }
 
-            return redirect()->route('units.index')
-                ->with('success', 'Unit berhasil dihapus.');
-        }
+    public function destroy(Unit $unit)
+    {
+        $unit->delete();
+
+        return redirect()->route('units.index')
+            ->with('success', 'Unit berhasil dihapus.');
+    }
         
-        public function show(Unit $unit)
+    public function show(Unit $unit)
     {
         $unit->load('tenant');
 

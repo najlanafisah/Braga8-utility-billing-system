@@ -76,7 +76,9 @@
                             <span class="label">Penghuni:</span> 
                             <span class="value">{{ $tenant->tenant_name }}</span> 
                         </div> 
-                        <div class="table-card-meta"> {{ $tenant->units->count() }} Unit </div> 
+                        <div class="table-card-meta"> 
+                            {{ $tenant->units->count() }} Unit 
+                        </div> 
                     </div> 
                     <table class="table"> 
                         <thead> 
@@ -123,29 +125,17 @@
                                                 </form> 
                                             </td> 
                                             <td>{{ \Carbon\Carbon::parse($reading->recorded_at)->format('d M Y') }}</td> 
-                                            <td>
-                                                <div class="flex justify-center">
-                                                    @if($reading->photo_path)
-                                                        <button class="light-green-btn-action" data-popup="photoModal" 
-                                                            onclick="showImage(
-                                                                '{{ asset('storage/'.$reading->photo_path) }}', 
-                                                                '{{ $unit->unit_number }}', 
-                                                                '{{ $meter->meter_type }}', 
-                                                                '{{ number_format($reading->reading_value, 2) }}', 
-                                                                '{{ \Carbon\Carbon::parse($reading->recorded_at)->format('d M Y, H:i') }}', 
-                                                                '{{ $reading->status }}', 
-                                                                '{{ $meter->meter_number }}',
-                                                                '{{ $reading->location_address ?? 'Lokasi tidak tercatat' }}',
-                                                                '{{ $reading->latitude }}',
-                                                                '{{ $reading->longitude }}'
-                                                            )">
-                                                            <i class="fa-regular fa-eye"></i> Lihat Detail
-                                                        </button>
-                                                    @else
-                                                        <span class="subtitle-text text-xs">Tanpa Foto</span>
-                                                    @endif
-                                                </div>
-                                            </td>
+                                            <td> 
+                                                <div class="flex justify-center"> 
+                                                    @if($reading->photo_path) 
+                                                        <button class="light-green-btn-action" data-popup="photoModal" onclick="showImage( '{{ asset('storage/'.$reading->photo_path) }}', '{{ $unit->unit_number }}', '{{ $meter->meter_type }}', '{{ number_format($reading->reading_value, 2) }}', '{{ \Carbon\Carbon::parse($reading->recorded_at)->format('d M Y, H:i') }}', '{{ $reading->status }}', '{{ $meter->meter_number }}', '{{ $reading->location_address ?? 'Lokasi tidak tercatat' }}', '{{ $reading->latitude }}', '{{ $reading->longitude }}' )"> 
+                                                            <i class="fa-regular fa-eye"></i> Lihat Detail 
+                                                        </button> 
+                                                    @else 
+                                                        <span class="subtitle-text text-xs">Tanpa Foto</span> 
+                                                    @endif 
+                                                </div> 
+                                            </td> 
                                         </tr> 
                                     @empty 
                                     @endforelse 
@@ -171,9 +161,20 @@
                 </div> 
             @endforelse 
         </div> 
+
+        {{-- PAGINATION LAYOUT DIUBAH MENJADI IDENTIK DENGAN LOG AUDIT --}}
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2"> 
+            <div class="text-sm text-zinc-500"> 
+                Menampilkan <span class="text-white">{{ $tenants->firstItem() ?? 0 }}</span> sampai <span class="text-white">{{ $tenants->lastItem() ?? 0 }}</span> dari <span class="text-white">{{ $tenants->total() }}</span> hasil 
+            </div> 
+            <div class="braga-pagination"> 
+                {{ $tenants->links('pagination::bootstrap-4') }} 
+            </div> 
+        </div> 
     </div> 
 </div> 
 
+{{-- POPUP COMPLAINT IMAGE / GEOLOCATION MAP DETAIL --}}
 <div class="popup" id="photoModal"> 
     <div class="popup-overlay"></div> 
     <div class="popup-card popup-lg text-left"> 
@@ -208,24 +209,22 @@
                             <span class="text-xl text-zinc-400 font-medium" id="modalUnitLabel">m³</span> 
                         </p> 
                     </div> 
-                    
                     <div class="flex flex-col gap-3 border-t border-white/5 pt-3"> 
                         <div class="flex flex-col"> 
-                            <div class="flex items-center gap-2">
-                                <i class="fa-regular fa-clock text-zinc-500 text-xs shrink-0"></i>
+                            <div class="flex items-center gap-2"> 
+                                <i class="fa-regular fa-clock text-zinc-500 text-xs shrink-0"></i> 
                                 <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-500">Waktu Rekam</span> 
-                            </div>
+                            </div> 
                             <span id="modalDateText" class="text-sm text-zinc-200 mt-1 pl-5">-</span> 
-                        </div>
-
+                        </div> 
                         <div class="flex flex-col"> 
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-gauge-high text-zinc-500 text-xs shrink-0"></i>
+                            <div class="flex items-center gap-2"> 
+                                <i class="fa-solid fa-gauge-high text-zinc-500 text-xs shrink-0"></i> 
                                 <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-500">No. Meteran</span> 
-                            </div>
+                            </div> 
                             <span id="modalNumberText" class="text-sm text-zinc-200 mt-1 pl-5">-</span> 
-                        </div>
-                    </div>
+                        </div> 
+                    </div> 
                 </div> 
             </div> 
         </div> 
@@ -244,47 +243,46 @@
             </div> 
         </div> 
     </div> 
-</div>
+</div> 
 
-<script>
-function showImage(src, unit, type, value, date, status, number, address, lat, lon) {
-    document.getElementById('modalImage').src = src;
-    document.getElementById('modalImageLink').href = src;
-    document.getElementById('modalUnitTitle').innerText = "Unit " + unit;
-    document.getElementById('modalValueText').innerText = value;
-    document.getElementById('modalDateText').innerText = date;
-    document.getElementById('modalNumberText').innerText = number;
+<script> 
+function showImage(src, unit, type, value, date, status, number, address, lat, lon) { 
+    document.getElementById('modalImage').src = src; 
+    document.getElementById('modalImageLink').href = src; 
+    document.getElementById('modalUnitTitle').innerText = "Unit " + unit; 
+    document.getElementById('modalValueText').innerText = value; 
+    document.getElementById('modalDateText').innerText = date; 
+    document.getElementById('modalNumberText').innerText = number; 
+    document.getElementById('modalAddressText').innerText = address; 
     
-    document.getElementById('modalAddressText').innerText = address;
-
-    const mapsLink = document.getElementById('modalMapsLink');
-    if (lat && lon && lat != 0 && lon != 0) {
-        mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-        mapsLink.style.display = "inline-flex";
-    } else {
-        mapsLink.style.display = "none";
-    }
-
-    const typeBadge = document.getElementById('modalTypeBadge');
-    const unitLabel = document.getElementById('modalUnitLabel');
-    if (type === 'electricity') {
-        typeBadge.className = "amber-btn";
-        typeBadge.innerHTML = 'Listrik';
-        unitLabel.innerText = "kWh";
-    } else {
-        typeBadge.className = "blue-btn";
-        typeBadge.innerHTML = 'Air';
-        unitLabel.innerText = "m³";
-    }
-
-    const statusBadge = document.getElementById('modalStatusBadge');
-    if (status === 'checked') {
-        statusBadge.className = "dark-green-btn";
-        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Terkonfirmasi';
-    } else {
-        statusBadge.className = "red-btn";
-        statusBadge.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i> Menunggu';
-    }
-}
-</script>
+    const mapsLink = document.getElementById('modalMapsLink'); 
+    if (lat && lon && lat != 0 && lon != 0) { 
+        mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`; 
+        mapsLink.style.display = "inline-flex"; 
+    } else { 
+        mapsLink.style.display = "none"; 
+    } 
+    
+    const typeBadge = document.getElementById('modalTypeBadge'); 
+    const unitLabel = document.getElementById('modalUnitLabel'); 
+    if (type === 'electricity') { 
+        typeBadge.className = "amber-btn"; 
+        typeBadge.innerHTML = 'Listrik'; 
+        unitLabel.innerText = "kWh"; 
+    } else { 
+        typeBadge.className = "blue-btn"; 
+        typeBadge.innerHTML = 'Air'; 
+        unitLabel.innerText = "m³"; 
+    } 
+    
+    const statusBadge = document.getElementById('modalStatusBadge'); 
+    if (status === 'checked') { 
+        statusBadge.className = "dark-green-btn"; 
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Terkonfirmasi'; 
+    } else { 
+        statusBadge.className = "red-btn"; 
+        statusBadge.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i> Menunggu'; 
+    } 
+} 
+</script> 
 @endsection
