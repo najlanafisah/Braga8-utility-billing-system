@@ -55,7 +55,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('payments', PaymentController::class);
     Route::resource('complaints', ComplaintController::class);
 
-
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/notify', [InvoiceController::class, 'notifyTenant'])->name('invoices.notify');
 
@@ -66,6 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [UsageReportController::class, 'index'])->name('reports.index');
         Route::post('/generate', [UsageReportController::class, 'generate'])->name('reports.generate');
         Route::get('/{id}/pdf', [UsageReportController::class, 'exportPdf'])->name('reports.pdf');
+        Route::delete('/{id}', [UsageReportController::class, 'destroy'])->name('reports.destroy'); // Route baru untuk hapus
     });
 
     Route::post('/payments/{payment}/remind', [PaymentController::class, 'remind'])->name('payments.remind');

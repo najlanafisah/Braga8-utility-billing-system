@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UsageReport extends Model
 {
     use LogsActivity;
+    
     protected $fillable = [
         'month_year',
         'total_units_billed',
@@ -22,24 +23,29 @@ class UsageReport extends Model
         $invoices = Invoice::where('billing_period_start', 'like', "$month%")->get();
 
         if ($invoices->isEmpty()) {
-            return;
+            return false;
         }
 
         $grandTotalRevenue = $invoices->sum('total_amount');
-
         $unitIds = $invoices->pluck('unit_id')->unique();
 
         $totalElectricityUsage = \App\Models\MeterReading::whereIn('meter_id', function($query) use ($unitIds) {
-                $query->select('id')->from('utility_meters')->whereIn('unit_id', $unitIds)->where('type', 'electric');
+                $query->select('id')
+                    ->from('utility_meters')
+                    ->whereIn('unit_id', $unitIds)
+                    ->where('meter_type', 'electricity'); 
             })
             ->where('created_at', 'like', "$month%")
-            ->sum('usage'); 
+            ->sum('reading_value'); 
 
         $totalWaterUsage = \App\Models\MeterReading::whereIn('meter_id', function($query) use ($unitIds) {
-                $query->select('id')->from('utility_meters')->whereIn('unit_id', $unitIds)->where('type', 'water');
+                $query->select('id')
+                    ->from('utility_meters')
+                    ->whereIn('unit_id', $unitIds)
+                    ->where('meter_type', 'water');
             })
             ->where('created_at', 'like', "$month%")
-            ->sum('usage');
+            ->sum('reading_value');
 
         $this->month_year = $month;
         $this->total_units_billed = $invoices->count();
@@ -50,5 +56,7 @@ class UsageReport extends Model
         $this->total_revenue_expected = $grandTotalRevenue;
 
         $this->save();
+
+        return true; // Berhasil tersimpan
     }
 }
