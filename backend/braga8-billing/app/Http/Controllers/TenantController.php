@@ -11,27 +11,28 @@ use Illuminate\Support\Str;
 
 class TenantController extends Controller
 {
-public function index(Request $request)
-{
-    $query = Tenant::query();
+    public function index(Request $request)
+    {
+        $query = Tenant::query();
 
-    if ($request->filled('search')) {
-        $query->where('tenant_name', 'LIKE', "%{$request->search}%")
-              ->orWhere('person_in_charge', 'LIKE', "%{$request->search}%");
+        if ($request->filled('search')) {
+            $query->where('tenant_name', 'LIKE', "%{$request->search}%")
+                  ->orWhere('person_in_charge', 'LIKE', "%{$request->search}%");
+        }
+
+        $query->with(['units.meters.readings' => function($q) {
+            $q->orderBy('recorded_at', 'desc'); 
+        }]);
+
+        $tenants = $query->latest()->paginate(10)->withQueryString();
+
+        if ($request->expectsJson()) {
+            return response()->json($tenants);
+        }
+
+        return view('tenants.index', compact('tenants'));
     }
 
-    $query->with(['units.meters.readings' => function($q) {
-        $q->orderBy('recorded_at', 'desc'); 
-    }]);
-
-    $tenants = $query->latest()->paginate(10)->withQueryString();
-
-    if ($request->expectsJson()) {
-        return response()->json($tenants);
-    }
-
-    return view('tenants.index', compact('tenants'));
-}
     public function create()
     {
         return view('tenants.create');
@@ -39,31 +40,38 @@ public function index(Request $request)
 
     public function store(Request $request)
     {
-        $request->validate([
+        // Validasi semua field yang dikirim dari form blade secara ketat
+        $validated = $request->validate([
             'tenant_name'      => 'required|string|max:255',
             'person_in_charge' => 'required|string|max:255',
+            'business_type'    => 'required|string|max:255',
             'contact_phone'    => 'required|string|max:20',
             'contact_email'    => 'required|email|max:255|unique:users,email',
+            'company_name'     => 'nullable|string|max:255',
         ]);
 
-        return DB::transaction(function () use ($request) {
+        // Menggunakan database transaction agar jika salah satu gagal, keduanya dibatalkan
+        return DB::transaction(function () use ($validated) {
+            
+            // 1. Otomatis membuat data akun di tabel users (Manajemen Pengguna)
             $user = User::create([
-                'name'         => $request->person_in_charge,
-                'email'        => $request->contact_email,
-                'username'     => Str::slug($request->person_in_charge) . rand(10, 99),
-                'password'     => Hash::make('password123'),
+                'name'         => $validated['person_in_charge'],
+                'email'        => $validated['contact_email'],
+                'username'     => Str::slug($validated['person_in_charge']) . rand(10, 99),
+                'password'     => Hash::make('password123'), // Password default tenant baru
                 'role'         => 'tenant',
-                'phone_number' => $request->contact_phone,
+                'phone_number' => $validated['contact_phone'],
             ]);
 
+            // 2. Membuat data profile di tabel tenants dan menghubungkannya ke user_id di atas
             Tenant::create([
                 'user_id'          => $user->id, 
-                'tenant_name'      => $request->tenant_name,
-                'company_name'     => $request->company_name,
-                'business_type'    => $request->business_type,
-                'person_in_charge' => $request->person_in_charge,
-                'contact_phone'    => $request->contact_phone,
-                'contact_email'    => $request->contact_email,
+                'tenant_name'      => $validated['tenant_name'],
+                'company_name'     => $validated['company_name'],
+                'business_type'    => $validated['business_type'],
+                'person_in_charge' => $validated['person_in_charge'],
+                'contact_phone'    => $validated['contact_phone'],
+                'contact_email'    => $validated['contact_email'],
             ]);
 
             return redirect()->route('tenants.index')->with('status', 'tenant-created');
@@ -72,23 +80,26 @@ public function index(Request $request)
 
     public function update(Request $request, Tenant $tenant)
     {
-        $request->validate([
+        $validated = $request->validate([
             'tenant_name'      => 'required|string|max:255',
             'person_in_charge' => 'required|string|max:255',
+            'business_type'    => 'required|string|max:255',
+            'contact_phone'    => 'required|string|max:20',
             'contact_email'    => 'required|email|max:255|unique:users,email,' . $tenant->user_id,
+            'company_name'     => 'nullable|string|max:255',
         ]);
 
-        return DB::transaction(function () use ($request, $tenant) {
-            $tenant->update($request->only([
-                'tenant_name', 'company_name', 'business_type', 
-                'person_in_charge', 'contact_phone', 'contact_email'
-            ]));
+        return DB::transaction(function () use ($validated, $tenant) {
+            
+            // Update data profil tenant
+            $tenant->update($validated);
 
+            // Jika email, nama PIC, atau nomor telepon diubah, update juga akun user-nya
             if ($tenant->user_id) {
                 User::where('id', $tenant->user_id)->update([
-                    'name'         => $request->person_in_charge,
-                    'email'        => $request->contact_email,
-                    'phone_number' => $request->contact_phone, 
+                    'name'         => $validated['person_in_charge'],
+                    'email'        => $validated['contact_email'],
+                    'phone_number' => $validated['contact_phone'], 
                 ]);
             }
 
@@ -109,13 +120,15 @@ public function index(Request $request)
     public function destroy(Tenant $tenant)
     {
         return DB::transaction(function () use ($tenant) {
+            
+            // Jika data tenant dihapus, akun login di manajemen pengguna juga otomatis terhapus
             if ($tenant->user_id) {
                 User::where('id', $tenant->user_id)->delete();
             }
+            
             $tenant->delete();
 
             return redirect()->route('tenants.index')->with('status', 'tenant-deleted');
         });
     }
-    
 }

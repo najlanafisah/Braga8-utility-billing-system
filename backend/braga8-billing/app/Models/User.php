@@ -9,55 +9,43 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
-
 {
     use LogsActivity;
     use HasApiTokens, HasFactory, Notifiable;
-  protected $fillable = [
-    'name',
-    'username',
-    'email',
-    'password',
-    'phone_number',
-    'role',
-];
-// User.php
-public function meterReadings() {
-    return $this->hasMany(MeterReading::class);
-}
 
+    /**
+     * Properti mass-assignment agar kolom ini diizinkan diisi lewat User::create()
+     */
+    protected $fillable = [
+        'name',
+        'username',
+        'email',
+        'password',
+        'phone_number',
+        'role',
+    ];
 
-// Unit.php
-public function tenant()
-{
-    return $this->hasOne(Tenant::class, 'user_id');
-}
+    /**
+     * Relasi ke data riwayat pencatatan meteran utilitas
+     */
+    public function meterReadings() 
+    {
+        return $this->hasMany(MeterReading::class);
+    }
 
-public function meters() {
-    return $this->hasMany(UtilityMeter::class);
-}
+    /**
+     * Relasi ke data Profile Tenant milik User ini
+     */
+    public function tenant()
+    {
+        return $this->hasOne(Tenant::class, 'user_id');
+    }
 
-// UtilityMeter.php
-public function unit() {
-    return $this->belongsTo(Unit::class);
-}
-
-public function readings() {
-    return $this->hasMany(MeterReading::class);
-}
-
-// MeterReading.php
-public function user() {
-    return $this->belongsTo(User::class);
-}
-
-public function meter() {
-    return $this->belongsTo(UtilityMeter::class);
-}
-
-public function customNotifications()
-{
-    return $this->hasMany(Notification::class, 'user_id')->latest();
-}
-
+    /**
+     * Relasi ke sistem Notifikasi custom di aplikasi Braga8
+     */
+    public function customNotifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id')->latest();
+    }
 }
