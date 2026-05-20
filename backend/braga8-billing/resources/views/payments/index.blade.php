@@ -4,8 +4,7 @@
 @if (session('status')) 
     @php 
     $alerts = [ 
-        'payment-stored' => ['title' => 'Pembayaran Ditambahkan!', 'desc' => 'Data pembayaran baru berhasil disimpan.', 'icon' => 'fa-circle-check'], 
-        'payment-updated' => ['title' => 'Pembayaran Diperbarui!', 'desc' => 'Perubahan pembayaran berhasil disimpan.', 'icon' => 'fa-pen-to-square'], 
+        'payment-updated' => ['title' => 'Pembayaran Diperbarui!', 'desc' => 'Perubahan status pembayaran berhasil disimpan.', 'icon' => 'fa-pen-to-square'], 
         'payment-deleted' => ['title' => 'Pembayaran Dihapus!', 'desc' => 'Riwayat pembayaran berhasil dihapus.', 'icon' => 'fa-trash-can'], 
         'profile-updated' => ['title' => 'Profil Diperbarui!', 'desc' => 'Informasi akun berhasil diperbarui.', 'icon' => 'fa-user-check'], 
         'remind-cooldown' => ['title' => 'Tunggu Sebentar!', 'desc' => 'Pengingat sudah dikirim sebelumnya.', 'icon' => 'fa-clock'], 
@@ -48,20 +47,18 @@
             <h1 class="title-text">Pembayaran</h1> 
             <p class="subtitle-text">Braga8 Utility Billing Management</p> 
         </div> 
-        <div class="header-user">
-            <div class="icon-wrapper" data-popup="notif-popup">
-                <i class="fa-solid fa-bell"></i>
-                
-                @if(auth()->user()->customNotifications()->whereNull('read_at')->exists())
-                    <span class="notif-dot"></span>
-                @endif
-            </div>
-
-            <div class="profile-container" data-popup="detail-profile-popup">
-                <div class="profile-icon">
-                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i>
-                </div>
-            </div>
+        <div class="header-user"> 
+            <div class="icon-wrapper" data-popup="notif-popup"> 
+                <i class="fa-solid fa-bell"></i> 
+                @if(auth()->user()->customNotifications()->whereNull('read_at')->exists()) 
+                <span class="notif-dot"></span> 
+                @endif 
+            </div> 
+            <div class="profile-container" data-popup="detail-profile-popup"> 
+                <div class="profile-icon"> 
+                    <i class="fa-solid fa-user text-2xl text-[#a04d30]"></i> 
+                </div> 
+            </div> 
         </div> 
     </div> 
 
@@ -69,41 +66,33 @@
         <div class="toolbar"> 
             <form method="GET" action="{{ route('payments.index') }}" class="search-wrapper"> 
                 <input type="text" name="search" placeholder="Cari Pembayaran.." value="{{ request('search') }}"> 
-                <span><i class="fa-solid fa-magnifying-glass"></i></span>
+                <span><i class="fa-solid fa-magnifying-glass"></i></span> 
             </form> 
         </div> 
 
-        <div class="card-image-container">
-            <div class="card card-with-image">
-                <div class="card-image"></div>
-                <div class="card-body">
-                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Total Tagihan</p>
-                    <p class="card-value" style="{{ strlen((string)$totalBill) > 8 ? 'font-size: 30px !important;' : '' }}">
-                        Rp {{ number_format($totalBill, 0, ',', '.') }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="card card-with-image">
-                <div class="card-image"></div>
-                <div class="card-body">
-                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Total Pembayaran Diterima</p>
-                    <p class="card-value" style="{{ strlen((string)$totalCollected) > 8 ? 'font-size: 30px !important;' : '' }}">
-                        Rp {{ number_format($totalCollected, 0, ',', '.') }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="card card-with-image">
-                <div class="card-image"></div>
-                <div class="card-body">
-                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Tagihan Tertunggak</p>
-                    <p class="card-value" style="{{ strlen((string)$outstandingBill) > 8 ? 'font-size: 30px !important;' : '' }}">
-                        Rp {{ number_format($outstandingBill, 0, ',', '.') }}
-                    </p>
-                </div>
-            </div>
-        </div>
+        <div class="card-image-container"> 
+            <div class="card card-with-image"> 
+                <div class="card-image"></div> 
+                <div class="card-body"> 
+                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Total Tagihan</p> 
+                    <p class="card-value" style="{{ strlen((string)$totalBill) > 8 ? 'font-size: 30px !important;' : '' }}"> Rp {{ number_format($totalBill, 0, ',', '.') }} </p> 
+                </div> 
+            </div> 
+            <div class="card card-with-image"> 
+                <div class="card-image"></div> 
+                <div class="card-body"> 
+                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Total Pembayaran Diterima</p> 
+                    <p class="card-value" style="{{ strlen((string)$totalCollected) > 8 ? 'font-size: 30px !important;' : '' }}"> Rp {{ number_format($totalCollected, 0, ',', '.') }} </p> 
+                </div> 
+            </div> 
+            <div class="card card-with-image"> 
+                <div class="card-image"></div> 
+                <div class="card-body"> 
+                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Tagihan Tertunggak</p> 
+                    <p class="card-value" style="{{ strlen((string)$outstandingBill) > 8 ? 'font-size: 30px !important;' : '' }}"> Rp {{ number_format($outstandingBill, 0, ',', '.') }} </p> 
+                </div> 
+            </div> 
+        </div> 
 
         <div class="table-wrapper"> 
             @forelse($payments->groupBy('invoice.tenant.tenant_name') as $tenantName => $tenantPayments) 
@@ -142,33 +131,37 @@
                                         @if($payment->status !== 'verified') 
                                             @php $isCooldown = $payment->reminded_at && $payment->reminded_at->diffInDays(now()) < 2; @endphp 
                                             @if($isCooldown) 
-                                                <div class="light-grey-btn-action opacity-50 cursor-not-allowed flex items-center py-1"> 
-                                                    <i class="fa-solid fa-clock-rotate-left text-zinc-400"></i> 
-                                                    <span class="text-[9px] font-bold">Wait {{ ceil(2 - $payment->reminded_at->diffInDays(now())) }}d</span> 
-                                                </div> 
+                                            <div class="light-grey-btn-action opacity-50 cursor-not-allowed flex items-center py-1"> 
+                                                <i class="fa-solid fa-clock-rotate-left text-zinc-400"></i> 
+                                                <span class="text-[9px] font-bold">Wait {{ ceil(2 - $payment->reminded_at->diffInDays(now())) }}d</span> 
+                                            </div> 
                                             @else 
-                                                <form action="{{ route('payments.remind', $payment->id) }}" method="POST" class="m-0 p-0" target="_blank"> 
-                                                    @csrf 
-                                                    <button type="submit" class="light-grey-btn-action group" onclick="setTimeout(() => { window.location.reload(); }, 2000);"> 
-                                                        <span><i class="fa-brands fa-whatsapp scale-120"></i></span> <span class="text-xs">Ingatkan</span> 
-                                                    </button> 
-                                                </form> 
+                                            <form action="{{ route('payments.remind', $payment->id) }}" method="POST" class="m-0 p-0" target="_blank"> 
+                                                @csrf 
+                                                <button type="submit" class="light-grey-btn-action group" onclick="setTimeout(() => { window.location.reload(); }, 2000);"> 
+                                                    <span><i class="fa-brands fa-whatsapp scale-120"></i></span> 
+                                                    <span class="text-xs">Ingatkan</span> 
+                                                </button> 
+                                            </form> 
                                             @endif 
                                         @endif 
-                                        
+
                                         @if($payment->proof_img) 
                                         <button class="light-green-btn-action" data-popup="detail-payment-{{ $payment->id }}"> 
-                                            <span><i class="fa-solid fa-eye"></i></span> <span class="text-xs">Bukti Bayar</span> 
+                                            <span><i class="fa-solid fa-eye"></i></span> 
+                                            <span class="text-xs">Bukti Bayar</span> 
                                         </button> 
                                         @endif 
-                                        
-                                        <button class="light-brown-btn-action" data-popup="edit-payment-{{ $payment->id }}"> 
-                                            <span><i class="fa-solid fa-pen"></i></span> <span class="text-xs">Ubah</span> 
-                                        </button> 
 
                                         <form id="delete-form-{{ $payment->id }}" action="{{ route('payments.destroy', $payment->id) }}" method="POST" class="m-0 p-0"> 
-                                            @csrf @method('DELETE') 
-                                            <button type="button" class="dark-brown-btn-action" data-popup="delete-tariff" data-id="{{ $payment->id }}"> 
+                                            @csrf 
+                                            @method('DELETE') 
+                                            <button type="button" class="dark-brown-btn-action" 
+                                                data-popup="delete-tariff" 
+                                                data-id="{{ $payment->id }}"
+                                                data-name="{{ $tenantName }}"
+                                                data-invoice="{{ $payment->invoice->invoice_number }}"
+                                                data-unit="{{ $payment->invoice->unit->unit_number ?? '-' }}"> 
                                                 <span><i class="fa-solid fa-trash"></i></span> <span class="text-xs">Hapus</span> 
                                             </button> 
                                         </form> 
@@ -180,171 +173,75 @@
                     </table> 
                 </div> 
             </div> 
-            @empty
-            <div class="table-card p-10 text-center text-zinc-400 italic">
-                Belum ada riwayat pembayaran.
-            </div>
-            @endforelse
+            @empty 
+            <div class="table-card p-10 text-center text-zinc-400 italic"> Belum ada riwayat pembayaran. </div> 
+            @endforelse 
 
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 px-2">
-            <div class="text-sm text-zinc-500">
-                Menampilkan <span class="text-white">{{ $payments->firstItem() }}</span> sampai <span class="text-white">{{ $payments->lastItem() }}</span> dari <span class="text-white">{{ $payments->total() }}</span> hasil
-            </div>
-            <div class="braga-pagination">
-                {{ $payments->links() }}
-            </div>
-        </div>
-    </div>
-
-    @foreach($payments as $payment)
-    <div class="popup" id="edit-payment-{{ $payment->id }}"> 
-        <div class="popup-overlay"></div> 
-        <div class="popup-card popup-md" style="overflow: visible !important;"> 
-            <div class="popup-close-wrapper"> 
-                <button class="popup-close" data-close="edit-payment-{{ $payment->id }}"> 
-                    <i class="fa-solid fa-xmark"></i> 
-                </button> 
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 px-2"> 
+                <div class="text-sm text-zinc-500"> Menampilkan <span class="text-white">{{ $payments->firstItem() }}</span> sampai <span class="text-white">{{ $payments->lastItem() }}</span> dari <span class="text-white">{{ $payments->total() }}</span> hasil </div> 
+                <div class="braga-pagination"> {{ $payments->links() }} </div> 
             </div> 
-            <div class="popup-header">Edit Pembayaran</div> 
-            <div class="popup-body"> 
-                <form action="{{ route('payments.update', $payment->id) }}" method="POST" enctype="multipart/form-data"> 
-                    @csrf @method('PUT') 
-                    <div class="flex flex-col gap-6"> 
-                        <div> 
-                            <div class="text-field"> 
-                                <label class="text-field-label text-left">Referensi Invoice</label> 
-                                <div class="text-field-input opacity-70 bg-zinc-200/50 flex items-center justify-between"> 
-                                    <span class="text-zinc-600 font-medium">{{ $payment->invoice->invoice_number }} - {{ $payment->invoice->tenant->tenant_name }}</span> 
-                                    <i class="fa-solid fa-lock text-[10px] text-zinc-400"></i> 
-                                </div> 
-                                <input type="hidden" name="invoice_id" value="{{ $payment->invoice_id }}"> 
-                            </div> 
-                            <div class="grid grid-cols-2 gap-4"> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Jumlah Bayar</label> 
-                                    <input type="number" name="amount_paid" value="{{ old('amount_paid', $payment->amount_paid) }}" class="text-field-input" required step="any"> 
-                                    <p class="text-[9px] text-zinc-500 mt-1 italic text-left">Tagihan: Rp {{ number_format($payment->invoice->total_amount, 0, ',', '.') }}</p> 
-                                </div> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Tanggal Bayar</label> 
-                                    <input type="date" name="payment_date" value="{{ old('payment_date', $payment->payment_date->format('Y-m-d')) }}" class="text-field-input" required> 
-                                </div> 
-                            </div> 
-                            <div class="grid grid-cols-2 gap-4"> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Metode Pembayaran</label> 
-                                    <div class="custom-dropdown"> 
-                                        <div class="dropdown-selected"> 
-                                            <span class="placeholder">{{ $payment->paid_using }}</span> 
-                                            <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> 
-                                        </div> 
-                                        <div class="dropdown-options"> 
-                                            <div class="option">Bank Transfer</div> 
-                                            <div class="option">Cash</div> 
-                                            <div class="option">E-Wallet</div> 
-                                        </div> 
-                                        <input type="hidden" name="paid_using" value="{{ $payment->paid_using }}"> 
-                                    </div> 
-                                </div> 
-                                <div class="text-field"> 
-                                    <label class="text-field-label text-left">Status</label> 
-                                    <div class="custom-dropdown"> 
-                                        <div class="dropdown-selected"> 
-                                            <span class="placeholder">{{ strtoupper($payment->status) }}</span> 
-                                            <i class="fa-solid fa-chevron-down text-[10px] text-zinc-500"></i> 
-                                        </div> 
-                                        <div class="dropdown-options"> 
-                                            <div class="option" data-value="pending">Pending</div> 
-                                            <div class="option" data-value="rejected">Rejected</div> 
-                                            <div class="option" data-value="verified">Verified</div> 
-                                        </div> 
-                                        <input type="hidden" name="status" value="{{ $payment->status }}"> 
-                                    </div> 
-                                </div> 
-                            </div> 
-                            <div class="text-field"> 
-                                <label class="text-field-label text-left">Bukti Bayar (Ganti jika perlu)</label> 
-                                @if($payment->proof_img) 
-                                <div class="mb-2 flex items-center gap-3"> 
-                                    <img src="{{ asset('storage/' . $payment->proof_img) }}" class="w-18 h-18 object-cover rounded-lg border border-zinc-400"> 
-                                    <span class="text-[10px] text-zinc-500 italic">Gambar saat ini</span> 
-                                </div> 
-                                @endif 
-                                <input type="file" name="proof_img" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-200 cursor-pointer w-full text-zinc-400"> 
-                            </div> 
-                        </div> 
-                        <div class="flex gap-3 mt-2"> 
-                            <button type="button" class="light-grey-btn flex-1 py-3" data-close="edit-payment-{{ $payment->id }}">Batal</button> 
-                            <button type="submit" class="dark-brown-button flex-[2] py-3"> <i class="fa-solid fa-rotate mr-2"></i> Perbarui </button> 
-                        </div> 
+        </div> 
+
+        @foreach($payments as $payment) 
+            @if($payment->proof_img) 
+            <div class="popup" id="detail-payment-{{ $payment->id }}"> 
+                <div class="popup-overlay"></div> 
+                <div class="popup-card popup-md"> 
+                    <div class="popup-close-wrapper"> 
+                        <button class="popup-close" data-close="detail-payment-{{ $payment->id }}"><i class="fa-solid fa-xmark"></i></button> 
                     </div> 
-                </form> 
+                    <div class="popup-header">Bukti Pembayaran: {{ $payment->invoice->invoice_number }}</div> 
+                    <div class="popup-body flex flex-col gap-4 text-center"> 
+                        <img src="{{ asset('storage/' . $payment->proof_img) }}" class="w-full max-h-[320px] object-contain rounded-lg shadow-lg bg-zinc-100"> 
+                        
+                        <form action="{{ route('payments.update', $payment->id) }}" method="POST" class="w-full mt-2"> 
+                            @csrf 
+                            @method('PUT') 
+                            <input type="hidden" name="amount_paid" value="{{ $payment->amount_paid }}"> 
+                            <input type="hidden" name="payment_date" value="{{ $payment->payment_date->format('Y-m-d') }}"> 
+                            <input type="hidden" name="paid_using" value="{{ $payment->paid_using }}"> 
+                            
+                            <div class="flex items-center gap-3 w-full"> 
+                                @if($payment->status !== 'rejected') 
+                                <button type="submit" name="status" value="rejected" class="light-grey-btn flex-1 py-2.5 text-xs font-bold rounded-xl transition hover:bg-zinc-200"> 
+                                    <i class="fa-solid fa-circle-xmark mr-1"></i> Tolak Pembayaran 
+                                </button> 
+                                @endif 
+
+                                @if($payment->status !== 'verified') 
+                                <button type="submit" name="status" value="verified" class="light-brown-btn flex-1 py-2.5 text-xs font-bold rounded-xl transition hover:opacity-90"> 
+                                    <i class="fa-solid fa-circle-check mr-1"></i> Verifikasi Lunas 
+                                </button> 
+                                @endif 
+                            </div> 
+                        </form> 
+                    </div> 
+                </div> 
+            </div> 
+            @endif 
+        @endforeach 
+
+        <div class="popup" id="delete-tariff"> 
+            <div class="popup-overlay"></div> 
+            <div class="popup-card popup-md"> 
+                <div class="popup-close-wrapper"> 
+                    <button class="popup-close" data-close="delete-tariff"><i class="fa-solid fa-xmark"></i></button> 
+                </div> 
+                <div class="popup-header">Hapus Pembayaran Ini?</div> 
+                <div class="popup-body flex flex-col gap-4"> 
+                    <div class="text-sm text-zinc-400 bg-zinc-900/40 p-4 rounded-xl border border-white/5 text-left flex flex-col gap-1.5">
+                        <p>Pembayaran untuk invoice <span id="display-invoice-number" class="text-white font-mono font-bold"></span></p>
+                        <p>Penyewa: <span id="display-tenant-name" class="text-white font-bold"></span> (<span id="display-unit-number" class="text-zinc-300"></span>)</p>
+                    </div>
+                    <div class="btn-delete-wrapper flex items-center gap-3 w-full mt-2"> 
+                        <button id="confirm-delete-btn" class="light-brown-btn flex-1 py-2.5 text-xs font-bold rounded-xl">Ya, Hapus</button> 
+                        <button type="button" class="dark-brown-button flex-1 py-2.5 text-xs font-bold rounded-xl" data-close="delete-tariff">Tidak</button> 
+                    </div> 
+                </div> 
             </div> 
         </div> 
-    </div> 
 
-    @if($payment->proof_img) 
-    <div class="popup" id="detail-payment-{{ $payment->id }}"> 
-        <div class="popup-overlay"></div> 
-        <div class="popup-card popup-md"> 
-            <div class="popup-close-wrapper"> <button class="popup-close" data-close="detail-payment-{{ $payment->id }}"><i class="fa-solid fa-xmark"></i></button> </div> 
-            <div class="popup-header">Evidence: {{ $payment->invoice->invoice_number }}</div> 
-            <div class="popup-body text-center"> <img src="{{ asset('storage/' . $payment->proof_img) }}" class="w-full rounded-lg shadow-lg"> </div> 
-        </div> 
-    </div> 
-    @endif
-    @endforeach
-
-    <div class="popup" id="delete-tariff"> 
-        <div class="popup-overlay"></div> 
-        <div class="popup-card popup-md"> 
-            <div class="popup-close-wrapper"> <button class="popup-close"> <i class="fa-solid fa-xmark"></i> </button> </div> 
-            <div class="popup-header">Hapus Pembayaran Ini?</div> 
-            <div class="popup-body btn-delete-wrapper"> 
-                <button id="confirm-delete-btn" class="light-brown-btn">Ya</button> 
-                <button class="dark-brown-button" data-close="delete-tariff">Tidak</button> 
-            </div> 
-        </div> 
     </div> 
 </div> 
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const invoiceDropdown = document.getElementById('addInvoiceDropdown');
-    const amountInput = document.getElementById('add_amount_paid');
-    const hintText = document.getElementById('add_invoice_hint');
-
-    if (invoiceDropdown) {
-        const options = invoiceDropdown.querySelectorAll('.dropdown-options .option:not(.disabled)');
-        const selectedSpan = invoiceDropdown.querySelector('.dropdown-selected .placeholder');
-        const hiddenInput = document.getElementById('add_invoice_id_input');
-
-        options.forEach(option => {
-            option.addEventListener('click', function () {
-                const invoiceId = this.getAttribute('data-value');
-                const totalAmount = this.getAttribute('data-total');
-                const textDisplay = this.textContent.trim();
-
-                hiddenInput.value = invoiceId;
-                selectedSpan.textContent = textDisplay;
-                selectedSpan.classList.remove('placeholder');
-
-                if (totalAmount) {
-                    amountInput.value = totalAmount;
-                    
-                    const formatted = new Intl.NumberFormat('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        maximumFractionDigits: 0
-                    }).format(totalAmount);
-                    
-                    hintText.innerHTML = `Total tagihan: <span class="text-emerald-600 font-bold">${formatted}</span>`;
-                }
-
-                invoiceDropdown.querySelector('.dropdown-options').classList.remove('show');
-            });
-        });
-    }
-});
-</script>
 @endsection
