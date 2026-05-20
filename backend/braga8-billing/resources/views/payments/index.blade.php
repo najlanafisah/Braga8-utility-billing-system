@@ -73,29 +73,37 @@
             </form> 
         </div> 
 
-        <div class="card-image-container mb-2"> 
-            <div class="card card-with-image"> 
-                <div class="card-image"></div> 
-                <div class="card-body"> 
-                    <p class="card-label">Total Tagihan</p> 
-                    <p class="card-value">Rp {{ number_format($totalBill, 0, ',', '.') }}</p> 
-                </div> 
-            </div> 
-            <div class="card card-with-image"> 
-                <div class="card-image"></div> 
-                <div class="card-body"> 
-                    <p class="card-label">Total Pembayaran Diterima</p> 
-                    <p class="card-value">Rp {{ number_format($totalCollected, 0, ',', '.') }}</p> 
-                </div> 
-            </div> 
-            <div class="card card-with-image"> 
-                <div class="card-image"></div> 
-                <div class="card-body"> 
-                    <p class="card-label">Tagihan Tertunggak</p> 
-                    <p class="card-value">Rp {{ number_format($outstandingBill, 0, ',', '.') }}</p> 
-                </div> 
-            </div> 
-        </div> 
+        <div class="card-image-container">
+            <div class="card card-with-image">
+                <div class="card-image"></div>
+                <div class="card-body">
+                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Total Tagihan</p>
+                    <p class="card-value" style="{{ strlen((string)$totalBill) > 8 ? 'font-size: 30px !important;' : '' }}">
+                        Rp {{ number_format($totalBill, 0, ',', '.') }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card card-with-image">
+                <div class="card-image"></div>
+                <div class="card-body">
+                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Total Pembayaran Diterima</p>
+                    <p class="card-value" style="{{ strlen((string)$totalCollected) > 8 ? 'font-size: 30px !important;' : '' }}">
+                        Rp {{ number_format($totalCollected, 0, ',', '.') }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card card-with-image">
+                <div class="card-image"></div>
+                <div class="card-body">
+                    <p class="card-label text-[11px] md:text-xs whitespace-nowrap">Tagihan Tertunggak</p>
+                    <p class="card-value" style="{{ strlen((string)$outstandingBill) > 8 ? 'font-size: 30px !important;' : '' }}">
+                        Rp {{ number_format($outstandingBill, 0, ',', '.') }}
+                    </p>
+                </div>
+            </div>
+        </div>
 
         <div class="table-wrapper"> 
             @forelse($payments->groupBy('invoice.tenant.tenant_name') as $tenantName => $tenantPayments) 

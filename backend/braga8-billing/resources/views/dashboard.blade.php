@@ -72,39 +72,38 @@
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-
-            <div class="card  lg:col-span-4">
-                <p class="card-label">Total Pembayaran</p>
-                <h3 class="card-value">
+            <div class="card lg:col-span-4">
+                <p class="card-label whitespace-nowrap">Total Pembayaran</p>
+                <h3 class="card-value" style="{{ strlen((string)$totalPaidAmount) > 8 ? 'font-size: 30px !important;' : '' }}">
                     <span class="font-medium">Rp</span> {{ number_format($totalPaidAmount, 0, ',', '.') }}
                 </h3>
-                <div class="mt-2 flex items-center gap-1.5 justify-end">
+                <div class="mt-2 flex items-center gap-1.5 justify-end whitespace-nowrap">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     <p class="card-caption">{{ $paidCount }} Pembayaran</p>
                 </div>
             </div>
 
             <div class="card lg:col-span-4">
-                <p class="card-label">Tagihan Tertunda</p>
-                <h3 class="card-value">
+                <p class="card-label whitespace-nowrap">Tagihan Tertunda</p>
+                <h3 class="card-value" style="{{ strlen((string)$totalUnpaidAmount) > 8 ? 'font-size: 30px !important;' : '' }}">
                     <span class="font-medium">Rp</span> {{ number_format($totalUnpaidAmount, 0, ',', '.') }}
                 </h3>
-                <div class="mt-2 flex items-center gap-1.5 justify-end">
+                <div class="mt-2 flex items-center gap-1.5 justify-end whitespace-nowrap">
                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                     <p class="card-caption">{{ $unpaidCount }} Belum Dibayar</p>
                 </div>
             </div>
 
             <div class="card lg:col-span-2">
-                <p class="card-label">Jumlah Penyewa</p>
+                <p class="card-label whitespace-nowrap">Jumlah Penyewa</p>
                 <h3 class="card-value">{{ $totalTenants }}</h3>
-                <p class="card-caption text-right">
+                <p class="card-caption text-right whitespace-nowrap">
                     +{{ $newTenantsThisMonth }}
                 </p>
             </div>
 
             <div class="card lg:col-span-2">
-                <p class="card-label">Keluhan</p>
+                <p class="card-label whitespace-nowrap">Keluhan</p>
                 <h3 class="card-value">{{ $totalComplaints }}</h3>
             </div>
         </div>
