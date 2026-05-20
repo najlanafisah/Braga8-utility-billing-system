@@ -18,17 +18,21 @@ class PaymentController extends Controller
         $totalCollected = Payment::where('status', 'verified')->sum('amount_paid');
         
         $outstandingBill = max(0, $totalBill - $totalCollected);
+        
+        $invoices = Invoice::with('tenant')
+            ->where('status', '!=', 'paid')
+            ->get();
 
         $query = Payment::with(['invoice.tenant', 'invoice.unit']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('paid_using', 'like', "%{$search}%")
+                $q->where('paid_using', 'like', "%{$search}%") // Cari berdasarkan metode bayar
                 ->orWhereHas('invoice', function($inv) use ($search) {
-                    $inv->where('invoice_number', 'like', "%{$search}%")
+                    $inv->where('invoice_number', 'like', "%{$search}%") // Cari nomor invoice
                         ->orWhereHas('tenant', function($tn) use ($search) {
-                            $tn->where('tenant_name', 'like', "%{$search}%");
+                            $tn->where('tenant_name', 'like', "%{$search}%"); // Cari nama penyewa
                         });
                 });
             });
@@ -36,7 +40,64 @@ class PaymentController extends Controller
 
         $payments = $query->latest()->paginate(10)->appends($request->all());
 
-        return view('payments.index', compact('payments', 'totalBill', 'totalCollected', 'outstandingBill'));
+        return view('payments.index', compact('payments', 'totalBill', 'totalCollected', 'outstandingBill', 'invoices'));
+    }
+
+    public function create()
+    {
+        $invoices = Invoice::with('tenant')
+            ->where('status', '!=', 'paid')
+            ->get();
+            
+        return view('payments.create', compact('invoices'));
+    }
+
+    public function store(Request $request)
+    {
+        $invoice = Invoice::findOrFail($request->invoice_id);
+
+        $request->validate([
+            'invoice_id'   => 'required|exists:invoices,id',
+            'amount_paid'  => 'required|numeric|min:' . $invoice->total_amount,
+            'payment_date' => 'required|date',
+            'paid_using'   => 'required|string',
+            'proof_img'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'invoice_id.required' => 'ID Invoice wajib dipilih.',
+            'amount_paid.required' => 'Jumlah pembayaran wajib diisi.',
+            'amount_paid.numeric'  => 'Jumlah pembayaran harus berupa angka.',
+            'amount_paid.min'      => 'Jumlah pembayaran tidak boleh kurang dari total tagihan (Rp ' . number_format($invoice->total_amount, 0, ',', '.') . ').',
+            'payment_date.required' => 'Tanggal pembayaran wajib diisi.',
+            'paid_using.required'  => 'Metode pembayaran wajib diisi.',
+            'proof_img.image'      => 'File harus berupa gambar.',
+            'proof_img.mimes'      => 'Format gambar yang didukung: jpeg, png, jpg.',
+            'proof_img.max'        => 'Ukuran gambar maksimal adalah 2MB.',
+        ]);
+
+        $path = $request->hasFile('proof_img') 
+            ? $request->file('proof_img')->store('payments', 'public') 
+            : null;
+
+        $payment = Payment::create([
+            'invoice_id'   => $request->invoice_id,
+            'amount_paid'  => $request->amount_paid,
+            'due_date'     => $invoice->billing_period_end,
+            'paid_using'   => $request->paid_using,
+            'status'       => 'pending',
+            'payment_date' => $request->payment_date,
+            'proof_img'    => $path,
+            'reminded_at'  => null,
+        ]);
+
+        return redirect()
+                ->route('payments.index')
+                ->with('status', 'payment-stored');
+    }
+
+    public function edit(Payment $payment)
+    {
+        $payment->load('invoice.tenant');
+        return view('payments.edit', compact('payment'));
     }
 
     public function update(Request $request, Payment $payment)
@@ -94,7 +155,10 @@ class PaymentController extends Controller
 
     public function remind(Payment $payment)
     {
-        if ($payment->reminded_at && now()->lessThan($payment->reminded_at->copy()->addDays(2))) {
+        if (    $payment->reminded_at && now()->lessThan($payment->reminded_at->copy()->addDays(2))) {
+            $diff = now()->diff(
+                $payment->reminded_at->copy()->addDays(2)
+            );
             return back()->with('status', 'remind-cooldown');
         }
 

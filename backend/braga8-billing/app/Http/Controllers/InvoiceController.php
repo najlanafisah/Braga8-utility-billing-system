@@ -217,14 +217,26 @@ public function index(Request $request)
 
         $electricUsage = 0;
         if ($eReadings->count() > 0) {
-            $eDiff = ($eReadings->count() >= 2) ? ($eReadings[0]->reading_value - $eReadings[1]->reading_value) : $eReadings[0]->reading_value;
-            $electricUsage = $eDiff * ($elecMeter->power_capacity ?? 1);
+            $elecMultiplier = $elecMeter->multiplier ?? 1; 
+
+            if ($eReadings->count() >= 2) {
+                $eDiff = $eReadings[0]->reading_value - $eReadings[1]->reading_value;
+                $electricUsage = $eDiff * $elecMultiplier;
+            } else {
+                $electricUsage = $eReadings[0]->reading_value * $elecMultiplier;
+            }
         }
 
         $waterUsage = 0;
         if ($wReadings->count() > 0) {
-            $wDiff = ($wReadings->count() >= 2) ? ($wReadings[0]->reading_value - $wReadings[1]->reading_value) : $wReadings[0]->reading_value;
-            $waterUsage = $wDiff * ($waterMeter->multiplier ?? 1);
+            $waterMultiplier = $waterMeter->multiplier ?? 1;
+
+            if ($wReadings->count() >= 2) {
+                $wDiff = $wReadings[0]->reading_value - $wReadings[1]->reading_value;
+                $waterUsage = $wDiff * $waterMultiplier;
+            } else {
+                $waterUsage = $wReadings[0]->reading_value * $waterMultiplier;
+            }
         }
 
         return [
@@ -252,7 +264,7 @@ public function index(Request $request)
 
     public function destroy(Invoice $invoice) {
         $invoice->delete();
-        return redirect()->route('invoices.index')->with('success', 'Invoice deleted.');
+        return redirect()->route('invoices.index')->with('success', 'Tagihan Berhasil di Hapus.');
     }
 
     public function notifyTenant(Invoice $invoice)
