@@ -702,6 +702,11 @@ main {
     position: relative;
     width: 100%;
     font-size: 14px;
+    z-index: 50;
+}
+
+.custom-dropdown.active {
+    z-index: 100;
 }
 
 .dropdown-selected {
@@ -737,7 +742,7 @@ main {
     max-height: 0;
     transition: 0.25s ease;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    z-index: 999;
 }
 
 .dropdown-options div {
@@ -928,15 +933,19 @@ main {
 
 .popup-body {
   margin: 1.4rem 0;
-  
-  max-height: 60vh;
-  overflow-y: auto;
-  
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  max-height: 65vh;
+  overflow: visible;
 }
 
-.popup-body::-webkit-scrollbar {
+.popup-body.is-scrollable {
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+}
+
+.popup-body.is-scrollable::-webkit-scrollbar {
   display: none;
 }
 

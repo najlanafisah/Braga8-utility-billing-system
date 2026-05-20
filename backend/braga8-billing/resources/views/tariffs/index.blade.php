@@ -165,7 +165,7 @@
                         <form action="{{ route('tariffs.update', $tariff->id) }}" method="POST"> 
                             @csrf 
                             @method('PUT') 
-                            <div class="popup-body flex flex-col gap-6"> 
+                            <div class="popup-body is-scrollable flex flex-col gap-6"> 
                                 <div> 
                                     <div class="text-field"> 
                                         <label class="text-field-label">Nama Tarif <span class="text-[#FA8327]">*</span></label> 
@@ -315,7 +315,7 @@
         <div class="popup-header">Tambah Tarif Baru</div> 
         <form action="{{ route('tariffs.store') }}" method="POST"> 
             @csrf 
-            <div class="popup-body flex flex-col gap-6"> 
+            <div class="popup-body is-scrollable flex flex-col gap-6"> 
                 <div> 
                     <div class="text-field"> 
                         <label class="text-field-label">Nama Tarif <span class="text-[#FA8327]">*</span></label> 
