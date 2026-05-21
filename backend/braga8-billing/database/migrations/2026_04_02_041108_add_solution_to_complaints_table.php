@@ -11,7 +11,6 @@ return new class extends Migration
      */public function up(): void
 {
     Schema::table('complaints', function (Blueprint $table) {
-        // Adding the solution column after the description
         $table->text('solution')->nullable()->after('description');
     });
 }

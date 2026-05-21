@@ -57,6 +57,6 @@ class UsageReport extends Model
 
         $this->save();
 
-        return true; // Berhasil tersimpan
+        return true;
     }
 }

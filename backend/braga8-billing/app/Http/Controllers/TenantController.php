@@ -40,7 +40,6 @@ class TenantController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi semua field yang dikirim dari form blade secara ketat
         $validated = $request->validate([
             'tenant_name'      => 'required|string|max:255',
             'person_in_charge' => 'required|string|max:255',
@@ -50,20 +49,17 @@ class TenantController extends Controller
             'company_name'     => 'nullable|string|max:255',
         ]);
 
-        // Menggunakan database transaction agar jika salah satu gagal, keduanya dibatalkan
         return DB::transaction(function () use ($validated) {
             
-            // 1. Otomatis membuat data akun di tabel users (Manajemen Pengguna)
             $user = User::create([
                 'name'         => $validated['person_in_charge'],
                 'email'        => $validated['contact_email'],
                 'username'     => Str::slug($validated['person_in_charge']) . rand(10, 99),
-                'password'     => Hash::make('password123'), // Password default tenant baru
+                'password'     => Hash::make('password123'),
                 'role'         => 'tenant',
                 'phone_number' => $validated['contact_phone'],
             ]);
 
-            // 2. Membuat data profile di tabel tenants dan menghubungkannya ke user_id di atas
             Tenant::create([
                 'user_id'          => $user->id, 
                 'tenant_name'      => $validated['tenant_name'],
@@ -91,10 +87,8 @@ class TenantController extends Controller
 
         return DB::transaction(function () use ($validated, $tenant) {
             
-            // Update data profil tenant
             $tenant->update($validated);
 
-            // Jika email, nama PIC, atau nomor telepon diubah, update juga akun user-nya
             if ($tenant->user_id) {
                 User::where('id', $tenant->user_id)->update([
                     'name'         => $validated['person_in_charge'],
@@ -121,7 +115,6 @@ class TenantController extends Controller
     {
         return DB::transaction(function () use ($tenant) {
             
-            // Jika data tenant dihapus, akun login di manajemen pengguna juga otomatis terhapus
             if ($tenant->user_id) {
                 User::where('id', $tenant->user_id)->delete();
             }

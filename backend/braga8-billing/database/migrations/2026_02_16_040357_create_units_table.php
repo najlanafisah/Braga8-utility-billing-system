@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('units', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
-    $table->string('unit_number');
-    $table->string('floor')->nullable();
-    $table->decimal('area_size', 8, 2)->nullable();
-    $table->boolean('is_active')->default(1); // matches Blade dropdown
-    $table->date('lease_start')->nullable();
-    $table->date('lease_end')->nullable();
-    $table->timestamps();
-});
+    Schema::create('units', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
+        $table->string('unit_number');
+        $table->string('floor')->nullable();
+        $table->decimal('area_size', 8, 2)->nullable();
+        $table->boolean('is_active')->default(1);
+        $table->date('lease_start')->nullable();
+        $table->date('lease_end')->nullable();
+        $table->timestamps();
+    });
 
     }
 

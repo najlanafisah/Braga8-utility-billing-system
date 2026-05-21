@@ -13,7 +13,7 @@ return new class extends Migration
     {
        Schema::table('audit_logs', function (Blueprint $table) {
     $table->boolean('is_archived')->default(false);
-});
+    });
     }
 
     /**

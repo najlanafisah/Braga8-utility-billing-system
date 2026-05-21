@@ -14,8 +14,8 @@ return new class extends Migration
 {
     Schema::create('complaints', function (Blueprint $table) {
         $table->id();
-        $table->string('reported_by'); // Name of person complaining
-        $table->string('role');        // e.g., Tenant, Staff, Visitor
+        $table->string('reported_by');
+        $table->string('role');
         $table->date('report_date');
         $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])->default('pending');
         $table->text('description');

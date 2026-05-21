@@ -17,26 +17,26 @@ class Tenant extends Model
         'contact_email',
         'user_id',
     ];
-// Tenant model
-public function user() {
-    return $this->belongsTo(User::class);
-}
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 
     public function units()
-{
-    return $this->hasMany(Unit::class);
-}
+    {
+        return $this->hasMany(Unit::class);
+    }
 
-public function meters()
-{
-    return $this->hasMany(UtilityMeter::class);
-}
+    public function meters()
+    {
+        return $this->hasMany(UtilityMeter::class);
+    }
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
     }
 
-public function readings() {
-    return $this->hasMany(MeterReading::class); // Harus hasMany!
-}
+    public function readings() {
+        return $this->hasMany(MeterReading::class);
+    }
 }

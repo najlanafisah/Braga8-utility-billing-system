@@ -21,8 +21,8 @@ class UnitController extends Controller
                     });
                 });
             })
-            ->paginate(5) // Menggunakan paginate alih-alih get() agar kompatibel dengan view index kamu
-            ->withQueryString(); // Memastikan parameter ?search= tetap terbawa saat pindah halaman pagination
+            ->paginate(5)
+            ->withQueryString();
 
         return view('units.index', compact('tenants'));
     }

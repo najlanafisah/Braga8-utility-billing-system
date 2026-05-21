@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle Login and return Role-based data
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -27,7 +24,6 @@ class AuthController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Platform-based restriction
         if ($request->header('X-Platform') === 'mobile' && $user->role === 'admin') {
             return response()->json([
                 'message' => 'Admins are not authorized to use the mobile application.'
@@ -42,34 +38,26 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Update Profile Data
-     */
     public function updateProfile(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // 1. Validation
         $request->validate([
             'name'             => 'required|string|max:255',
             'phone_number'     => 'nullable|string',
-            // Tenant specifics
             'tenant_name'      => 'required_if:role,tenant|string|max:255',
             'person_in_charge' => 'required_if:role,tenant|string|max:255',
             'contact_phone'    => 'required_if:role,tenant|string',
         ]);
 
-        // 2. Database Transaction to ensure both updates happen or neither
         return DB::transaction(function () use ($request, $user) {
             try {
-                // Update User Table
                 $user->update([
                     'name'         => $request->name,
                     'phone_number' => $request->phone_number,
                 ]);
 
-                // Update Tenant Table if user is a tenant
                 if ($user->role === 'tenant' && $user->tenant) {
                     $user->tenant()->update([
                         'tenant_name'      => $request->tenant_name,
@@ -92,12 +80,8 @@ class AuthController extends Controller
         });
     }
 
-    /**
-     * Helper to keep user data structure consistent
-     */
     private function formatUserResponse($user)
     {
-        // Force load the relationship for tenants
         if ($user->role === 'tenant') {
             $user->load('tenant');
         }
@@ -113,9 +97,6 @@ class AuthController extends Controller
         ];
     }
 
-    /**
-     * Handle Logout
-     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

@@ -11,7 +11,6 @@ return new class extends Migration
 {
     public function up()
     {
-        // 1. Add tariff_id column
         Schema::table('utility_meters', function (Blueprint $table) {
             $table->foreignId('tariff_id')
                 ->nullable()
@@ -20,7 +19,6 @@ return new class extends Migration
                 ->nullOnDelete();
         });
 
-        // 2. Migrate existing data from tariff_group → tariff_id
         UtilityMeter::all()->each(function ($meter) {
             if ($meter->tariff_group) {
                 $tariff = Tariff::where('name', $meter->tariff_group)->first();
@@ -29,13 +27,11 @@ return new class extends Migration
                     $meter->tariff_id = $tariff->id;
                     $meter->save();
                 } else {
-                    // Log missing mapping (very important for debugging)
                     Log::warning("Tariff not found for group: " . $meter->tariff_group);
                 }
             }
         });
 
-        // 3. Drop old column
         Schema::table('utility_meters', function (Blueprint $table) {
             $table->dropColumn('tariff_group');
         });
@@ -43,7 +39,6 @@ return new class extends Migration
 
     public function down()
     {
-        // Rollback: bring back tariff_group (but data will be lost)
         Schema::table('utility_meters', function (Blueprint $table) {
             $table->string('tariff_group')->nullable();
         });

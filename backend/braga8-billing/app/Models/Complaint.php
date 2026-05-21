@@ -16,7 +16,7 @@ class Complaint extends Model
     'report_date', 
     'status', 
     'description', 
-    'solution', // <--- Add this!
+    'solution',
     'image'
 ];
 protected $casts = [

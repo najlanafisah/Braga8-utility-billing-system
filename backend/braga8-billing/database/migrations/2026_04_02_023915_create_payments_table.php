@@ -16,11 +16,11 @@ return new class extends Migration
         $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
         $table->decimal('amount_paid', 15, 2);
         $table->date('due_date');
-        $table->string('paid_using'); // e.g., 'Bank Transfer', 'Cash', 'E-Wallet'
-        $table->string('bank_rekening')->nullable(); // Account number used
+        $table->string('paid_using'); 
+        $table->string('bank_rekening')->nullable(); 
         $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');
         $table->timestamp('payment_date')->nullable();
-        $table->string('proof_img')->nullable(); // Path to the uploaded receipt
+        $table->string('proof_img')->nullable(); 
         $table->text('notes')->nullable();
         $table->timestamps();
     });

@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
             'email' => $validated['email'],
             'phone_number' => $validated['phone_number'],
             'password' => Hash::make($validated['password']),
-            'role' => 'admin', // 👈 automatic admin
+            'role' => 'admin',
         ]);
 
         event(new Registered($user));

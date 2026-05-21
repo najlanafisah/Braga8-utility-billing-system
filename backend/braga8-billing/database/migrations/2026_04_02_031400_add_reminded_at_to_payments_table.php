@@ -12,7 +12,6 @@ return new class extends Migration
   public function up(): void
 {
     Schema::table('payments', function (Blueprint $table) {
-        // We add the column after 'status' (or any existing column)
         $table->timestamp('reminded_at')->nullable()->after('status');
     });
 }

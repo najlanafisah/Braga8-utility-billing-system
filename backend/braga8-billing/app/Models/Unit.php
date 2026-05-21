@@ -28,18 +28,10 @@ class Unit extends Model
         return $this->hasMany(UtilityMeter::class, 'unit_id');
     }
 
-    // --- SMART HELPERS ---
-
-    /**
-     * Get the specific electricity meter for this unit
-     */
     public function electricityMeter() {
         return $this->hasOne(UtilityMeter::class, 'unit_id')->where('meter_type', 'electricity');
     }
 
-    /**
-     * Get the specific water meter for this unit
-     */
     public function waterMeter() {
         return $this->hasOne(UtilityMeter::class, 'unit_id')->where('meter_type', 'water');
     }

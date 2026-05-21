@@ -12,7 +12,6 @@ return new class extends Migration
    public function up()
 {
     Schema::table('tariffs', function (Blueprint $table) {
-        // We add 'name' at the beginning of the table
         $table->string('name')->after('id')->nullable(); 
     });
 }

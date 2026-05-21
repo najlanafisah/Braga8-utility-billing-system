@@ -10,18 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
    public function up()
-{
-    Schema::table('tariffs', function (Blueprint $table) {
-        $table->dropColumn('other_fee');
-        $table->json('other_fees')->nullable()->after('stamp_fee');
-    });
-}
+    {
+        Schema::table('tariffs', function (Blueprint $table) {
+            $table->dropColumn('other_fee');
+            $table->json('other_fees')->nullable()->after('stamp_fee');
+        });
+    }
 
-public function down()
-{
-    Schema::table('tariffs', function (Blueprint $table) {
-        $table->dropColumn('other_fees');
-        $table->decimal('other_fee', 12, 2)->default(0);
-    });
-}
+    public function down()
+    {
+        Schema::table('tariffs', function (Blueprint $table) {
+            $table->dropColumn('other_fees');
+            $table->decimal('other_fee', 12, 2)->default(0);
+        });
+    }
 };

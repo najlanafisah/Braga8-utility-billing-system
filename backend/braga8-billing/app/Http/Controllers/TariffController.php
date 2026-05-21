@@ -16,7 +16,7 @@ class TariffController extends Controller
                 $query->where('name', 'like', "%{$search}%");
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10) // GANTI ->get() MENJADI ->paginate() DI SINI
+            ->paginate(10)
             ->withQueryString();
 
         return view('tariffs.index', compact('tariffs'));

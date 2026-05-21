@@ -9,13 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
-{
-    Schema::table('invoices', function (Blueprint $table) {
-        // Adding the due_date column after the billing period or total_amount
-        $table->date('due_date')->nullable()->after('total_amount');
-    });
-}
+    public function up(): void
+    {
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->date('due_date')->nullable()->after('total_amount');
+        });
+    }
 
     /**
      * Reverse the migrations.

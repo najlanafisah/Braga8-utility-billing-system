@@ -35,7 +35,7 @@ class AuditLog extends Model
             'tenants'        => $model->tenant_name ?? "#{$this->record_id}",
             'users'          => $model->name ?? "#{$this->record_id}",
             'meter_readings' => "Reading: " . ($model->reading_value ?? 'N/A'),
-            'tariffs'        => $model->name ?? "Tariff #{$this->record_id}", // <--- Add this
+            'tariffs'        => $model->name ?? "Tariff #{$this->record_id}",
             default          => "#" . $this->record_id,
         };
     }

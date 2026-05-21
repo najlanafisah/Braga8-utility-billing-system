@@ -21,11 +21,12 @@ class Invoice extends Model
 ];
 
 
-protected $casts = [
-    'notified_at' => 'datetime',
-    'billing_period_start' => 'date',
-    'billing_period_end' => 'date',
-];
+    protected $casts = [
+        'notified_at' => 'datetime',
+        'billing_period_start' => 'date',
+        'billing_period_end' => 'date',
+    ];
+
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
@@ -41,13 +42,14 @@ protected $casts = [
     {
         return $this->hasMany(InvoiceItem::class);
     }
+    
     public function payments()
-{
-    return $this->hasMany(Payment::class);
-}
+    {
+        return $this->hasMany(Payment::class);
+    }
 
-public function getIsPaidAttribute()
-{
-    return $this->payments()->where('status', 'verified')->sum('amount_paid') >= $this->total_amount;
-}
+    public function getIsPaidAttribute()
+    {
+        return $this->payments()->where('status', 'verified')->sum('amount_paid') >= $this->total_amount;
+    }
 }

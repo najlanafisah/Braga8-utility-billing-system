@@ -44,7 +44,6 @@ class ReminderController extends Controller
             'role_target'   => 'required|in:supervisor,admin,tenant,petugas',
         ]);
 
-        // Cek apakah tanggal pengingat ada di masa depan (besok ke depan) atau hari ini/masa lalu
         $reminderDate = Carbon::parse($validated['reminder_date']);
         $calculatedStatus = $reminderDate->isFuture() ? 'pending' : 'sent';
 
@@ -60,7 +59,6 @@ class ReminderController extends Controller
             foreach ($escalations as $index => $step) {
                 $remindAt = $baseDate->copy()->addDays($step['days']);
                 
-                // Status eskalasi otomatis dihitung berdasarkan waktu eksekusinya nanti
                 $escalationStatus = $remindAt->isFuture() ? 'pending' : 'sent';
 
                 $reminder = Reminder::create([
@@ -71,7 +69,6 @@ class ReminderController extends Controller
                     'status'        => $escalationStatus
                 ]);
 
-                // Kirim notifikasi ke dalam sistem jika statusnya langsung terhitung 'sent'
                 if ($escalationStatus === 'sent') {
                     $this->sendImpulsiveNotification($reminder, $step['msg'], $index);
                 }
@@ -80,13 +77,11 @@ class ReminderController extends Controller
             return redirect()->route('reminders.index')->with('status', 'reminder-stored');
 
         } else {
-            // Pasang status otomatis hasil perhitungan waktu
             $reminder = Reminder::create([
                 ...$validated,
                 'status' => $calculatedStatus
             ]);
 
-            // Jika statusnya otomatis 'sent' (hari ini), langsung kirim notifikasi ke user terkait
             if ($calculatedStatus === 'sent') {
                 $users = User::where('role', $reminder->role_target)->get();
                 foreach ($users as $user) {
@@ -135,10 +130,8 @@ class ReminderController extends Controller
             'reminder_date' => 'sometimes|date',
             'due_date'      => 'sometimes|date|after_or_equal:reminder_date',
             'role_target'   => 'sometimes|in:supervisor,admin,tenant,petugas',
-            // Validasi input 'status' manual dihilangkan total karena sudah diatur sistem
         ]);
 
-        // Hitung ulang status secara otomatis jika ada perubahan tanggal pengingat
         if (isset($validated['reminder_date'])) {
             $reminderDate = Carbon::parse($validated['reminder_date']);
             $validated['status'] = $reminderDate->isFuture() ? 'pending' : 'sent';

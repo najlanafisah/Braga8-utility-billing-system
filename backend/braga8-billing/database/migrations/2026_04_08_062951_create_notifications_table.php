@@ -19,7 +19,6 @@ return new class extends Migration
     $table->text('message');
 
     $table->string('type')->nullable(); 
-    // example: payment, complaint, reminder, invoice
 
     $table->timestamp('read_at')->nullable();
 

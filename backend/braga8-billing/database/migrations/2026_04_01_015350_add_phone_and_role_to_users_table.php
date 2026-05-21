@@ -10,17 +10,17 @@ return new class extends Migration
      * Run the migrations.
      */
   public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->string('phone_number')->nullable();
-        $table->enum('role', ['admin', 'supervisor', 'petugas', 'tenant'])->default('tenant');
-    });
-}
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('phone_number')->nullable();
+            $table->enum('role', ['admin', 'supervisor', 'petugas', 'tenant'])->default('tenant');
+        });
+    }
 
-public function down()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['phone_number', 'role']);
-    });
-}
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['phone_number', 'role']);
+        });
+    }
 };

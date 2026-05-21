@@ -11,21 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoices', function (Blueprint $table) {
-    $table->id();
+        
+    Schema::create('invoices', function (Blueprint $table) {
+        $table->id();
 
-    $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-    $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
+        $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+        $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
 
-    $table->string('invoice_number');
+        $table->string('invoice_number');
 
-    $table->date('billing_period_start');
-    $table->date('billing_period_end');
+        $table->date('billing_period_start');
+        $table->date('billing_period_end');
 
-    $table->decimal('total_amount', 14,2);
+        $table->decimal('total_amount', 14,2);
 
-    $table->timestamps();
-});
+        $table->timestamps();
+    });
 
     }
 

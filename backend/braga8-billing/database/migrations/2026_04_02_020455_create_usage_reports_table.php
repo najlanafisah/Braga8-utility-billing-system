@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::create('usage_reports', function (Blueprint $table) {
         $table->id();
-        $table->string('month_year'); // Format: "2026-04"
+        $table->string('month_year');
         $table->integer('total_units_billed')->default(0);
         $table->decimal('total_electric_usage', 15, 2)->default(0);
         $table->decimal('total_water_usage', 15, 2)->default(0);

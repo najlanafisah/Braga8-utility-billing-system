@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::table('invoices', function (Blueprint $table) {
         $table->timestamp('sent_at')->nullable();
-        $table->string('notification_method')->nullable(); // 'whatsapp' or 'email'
+        $table->string('notification_method')->nullable();
     });
 }
 

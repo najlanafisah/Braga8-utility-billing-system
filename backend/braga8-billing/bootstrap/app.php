@@ -12,12 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // This ensures the 'web' group is active for all routes in routes/web.php
         $middleware->web(append: [
-            // If you have custom middleware, add it here
-            // \App\Http\Middleware\CheckRole::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        
     })->create();

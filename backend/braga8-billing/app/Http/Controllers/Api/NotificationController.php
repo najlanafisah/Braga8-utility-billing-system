@@ -8,23 +8,20 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-public function index()
+    public function index()
     {
-        // Ambil notif hanya untuk user yang sedang login
         $notifications = Notification::where('user_id', Auth::id())
             ->latest()
             ->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'data' => $notifications // Struktur nested 'data' sesuai permintaan Flutter lu tadi
+            'data'   => [
+                'data' => $notifications
             ]
         ]);
     }
-    /**
-     * Membuat notifikasi baru (Create)
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -39,7 +36,7 @@ public function index()
             'title'   => $validated['title'],
             'message' => $validated['message'],
             'type'    => $validated['type'] ?? 'info',
-            'read_at' => null, // Defaultnya belum dibaca
+            'read_at' => null,
         ]);
 
         return response()->json([
@@ -60,9 +57,15 @@ public function index()
         return response()->json(['message' => 'Marked as read']);
     }
 
-    /**
-     * Menghapus notifikasi (Delete)
-     */
+    public function markAllAsRead()
+    {
+        Notification::where('user_id', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return response()->json(['message' => 'Semua notifikasi ditandai dibaca']);
+    }
+
     public function destroy(Notification $notification)
     {
         if ($notification->user_id !== Auth::id()) {
@@ -72,5 +75,12 @@ public function index()
         $notification->delete();
 
         return response()->json(['message' => 'Notification deleted successfully']);
+    }
+
+    public function destroyAll()
+    {
+        Notification::where('user_id', Auth::id())->delete();
+
+        return response()->json(['message' => 'Semua notifikasi dihapus']);
     }
 }

@@ -7,22 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class UtilityMeter extends Model
 {
-    
     use LogsActivity;
-    protected $table = 'utility_meters'; // Tambahkan ini untuk memastikan nama tabelnya benar
+
+    protected $table = 'utility_meters';
 
     protected $fillable = [
-        'unit_id', 
-        'meter_type', 
-        'meter_number', 
+        'unit_id',
+        'meter_type',
+        'meter_number',
         'multiplier',
-        'power_capacity', 
+        'power_capacity',
         'tariff_id',
     ];
 
-    /**
-     * Standardize behavior: Always set category to postpaid upon creation.
-     */
     protected static function booted()
     {
         static::creating(function ($meter) {
@@ -30,26 +27,33 @@ class UtilityMeter extends Model
         });
     }
 
-    public function unit() 
+    public function unit()
     {
         return $this->belongsTo(Unit::class)->withDefault();
     }
 
-    public function tariff() 
+    public function tariff()
     {
         return $this->belongsTo(Tariff::class);
     }
 
-    public function readings() 
+    public function readings()
     {
         return $this->hasMany(MeterReading::class, 'meter_id');
     }
 
-    /**
-     * Gets the most recent reading for this meter
-     */
-    public function latestReading() 
+    public function latestReading()
     {
-        return $this->hasOne(MeterReading::class, 'meter_id')->latestOfMany('recorded_at');
+        return $this->hasOne(MeterReading::class, 'meter_id')
+            ->latestOfMany('recorded_at');
+    }
+
+    public function previousReading()
+    {
+        return $this->hasOne(MeterReading::class, 'meter_id')
+            ->where('status', 'checked')
+            ->orderByDesc('recorded_at')
+            ->skip(1)
+            ->take(1);
     }
 }

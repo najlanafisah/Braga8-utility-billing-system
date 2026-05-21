@@ -9,7 +9,6 @@ return new class extends Migration
     public function up()
     {
         Schema::table('units', function (Blueprint $table) {
-            // Only add if column doesn't exist
             if (!Schema::hasColumn('units', 'tenant_id')) {
                 $table->unsignedBigInteger('tenant_id')->after('unit_number');
                 $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');

@@ -11,21 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('utility_meters', function (Blueprint $table) {
-    $table->engine = 'InnoDB'; // wajib InnoDB untuk FK
-    $table->id();
+    Schema::create('utility_meters', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
+        $table->id();
 
-    // pastikan FK ke units.id pakai foreignId
-    $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
+        $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
 
-    $table->enum('meter_type',['electricity','water']);
-    $table->string('meter_number');
-    $table->string('power_capacity')->nullable();
-    $table->string('tariff_group')->nullable();
-    $table->enum('meter_category',['postpaid','prepaid']);
-    $table->timestamps();
-});
-
+        $table->enum('meter_type',['electricity','water']);
+        $table->string('meter_number');
+        $table->string('power_capacity')->nullable();
+        $table->string('tariff_group')->nullable();
+        $table->enum('meter_category',['postpaid','prepaid']);
+        $table->timestamps();
+    });
 
     }
 
