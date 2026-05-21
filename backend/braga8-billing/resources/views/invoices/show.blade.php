@@ -25,11 +25,11 @@
     <div class="flex flex-col gap-6">
 
         <div class="toolbar">
-            <div class="toolbar-action">
-                <a href="{{ route('invoices.index') }}"
-                    class="dark-brown-button btn-small">
-                    Kembali
-                </a>
+            <div class="toolbar-action"> 
+                <a href="{{ route('invoices.index') }}" class="dark-brown-button btn-small inline-flex items-center gap-2"> 
+                    <i class="fa-solid fa-angle-left"></i>
+                    <span>Kembali</span>
+                </a> 
             </div>
         </div>
 

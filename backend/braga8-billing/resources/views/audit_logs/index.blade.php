@@ -32,14 +32,13 @@
                 <span><i class="fa-solid fa-magnifying-glass"></i></span> 
             </div> 
             <button type="button" class="dark-brown-button btn-small {{ request()->filled('category') || request()->filled('action') ? 'ring-2 ring-amber-500' : '' }}" id="filter-btn-trigger"> 
-                <i class="fa-solid fa-filter"></i> 
+                <i class="fa-solid fa-sliders"></i>
             </button> 
 
             <div class="hidden absolute mt-2 z-50 w-[280px] filter-dropdown-container p-5" id="filter-dropdown" style="top: 100%; right: 0;"> 
                 <div class="flex flex-col gap-5"> 
                     <div class="flex flex-col gap-3"> 
                         
-                        {{-- 1. JENIS AKTIVITAS --}}
                         <div> 
                             <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Jenis Aktivitas</label> 
                             <div class="filter-custom-wrapper w-full relative"> 
@@ -49,7 +48,6 @@
                                     </span> 
                                     <i class="fa-solid fa-chevron-down text-[10px]"></i> 
                                 </div> 
-                                {{-- Class diganti jadi filter-options-box (Unik) --}}
                                 <div class="filter-options-box hidden shadow-xl absolute left-0 w-full z-[60] bg-[#1a1a1c] border border-zinc-700 rounded-xl mt-1"> 
                                     <div class="filter-option-item p-3 hover:bg-zinc-800 cursor-pointer text-sm text-white" data-value="">Semua Aktivitas</div> 
                                     <div class="filter-option-item p-3 hover:bg-zinc-800 cursor-pointer text-sm text-white" data-value="created">Dibuat</div> 
@@ -60,7 +58,6 @@
                             </div> 
                         </div> 
 
-                        {{-- 2. KATEGORI DATA --}}
                         <div> 
                             <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Kategori Data</label> 
                             <div class="filter-custom-wrapper w-full relative"> 
@@ -68,7 +65,6 @@
                                     <span>{{ request('category') ? ucfirst(str_replace('_', ' ', request('category'))) : 'Semua Kategori' }}</span> 
                                     <i class="fa-solid fa-chevron-down text-[10px]"></i> 
                                 </div> 
-                                {{-- Class diganti jadi filter-options-box (Unik) --}}
                                 <div class="filter-options-box hidden max-h-[200px] overflow-y-auto shadow-xl absolute left-0 w-full z-[60] bg-[#1a1a1c] border border-zinc-700 rounded-xl mt-1"> 
                                     <div class="filter-option-item p-3 hover:bg-zinc-800 cursor-pointer text-sm text-white" data-value="">Semua Kategori</div> 
                                     @foreach($categories as $category) 
@@ -161,7 +157,6 @@
     const filterBtn = document.getElementById('filter-btn-trigger');
     const filterDropdown = document.getElementById('filter-dropdown');
 
-    // 1. Toggle Filter Box Utama (Tombol Corong)
     if (filterBtn && filterDropdown) {
         filterBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -169,7 +164,6 @@
         });
     }
 
-    // 2. Handle Klik di Sub-Dropdown Filter
     document.querySelectorAll('.filter-custom-wrapper').forEach(wrapper => {
         const selectBox = wrapper.querySelector('.filter-select-box');
         const optionsBox = wrapper.querySelector('.filter-options-box');
@@ -179,7 +173,6 @@
         selectBox.addEventListener('click', (e) => {
             e.stopPropagation();
             
-            // Tutup sub-dropdown pasangannya dulu biar ga tumpang tindih
             document.querySelectorAll('.filter-options-box').forEach(box => {
                 if (box !== optionsBox) box.classList.add('hidden');
             });
@@ -199,7 +192,6 @@
         });
     });
 
-    // 3. Klik di luar untuk nutup semuanya
     document.addEventListener('click', (e) => {
         if (filterDropdown && !filterDropdown.contains(e.target) && !filterBtn.contains(e.target)) {
             filterDropdown.classList.add('hidden');
