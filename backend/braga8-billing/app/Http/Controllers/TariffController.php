@@ -9,14 +9,16 @@ class TariffController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Tariff::query();
+        $search = $request->query('search');
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
+        $tariffs = Tariff::query()
+            ->when($search, function($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10) // GANTI ->get() MENJADI ->paginate() DI SINI
+            ->withQueryString();
 
-        $tariffs = $query->latest()->get();
         return view('tariffs.index', compact('tariffs'));
     }
 

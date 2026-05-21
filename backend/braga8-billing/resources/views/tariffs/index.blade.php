@@ -78,6 +78,7 @@
 
         <div class="table-wrapper"> 
             @forelse($tariffs as $tariff) 
+                {{-- POPUP DETAIL TARIF --}}
                 <div class="popup" id="detail-tariff-{{ $tariff->id }}"> 
                     <div class="popup-overlay"></div> 
                     <div class="popup-card popup-md"> 
@@ -118,7 +119,6 @@
                                     <p>Rp {{ number_format($tariff->stamp_fee ?? 0, 0, ',', '.') }}</p> 
                                 </div> 
                             </div> 
-
                             @php 
                                 $hasCustomFees = false; 
                                 if(!empty($tariff->other_fees)) { 
@@ -129,7 +129,6 @@
                                     } 
                                 } 
                             @endphp 
-
                             @if($hasCustomFees) 
                                 <div class="flex flex-col gap-2 border-t border-dashed border-white/10 pt-4 w-full"> 
                                     <p class="font-bold text-[#FA8327] text-[10px] uppercase tracking-widest mb-3">Biaya Tambahan Khusus</p> 
@@ -153,29 +152,33 @@
                     </div> 
                 </div> 
 
+                {{-- POPUP EDIT TARIF (SUDAH ANTI-SCROLL HORIZONTAL) --}}
                 <div class="popup" id="update-tariff-{{ $tariff->id }}"> 
                     <div class="popup-overlay"></div> 
-                    <div class="popup-card popup-md"> 
+                    <div class="popup-card popup-md text-left"> 
                         <div class="popup-close-wrapper"> 
                             <button class="popup-close" data-close="update-tariff-{{ $tariff->id }}"> 
                                 <i class="fa-solid fa-xmark"></i> 
                             </button> 
                         </div> 
                         <div class="popup-header">Edit Tarif: {{ $tariff->name }}</div> 
-                        <form action="{{ route('tariffs.update', $tariff->id) }}" method="POST"> 
+                        <form action="{{ route('tariffs.update', $tariff->id) }}" method="POST" class="w-full max-w-full overflow-x-hidden"> 
                             @csrf 
                             @method('PUT') 
-                            <div class="popup-body is-scrollable flex flex-col gap-6"> 
-                                <div> 
+                            <div class="popup-body is-scrollable flex flex-col gap-5 max-w-full overflow-x-hidden"> 
+                                <div class="w-full flex flex-col gap-4"> 
                                     <div class="text-field"> 
                                         <label class="text-field-label">Nama Tarif <span class="text-[#FA8327]">*</span></label> 
                                         <input type="text" name="name" class="text-field-input" value="{{ old('name', $tariff->name) }}" required> 
                                     </div> 
-                                    <div class="add-tariff-wrapper"> 
-                                        <div class="column"> 
+                                    
+                                    {{-- Mengubah wrapper kolom menjadi grid murni Tailwind biar gak overflow --}}
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full"> 
+                                        <div class="flex flex-col gap-4 w-full"> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Listrik (per kWh) <span class="text-[#FA8327]">*</span></label> 
-                                                <input type="number" name="electric_price" class="text-field-input" step="0.01" value="{{ old('electric_price', $tariff->electric_price) }}" required> </div> 
+                                                <input type="number" name="electric_price" class="text-field-input" step="0.01" value="{{ old('electric_price', $tariff->electric_price) }}" required> 
+                                            </div> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Beban Listrik</label> 
                                                 <input type="number" name="other_fees[electric_load]" class="text-field-input" step="0.01" value="{{ old('other_fees.electric_load', $tariff->electric_load_cost ?? 0) }}"> 
@@ -189,7 +192,7 @@
                                                 <input type="number" name="tax_percent" class="text-field-input" step="0.01" value="{{ old('tax_percent', $tariff->tax_percent) }}" required> 
                                             </div> 
                                         </div> 
-                                        <div class="column"> 
+                                        <div class="flex flex-col gap-4 w-full"> 
                                             <div class="text-field"> 
                                                 <label class="text-field-label">Biaya Air (per m³) <span class="text-[#FA8327]">*</span></label> 
                                                 <input type="number" name="water_price" class="text-field-input" step="0.01" value="{{ old('water_price', $tariff->water_price) }}" required> 
@@ -204,22 +207,23 @@
                                             </div> 
                                         </div> 
                                     </div> 
-                                    <div class="flex flex-col mt-4 gap-4 border-t border-dashed border-white/10 pt-4"> 
-                                        <div class="flex flex-col gap-2"> 
-                                            <label class="text-[11px] uppercase font-bold tracking-wider text-zinc-500 block mb-3">Biaya Kustom Tambahan</label> 
-                                            <div id="dynamic-fee-container-edit-{{ $tariff->id }}" class="flex flex-col gap-2.5"> 
+
+                                    <div class="flex flex-col mt-2 gap-4 border-t border-dashed border-white/10 pt-4 w-full"> 
+                                        <div class="flex flex-col gap-2 w-full"> 
+                                            <label class="text-[11px] uppercase font-bold tracking-wider text-zinc-500 block mb-2">Biaya Kustom Tambahan</label> 
+                                            <div id="dynamic-fee-container-edit-{{ $tariff->id }}" class="flex flex-col gap-2.5 w-full"> 
                                                 @if(!empty($tariff->other_fees)) 
                                                     @foreach($tariff->other_fees as $key => $value) 
                                                         @if(!in_array($key, ['electric_load', 'maintenance', 'admin_fee', 'stamp_fee', 'other_fee'])) 
-                                                            <div class="grid grid-cols-12 gap-3 items-center dynamic-fee-row mb-1"> 
+                                                            <div class="grid grid-cols-12 gap-2 items-center dynamic-fee-row mb-1 w-full"> 
                                                                 <div class="col-span-7"> 
                                                                     <input type="text" placeholder="Nama Biaya" class="text-field-input" value="{{ $key }}" oninput="updateInputName(this)"> 
                                                                 </div> 
                                                                 <div class="col-span-4"> 
-                                                                    <input type="number" name="other_fees[{{ $key }}]" placeholder="Harga (Rp)" class="text-field-input dynamic-value-input" step="0.01" value="{{ $value }}"> 
+                                                                    <input type="number" name="other_fees[{{ $key }}]" placeholder="Harga" class="text-field-input dynamic-value-input" step="0.01" value="{{ $value }}"> 
                                                                 </div> 
                                                                 <div class="col-span-1 flex justify-center"> 
-                                                                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-zinc-500 hover:text-rose-500 p-2 shrink-0 transition-colors"> 
+                                                                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-zinc-500 hover:text-rose-500 p-1 shrink-0 transition-colors"> 
                                                                         <i class="fa-solid fa-trash-can text-sm"></i> 
                                                                     </button> 
                                                                 </div> 
@@ -229,12 +233,14 @@
                                                 @endif 
                                             </div> 
                                         </div> 
-                                        <button type="button" onclick="addCustomFeeField('edit-{{ $tariff->id }}')" class="text-xs text-[#FA8327] hover:text-[#a04d30] font-semibold inline-flex items-center gap-1.5 transition-colors bg-[#FA8327]/10 px-4 py-2 mt-3 rounded-xl border border-[#FA8327]/20"> 
-                                            <i class="fa-solid fa-plus-circle"></i> Tambah Biaya Lainnya 
-                                        </button> 
+                                        <div>
+                                            <button type="button" onclick="addCustomFeeField('edit-{{ $tariff->id }}')" class="text-xs text-[#FA8327] hover:text-[#a04d30] font-semibold inline-flex items-center gap-1.5 transition-colors bg-[#FA8327]/10 px-4 py-2 rounded-xl border border-[#FA8327]/20"> 
+                                                <i class="fa-solid fa-plus-circle"></i> Tambah Biaya Lainnya 
+                                            </button> 
+                                        </div>
                                     </div> 
                                 </div> 
-                                <button type="submit" class="dark-brown-button"> Perbarui Data Tarif </button> 
+                                <button type="submit" class="dark-brown-button mt-2"> Perbarui Data Tarif </button> 
                             </div> 
                         </form> 
                     </div> 
@@ -256,7 +262,7 @@
                                     <th>Beban Listrik</th> 
                                     <th>Pemeliharaan</th> 
                                     <th>Biaya Administrasi</th> 
-                                    <th>Tindakan</th> 
+                                    <th class="text-center">Tindakan</th> 
                                 </tr> 
                             </thead> 
                             <tbody> 
@@ -298,31 +304,46 @@
                     </div> 
                 </div> 
             @empty 
-                <div class="table-card p-10 text-center text-zinc-400 italic"> Data tarif tidak ditemukan </div> 
+                <div class="table-card p-10 text-center text-zinc-400 italic"> 
+                    Data tarif tidak ditemukan 
+                </div> 
             @endforelse 
+        </div> 
+
+        {{-- SINKRONISASI PAGINATION DENGAN LOG AUDIT & DAFTAR UNIT --}}
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 px-2"> 
+            <div class="text-sm text-zinc-500"> 
+                Menampilkan <span class="text-white">{{ $tariffs->firstItem() ?? 0 }}</span> sampai <span class="text-white">{{ $tariffs->lastItem() ?? 0 }}</span> dari <span class="text-white">{{ $tariffs->total() }}</span> hasil 
+            </div> 
+            <div class="braga-pagination"> 
+                {{ $tariffs->links('pagination::bootstrap-4') }} 
+            </div> 
         </div> 
     </div> 
 </div> 
 
+{{-- POPUP TAMBAH TARIF BARU (SUDAH ANTI-SCROLL HORIZONTAL) --}}
 <div class="popup" id="add-new-tariff"> 
     <div class="popup-overlay"></div> 
-    <div class="popup-card popup-md"> 
+    <div class="popup-card popup-md text-left"> 
         <div class="popup-close-wrapper"> 
             <button class="popup-close" data-close="add-new-tariff"> 
                 <i class="fa-solid fa-xmark"></i> 
             </button> 
         </div> 
         <div class="popup-header">Tambah Tarif Baru</div> 
-        <form action="{{ route('tariffs.store') }}" method="POST"> 
+        <form action="{{ route('tariffs.store') }}" method="POST" class="w-full max-w-full overflow-x-hidden"> 
             @csrf 
-            <div class="popup-body is-scrollable flex flex-col gap-6"> 
-                <div> 
+            <div class="popup-body is-scrollable flex flex-col gap-6 max-w-full overflow-x-hidden"> 
+                <div class="w-full flex flex-col gap-4"> 
                     <div class="text-field"> 
                         <label class="text-field-label">Nama Tarif <span class="text-[#FA8327]">*</span></label> 
                         <input type="text" name="name" class="text-field-input" placeholder="e.g., Residential Type A" required> 
                     </div> 
-                    <div class="add-tariff-wrapper"> 
-                        <div class="column"> 
+                    
+                    {{-- Mengubah wrapper kolom menjadi grid murni Tailwind biar gak overflow --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full"> 
+                        <div class="flex flex-col gap-4 w-full"> 
                             <div class="text-field"> 
                                 <label class="text-field-label">Biaya Listrik (per kWh) <span class="text-[#FA8327]">*</span></label> 
                                 <input type="number" name="electric_price" class="text-field-input" step="0.01" placeholder="Contoh: 1500" required> 
@@ -340,7 +361,7 @@
                                 <input type="number" name="tax_percent" class="text-field-input" step="0.01" placeholder="0" required> 
                             </div> 
                         </div> 
-                        <div class="column"> 
+                        <div class="flex flex-col gap-4 w-full"> 
                             <div class="text-field"> 
                                 <label class="text-field-label">Biaya Air (per m³) <span class="text-[#FA8327]">*</span></label> 
                                 <input type="number" name="water_price" class="text-field-input" step="0.01" placeholder="Contoh: 5000" required> 
@@ -355,31 +376,40 @@
                             </div> 
                         </div> 
                     </div> 
-                    <div class="flex flex-col mt-4 gap-4 border-t border-dashed border-white/10 pt-4"> 
-                        <div class="flex flex-col gap-2"> 
-                            <label class="text-[11px] uppercase font-bold tracking-wider text-zinc-500 block mb-3">Biaya Kustom Tambahan</label> 
-                            <div id="dynamic-fee-container-add" class="flex flex-col gap-2.5"></div> 
+
+                    <div class="flex flex-col mt-2 gap-4 border-t border-dashed border-white/10 pt-4 w-full"> 
+                        <div class="flex flex-col gap-2 w-full"> 
+                            <label class="text-[11px] uppercase font-bold tracking-wider text-zinc-500 block mb-2">Biaya Kustom Tambahan</label> 
+                            <div id="dynamic-fee-container-add" class="flex flex-col gap-2.5 w-full"></div> 
                         </div> 
-                        <button type="button" onclick="addCustomFeeField('add')" class="text-xs text-[#FA8327] hover:text-[#a04d30] font-semibold inline-flex items-center gap-1.5 transition-colors bg-[#FA8327]/10 px-4 py-2 mt-3 rounded-xl border border-[#FA8327]/20"> 
-                            <i class="fa-solid fa-plus-circle"></i> Tambah Biaya Lainnya 
-                        </button> 
+                        <div>
+                            <button type="button" onclick="addCustomFeeField('add')" class="text-xs text-[#FA8327] hover:text-[#a04d30] font-semibold inline-flex items-center gap-1.5 transition-colors bg-[#FA8327]/10 px-4 py-2 rounded-xl border border-[#FA8327]/20"> 
+                                <i class="fa-solid fa-plus-circle"></i> Tambah Biaya Lainnya 
+                            </button> 
+                        </div>
                     </div> 
                 </div> 
-                <button type="submit" class="dark-brown-button"> Simpan Tarif Baru </button> </div> 
+                <button type="submit" class="dark-brown-button"> Simpan Tarif Baru </button> 
+            </div> 
         </form> 
     </div> 
 </div> 
 
+{{-- POPUP DELETE TARIF --}}
 <div class="popup" id="delete-tariff"> 
     <div class="popup-overlay"></div> 
     <div class="popup-card popup-md"> 
         <div class="popup-close-wrapper"> 
-            <button class="popup-close"> <i class="fa-solid fa-xmark"></i> </button> 
+            <button class="popup-close"> 
+                <i class="fa-solid fa-xmark"></i> 
+            </button> 
         </div> 
-        <div class="popup-header mb-4">Hapus Tarif Ini</div> 
-        <div class="popup-body btn-delete-wrapper"> 
-            <button id="confirm-delete-btn" class="light-brown-btn">Ya</button> 
-            <button class="dark-brown-button" data-close="delete-tariff">Tidak</button> 
+        <div class="popup-header mb-4">Hapus Tarif Ini?</div> 
+        <div class="popup-body"> 
+            <div class="btn-delete-wrapper flex gap-3">
+                <button id="confirm-delete-btn" class="light-brown-btn flex-1">Ya, Hapus</button> 
+                <button class="dark-brown-button flex-1" data-close="delete-tariff">Batal</button> 
+            </div>
         </div> 
     </div> 
 </div> 
@@ -388,7 +418,7 @@
 function addCustomFeeField(containerType) { 
     const container = document.getElementById(`dynamic-fee-container-${containerType}`); 
     const row = document.createElement('div'); 
-    row.className = 'grid grid-cols-12 gap-3 items-center dynamic-fee-row mb-1 animate-fadeIn'; 
+    row.className = 'grid grid-cols-12 gap-2 items-center dynamic-fee-row mb-1 animate-fadeIn w-full'; 
     row.innerHTML = ` 
         <div class="col-span-7"> 
             <input type="text" placeholder="Nama Biaya" class="text-field-input" oninput="updateInputName(this)" required> 
@@ -397,7 +427,7 @@ function addCustomFeeField(containerType) {
             <input type="number" placeholder="0" class="text-field-input dynamic-value-input" step="0.01" disabled required> 
         </div> 
         <div class="col-span-1 flex justify-center"> 
-            <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-zinc-500 hover:text-[#FA8327] p-2 transition-colors shrink-0"> 
+            <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-zinc-500 hover:text-[#FA8327] p-1 transition-colors shrink-0"> 
                 <i class="fa-solid fa-trash-can text-sm"></i> 
             </button> 
         </div> 
