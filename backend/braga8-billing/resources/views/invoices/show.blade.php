@@ -33,107 +33,104 @@
             </div>
         </div>
 
-        <div class="table-card mb-6">
-
-            <div class="table-card-header">
-                <div class="table-card-title">
-                    <span class="label">Tenant:</span>
-                    <span class="value">{{ $invoice->tenant->tenant_name }}</span>
-                </div>
-
-                <div class="table-card-meta">
-                    Unit {{ $invoice->unit->unit_number }}
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"">
+            <div>
+                <table class="invoice-items">
                     <thead>
                         <tr>
-                            <th>Invoice No</th>
-                            <th>Unit</th>
-                            <th>Total</th>
-                            <th>Period</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>Tenant</th>
+                            <th>{{ $invoice->tenant->tenant_name }}</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>{{ $invoice->invoice_number }}</td>
 
-                            <td>
-                                {{ $invoice->unit->unit_number }}
-                            </td>
+                            <tr>
+                                <td>Invoice No</td>
+                                <td>
+                                    {{ $invoice->invoice_number }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Unit</td>
+                                <td>
+                                    {{ $invoice->unit->unit_number }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Total</td>
+                                <td>
+                                    {{ $invoice->unit->unit_number }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Masa Periode</td>
+                                <td>
+                                    {{ $invoice->billing_period_start }}
+                                    -
+                                    {{ $invoice->billing_period_end }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td class="status">
+                                    <button class="
+                                        {{ $invoice->status == 'paid'
+                                            ? 'dark-green-btn'
+                                            : ($invoice->status == 'pending'
+                                                ? 'light-brown-btn-action'
+                                                : 'red-btn') }}
+                                        pointer-events-none
+                                    ">
+                                        {{ strtoupper($invoice->status) }}
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Aksi</td>
+                                <td class="actions">
+                                    <div class="flex items-center justify-center gap-2">
 
-                            <td>
-                                Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}
-                            </td>
+                                        <a href="{{ route('invoices.pdf', $invoice) }}"
+                                        class="light-brown-btn-action">
+                                            <span>
+                                                <i class="fa-solid fa-download"></i>
+                                            </span>
+                                            <span>Download PDF</span>
+                                        </a>
 
-                            <td>
-                                {{ $invoice->billing_period_start }}
-                                -
-                                {{ $invoice->billing_period_end }}
-                            </td>
+                                    </div>
+                                </td>
+                            </tr>
 
-                            <td class="status">
-                                <button class="
-                                    {{ $invoice->status == 'paid'
-                                        ? 'dark-green-btn'
-                                        : ($invoice->status == 'pending'
-                                            ? 'light-brown-btn-action'
-                                            : 'red-btn') }}
-                                    pointer-events-none
-                                ">
-                                    {{ strtoupper($invoice->status) }}
-                                </button>
-                            </td>
-
-                            <td class="actions">
-                                <div class="flex items-center justify-center gap-2">
-
-                                    <a href="{{ route('invoices.pdf', $invoice) }}"
-                                    class="light-brown-btn-action">
-                                        <span>
-                                            <i class="fa-solid fa-download"></i>
-                                        </span>
-                                        <span>Download PDF</span>
-                                    </a>
-
-                                </div>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
 
-        <div>
-            <h1 class="invoice-title-card">Invoice Items</h1>
-
-            <table class="invoice-items mb-8">
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach($invoice->items as $item)
+            <div>
+                <table class="invoice-items">
+                    <thead>
                         <tr>
-                            <td>{{ $item->description }}</td>
-
-                            <td>
-                                Rp {{ number_format($item->amount, 0, ',', '.') }}
-                            </td>
+                            <th>Description</th>
+                            <th>Amount</th>
                         </tr>
-                    @endforeach
+                    </thead>
 
-                </tbody>
-            </table>
+                    <tbody>
+
+                        @foreach($invoice->items as $item)
+                            <tr>
+                                <td>{{ $item->description }}</td>
+
+                                <td>
+                                    Rp {{ number_format($item->amount, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        @endforeach
+
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div>
