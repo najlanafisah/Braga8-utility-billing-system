@@ -9,23 +9,27 @@ use Illuminate\Http\Request;
 class UnitController extends Controller
 {
     public function index(Request $request)
-    {
-        $search = $request->query('search');
+{
+    $search = $request->query('search');
 
-        $tenants = Tenant::with('units')
-            ->when($search, function($query) use ($search) {
-                $query->where(function($q) use ($search) {
-                    $q->where('tenant_name', 'like', "%{$search}%")
-                    ->orWhereHas('units', function($unitQuery) use ($search) {
-                        $unitQuery->where('unit_number', 'like', "%{$search}%");
-                    });
+    $tenants = Tenant::with('units')
+        ->when($search, function($query) use ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('tenant_name', 'like', "%{$search}%")
+                ->orWhereHas('units', function($unitQuery) use ($search) {
+                    $unitQuery->where('unit_number', 'like', "%{$search}%");
                 });
-            })
-            ->paginate(5)
-            ->withQueryString();
+            });
+        })
+        ->latest() 
+        ->paginate(5)
+        ->withQueryString();
 
-        return view('units.index', compact('tenants'));
-    }
+    $allTenants = Tenant::orderBy('tenant_name', 'asc')->get();
+
+    // 3. Lempar variabel $allTenants ke view
+    return view('units.index', compact('tenants', 'allTenants'));
+}
 
     public function create()
     {

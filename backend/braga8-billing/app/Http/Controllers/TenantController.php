@@ -49,8 +49,7 @@ class TenantController extends Controller
             'company_name'     => 'nullable|string|max:255',
         ]);
 
-        return DB::transaction(function () use ($validated) {
-            
+        DB::transaction(function () use ($validated) {
             $user = User::create([
                 'name'         => $validated['person_in_charge'],
                 'email'        => $validated['contact_email'],
@@ -69,9 +68,9 @@ class TenantController extends Controller
                 'contact_phone'    => $validated['contact_phone'],
                 'contact_email'    => $validated['contact_email'],
             ]);
+        }); 
 
-            return redirect()->route('tenants.index')->with('status', 'tenant-created');
-        });
+        return redirect()->route('tenants.index')->with('status', 'tenant-created');
     }
 
     public function update(Request $request, Tenant $tenant)

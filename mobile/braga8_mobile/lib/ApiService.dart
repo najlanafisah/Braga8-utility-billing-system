@@ -27,7 +27,7 @@ class ApiService {
   Map<String, dynamic>? currentUser;
   Tenant? currentTenant;
 
-  static const String _baseUrl = 'https://bunkbed-deem-spew.ngrok-free.dev/api';
+  static const String _baseUrl = 'https://untie-exfoliate-petunia.ngrok-free.dev';
 
   final Dio dio =
       Dio(
