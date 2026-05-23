@@ -2,13 +2,10 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:braga8_mobile/ApiService.dart';
 import 'package:braga8_mobile/data/models/complaint_model.dart';
-import 'package:braga8_mobile/views/complaint/customer_care_screen.dart';
 import 'package:braga8_mobile/views/complaint/edit_complaint_screen.dart';
-import 'package:braga8_mobile/views/complaint/input_complaint_screen.dart';
 import 'package:braga8_mobile/core/app_colors.dart';
 import 'package:braga8_mobile/views/widgets/app_header.dart';
 import 'package:braga8_mobile/views/widgets/main_layouts.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class DetailComplaintScreen extends StatefulWidget {
@@ -42,10 +39,10 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
 
   // ── Colors ────────────────────────────────────────────────────────────────────
   static const _orange = AppColors.primaryOrange;
-  Color get _orangeDim => _orange.withOpacity(0.22);
-  Color get _orangeBorder => _orange.withOpacity(0.45);
-  Color get _glass => Colors.white.withOpacity(0.05);
-  Color get _glassBorder => Colors.white.withOpacity(0.12);
+  Color get _orangeDim => _orange.withValues(alpha: 0.22);
+  Color get _orangeBorder => _orange.withValues(alpha: 0.45);
+  Color get _glass => Colors.white.withValues(alpha: 0.05);
+  Color get _glassBorder => Colors.white.withValues(alpha: 0.12);
 
   // ── Derived ───────────────────────────────────────────────────────────────────
   /// Edit is allowed only when the admin hasn't yet provided a solution
@@ -87,7 +84,6 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
     super.dispose();
   }
 
-  // ── Refresh ───────────────────────────────────────────────────────────────────
   Future<void> _refreshComplaint() async {
     setState(() => _isLoading = true);
     try {
@@ -100,23 +96,6 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
       // silently keep existing data on error
     } finally {
       if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _loadImage() async {
-    if (_imageFullUrl.isEmpty) return;
-    try {
-      final response = await _apiService.dio.get(
-        _imageFullUrl,
-        options: Options(
-          responseType: ResponseType.bytes,
-          headers: {'ngrok-skip-browser-warning': 'true'},
-        ),
-      );
-      if (mounted)
-        setState(() => _imageBytes = Uint8List.fromList(response.data));
-    } catch (e) {
-      debugPrint('Image load error: $e');
     }
   }
 
@@ -147,12 +126,12 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.75),
+                color: Colors.black.withValues(alpha: 0.75),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isError
-                      ? Colors.redAccent.withOpacity(0.5)
-                      : _orange.withOpacity(0.5),
+                      ? Colors.redAccent.withValues(alpha: 0.5)
+                      : _orange.withValues(alpha: 0.5),
                   width: 1.2,
                 ),
               ),
@@ -210,10 +189,6 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
                     AppHeader(
                       title: "Detail Komplain",
                       titleIcon: Icons.report_problem_rounded,
-                      onBack: () {
-                        Navigator.pop(context);
-                        widget.onBack?.call();
-                      },
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -306,7 +281,7 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: _canEdit ? _orangeDim : Colors.white.withOpacity(0.06),
+          color: _canEdit ? _orangeDim : Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: _canEdit ? _orangeBorder : Colors.white24,
@@ -351,9 +326,9 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
           decoration: BoxDecoration(
-            color: cfg.color.withOpacity(0.15),
+            color: cfg.color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: cfg.color.withOpacity(0.45), width: 1.2),
+            border: Border.all(color: cfg.color.withValues(alpha: 0.45), width: 1.2),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -497,7 +472,7 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
               border: Border.all(color: _orangeBorder, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: _orange.withOpacity(0.12),
+                  color: _orange.withValues(alpha: 0.12),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),

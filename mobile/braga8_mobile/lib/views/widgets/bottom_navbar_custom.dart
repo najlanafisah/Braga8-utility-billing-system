@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:braga8_mobile/core/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavbarCustom extends StatelessWidget {
@@ -24,7 +23,7 @@ class BottomNavbarCustom extends StatelessWidget {
       child: Container(
         height: 70,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.5),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
           borderRadius: BorderRadius.circular(40),
           image: const DecorationImage(
             image: AssetImage('assets/navbar-img.png'),
@@ -37,7 +36,7 @@ class BottomNavbarCustom extends StatelessWidget {
             filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.25),
+                color: Colors.black.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(40),
               ),
               child: SingleChildScrollView(

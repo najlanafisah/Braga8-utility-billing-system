@@ -1,4 +1,3 @@
-import 'package:braga8_mobile/core/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AppHeader extends StatelessWidget {
@@ -17,7 +16,7 @@ class AppHeader extends StatelessWidget {
     this.trailing,
   });
 
-  static Color get _glassBorder => Colors.white.withOpacity(0.12);
+  static Color get _glassBorder => Colors.white.withValues(alpha: 0.12);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,7 @@ class AppHeader extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.07),
+                color: Colors.white.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: _glassBorder, width: 1),
               ),

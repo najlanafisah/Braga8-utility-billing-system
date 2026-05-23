@@ -901,10 +901,9 @@ String _truncateTitle(String title) => title.length <= _maxTitleLength
                     MaterialPageRoute(
                       builder: (_) => DetailComplaintScreen(
                         complaint: complaint,
-                        onBack: () => Navigator.pop(context),
                       ),
                     ),
-                  ),
+                  ).then((_) => _refreshData(silent: true)),
                 ),
                 const SizedBox(width: 6),
                 _actionBtn(

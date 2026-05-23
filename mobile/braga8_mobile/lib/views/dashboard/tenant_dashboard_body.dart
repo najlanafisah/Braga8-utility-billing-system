@@ -55,7 +55,7 @@ class TenantDashboardBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Halo, Tim ${(() {
+                  "Halo, ${(() {
                     String name = api.currentUser?['name'] ?? role;
                     if (name.isEmpty) return name;
                     return name[0].toUpperCase() + name.substring(1).toLowerCase();

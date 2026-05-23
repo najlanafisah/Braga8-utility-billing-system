@@ -1,8 +1,6 @@
 import 'package:braga8_mobile/ApiService.dart';
 import 'package:braga8_mobile/components/profile_modal.dart';
 import 'package:braga8_mobile/views/complaint/customer_care_screen.dart';
-import 'package:braga8_mobile/views/dashboard/dashboard_screen.dart';
-import 'package:braga8_mobile/views/dashboard/dashboard_shared_widgets.dart';
 import 'package:braga8_mobile/views/dashboard/petugas_dashboard_body.dart';
 import 'package:braga8_mobile/views/dashboard/tenant_dashboard_body.dart';
 import 'package:braga8_mobile/views/history/audit_log_screen.dart';
@@ -66,14 +64,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _onItemTapped(int index) {
     final bool isPetugas = widget.role.toLowerCase() == 'petugas';
-    final int profileIndex = isPetugas ? 5 : 4;
+    final int profileIndex = isPetugas ? 5 : -1; 
 
     if (index == profileIndex) {
       showProfileModal(context, widget.api, widget.role, widget.token);
-      return; // don't change _selectedIndex
+      return;
     }
 
-    debugPrint('Nav tapped: $index, pages length: ${_pages.length}');
     setState(() => _selectedIndex = index);
   }
 
@@ -95,10 +92,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       debugPrint('Invoice fetch error: $e');
     }
   }
-
-  // -----------------------------------------------------------------------
-  // DATA FETCHING
-  // -----------------------------------------------------------------------
 
   Future<void> _loadDashboardData() async {
     await _fetchUnreadCount();
