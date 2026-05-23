@@ -322,7 +322,6 @@
     </div> 
 </div> 
 
-{{-- POPUP TAMBAH TARIF BARU (SUDAH ANTI-SCROLL HORIZONTAL) --}}
 <div class="popup" id="add-new-tariff"> 
     <div class="popup-overlay"></div> 
     <div class="popup-card popup-md text-left"> 
@@ -341,7 +340,6 @@
                         <input type="text" name="name" class="text-field-input" placeholder="e.g., Residential Type A" required> 
                     </div> 
                     
-                    {{-- Mengubah wrapper kolom menjadi grid murni Tailwind biar gak overflow --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full"> 
                         <div class="flex flex-col gap-4 w-full"> 
                             <div class="text-field"> 
@@ -395,7 +393,6 @@
     </div> 
 </div> 
 
-{{-- POPUP DELETE TARIF --}}
 <div class="popup" id="delete-tariff"> 
     <div class="popup-overlay"></div> 
     <div class="popup-card popup-md"> 

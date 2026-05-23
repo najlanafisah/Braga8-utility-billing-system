@@ -71,43 +71,46 @@ class ComplaintController extends Controller
    }
 
 
-   public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
-    $complaint = Complaint::findOrFail($id);
+        $complaint = Complaint::findOrFail($id);
 
+        $data = $request->validate([
+            'title'        => 'sometimes|required|string|max:255',
+            'description'  => 'sometimes|required|string',
+            'status'       => 'sometimes|required|in:pending,in_progress,resolved,rejected',
+            'solution'     => 'nullable|string',
+            'photo_base64' => 'nullable|string',
+        ]);
 
-    $data = $request->validate([
-        'title'        => 'sometimes|required|string|max:255',
-        'description'  => 'sometimes|required|string',
-        'status'       => 'sometimes|required|in:pending,in_progress,resolved,rejected',
-        'solution'     => 'nullable|string',
-        'photo_base64' => 'nullable|string',
-    ]);
+        if (!empty($data['photo_base64'])) {
+            if ($complaint->image) {
+                Storage::disk('public')->delete($complaint->image);
+            }
 
-
-    if (!empty($data['photo_base64'])) {
-        if ($complaint->image) {
-            Storage::disk('public')->delete($complaint->image);
+            $image = $data['photo_base64'];
+            preg_match('/data:(image\/\w+);base64,/', $image, $matches);
+            $extension = str_replace('image/', '', $matches[1] ?? 'jpeg');
+            $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $image));
+            $filename = 'complaints/' . uniqid() . '.' . $extension;
+            Storage::disk('public')->put($filename, $imageData);
+            $data['image'] = $filename;
         }
 
+        unset($data['photo_base64']);
 
-        $image = $data['photo_base64'];
-        preg_match('/data:(image\/\w+);base64,/', $image, $matches);
-        $extension = str_replace('image/', '', $matches[1] ?? 'jpeg');
-        $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $image));
-        $filename = 'complaints/' . uniqid() . '.' . $extension;
-        Storage::disk('public')->put($filename, $imageData);
-        $data['image'] = $filename;
-    }
+        $complaint->update($data);
 
+        if (!empty($data['solution']) && $complaint->user_id) {
+            Notification::create([
+                'user_id' => $complaint->user_id,
+                'title'   => 'Komplain Ditanggapi',
+                'message' => 'Komplain Anda "' . $complaint->title . '" telah mendapat solusi dari admin.',
+                'type'    => 'complaint',
+            ]);
+        }
 
-    unset($data['photo_base64']);
-
-
-    $complaint->update($data);
-
-
-    return response()->json($complaint);
+        return response()->json($complaint);
     }
 
    public function destroy($id)

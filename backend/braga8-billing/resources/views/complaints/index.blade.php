@@ -148,8 +148,7 @@
                                             </button>
                                         </div>
                                         <div class="popup-header">{{ $complaint->subject ?? 'Keluhan Umum' }}</div>
-                                        <div class="popup-body flex flex-col gap-6 pt-2">
-                                            {{-- Flex Row buat Konten & Foto --}}
+                                        <div class="popup-body is-scrollable flex flex-col gap-6 pt-2">
                                             <div class="flex flex-col lg:flex-row gap-8">
                                                 <div class="flex-1 flex flex-col gap-4">
                                                     <div class="grid grid-cols-2 gap-y-5 gap-x-4">

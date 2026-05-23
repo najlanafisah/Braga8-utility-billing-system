@@ -96,6 +96,15 @@ class ComplaintController extends Controller
             'status'   => 'resolved',
         ]);
 
+        if ($complaint->user_id) {
+            \App\Models\Notification::create([
+                'user_id' => $complaint->user_id,
+                'title'   => 'Komplain Ditanggapi',
+                'message' => 'Komplain Anda "' . $complaint->title . '" telah mendapat solusi dari admin.',
+                'type'    => 'complaint',
+            ]);
+        }
+
         return redirect()->back()->with('status', 'complaint-resolved');
     }
 
