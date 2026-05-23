@@ -51,8 +51,6 @@ class ApiService {
     return Options(headers: {'Authorization': 'Bearer $effectiveToken'});
   }
 
-  // --- AUTHENTICATION ---
-
   Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
       final response = await dio.post(
@@ -62,8 +60,7 @@ class ApiService {
       if (response.data != null && response.data['token'] != null) {
         token = response.data['token'];
         currentUser = response.data['user'];
-
-        // Try both common structures
+        
         final tenantJson = response.data['user']?['tenant_details'];
         if (tenantJson != null) {
           currentTenant = Tenant.fromJson(tenantJson as Map<String, dynamic>);
@@ -106,7 +103,6 @@ class ApiService {
     }
   }
 
-  // --- TENANT & PROFILE ---
 
   Future<List<dynamic>> getTenants(String providedToken) async {
     try {
@@ -513,7 +509,7 @@ class ApiService {
       return null;
     } on DioException catch (e) {
       print('getTenantProfile Error: ${e.response?.data}');
-      return null; // returns null instead of throwing — so _fetchTenantDetails won't error
+      return null;
     }
   }
 
@@ -554,7 +550,7 @@ class ApiService {
     String? notes,
   }) async {
     try {
-      // Encode photo to Base64 (same strategy as submitMeterReading)
+
       final bytes = await proofPhoto.readAsBytes();
       final ext = proofPhoto.name.split('.').last.toLowerCase();
       final mime = (ext == 'png') ? 'image/png' : 'image/jpeg';

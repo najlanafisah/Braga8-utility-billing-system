@@ -170,7 +170,7 @@
 
                 <div class="text-field">
                     <label class="text-field-label">Alamat Email</label>
-                    <input type="email" name="email" class="text-field-input" placeholder="nama@gmail.com" :value="old('email')" required autofocus>
+                    <input type="email" name="email" class="text-field-input" placeholder="masukkan email" :value="old('email')" required autofocus>
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-white text-xs" />
                 </div>
 

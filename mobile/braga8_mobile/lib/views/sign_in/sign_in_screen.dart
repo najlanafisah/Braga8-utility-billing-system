@@ -1,6 +1,5 @@
 import 'package:braga8_mobile/main.dart'; // for apiService singleton
 import 'package:braga8_mobile/services/session_services.dart';
-import 'package:braga8_mobile/views/dashboard/dashboard_screen.dart'; // DashboardScreen
 import 'package:braga8_mobile/views/widgets/main_layouts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -23,7 +22,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   final List<Shadow> _uiShadows = [
     Shadow(
-      color: Colors.black.withOpacity(0.5),
+      color: Colors.black.withValues(alpha: 0.5),
       blurRadius: 10,
       offset: const Offset(0, 4),
     ),
