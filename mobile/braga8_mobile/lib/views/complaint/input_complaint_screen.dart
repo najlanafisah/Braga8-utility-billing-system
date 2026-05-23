@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:braga8_mobile/data/models/complaint_model.dart';
-import 'package:braga8_mobile/views/meter_input/meter_camera_screen.dart';
 import 'package:braga8_mobile/views/widgets/app_header.dart';
 import 'package:braga8_mobile/views/widgets/main_layouts.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -29,32 +28,26 @@ class InputComplaintScreen extends StatefulWidget {
 
 class _InputComplaintScreenState extends State<InputComplaintScreen>
     with SingleTickerProviderStateMixin {
-  // ── Form ──────────────────────────────────────────────────────────────────────
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
 
-  // ── Photo ─────────────────────────────────────────────────────────────────────
   File? _photoFile;
   XFile? _photoXFile;
   Uint8List? _photoBytes;
 
-  // ── Submit ────────────────────────────────────────────────────────────────────
   bool _isSubmitting = false;
 
-  // ── Services ──────────────────────────────────────────────────────────────────
   final ApiService _apiService = ApiService();
 
-  // ── Animation ─────────────────────────────────────────────────────────────────
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
 
-  // ── Colors ────────────────────────────────────────────────────────────────────
   static const _orange = AppColors.primaryOrange;
-  Color get _orangeDim => _orange.withOpacity(0.22);
-  Color get _orangeBorder => _orange.withOpacity(0.45);
-  Color get _glass => Colors.white.withOpacity(0.05);
-  Color get _glassBorder => Colors.white.withOpacity(0.12);
+  Color get _orangeDim => _orange.withValues(alpha: .22);
+  Color get _orangeBorder => _orange.withValues(alpha: .45);
+  Color get _glass => Colors.white.withValues(alpha: .05);
+  Color get _glassBorder => Colors.white.withValues(alpha: .12);
 
   @override
   void initState() {
@@ -79,8 +72,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     super.dispose();
   }
 
-  // ── Progress ──────────────────────────────────────────────────────────────────
-  // Update _progress to include title:
   double get _progress {
     int filled = 0;
     if (_titleController.text.isNotEmpty) filled++;
@@ -89,47 +80,22 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     return filled / 3;
   }
 
-  // ── Photo — CAMERA ONLY ───────────────────────────────────────────────────────
   Future<void> _openCamera() async {
-    if (kIsWeb) {
-      try {
-        final picker = ImagePicker();
-        final XFile? image = await picker.pickImage(
-          source: ImageSource.camera,
-          imageQuality: 85,
-          preferredCameraDevice: CameraDevice.rear,
-        );
-        if (image == null) return;
-        final bytes = await image.readAsBytes();
-        setState(() {
-          _photoXFile = image;
-          _photoBytes = bytes;
-        });
-      } on Exception catch (e) {
-        _showSnack("Akses kamera ditolak: $e", isError: true);
-      }
-      return;
-    }
-
-    final XFile? photo = await Navigator.push<XFile>(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => const MeterCameraScreen(),
-      ),
-    );
-
-    if (photo == null) return;
-
     try {
-      final bytes = await photo.readAsBytes();
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (image == null) return;
+      final bytes = await image.readAsBytes();
       setState(() {
-        _photoXFile = photo;
+        _photoXFile = image;
         _photoBytes = bytes;
-        _photoFile = File(photo.path);
+        _photoFile = kIsWeb ? null : File(image.path);
       });
     } catch (e) {
-      _showSnack("Gagal memproses foto: $e", isError: true);
+      _showSnack("Gagal memilih foto: $e", isError: true);
     }
   }
 
@@ -141,34 +107,17 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     });
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSubmitting = true);
 
-    double? latitude;
-    double? longitude;
-    try {
-      final position = await _apiService.determinePosition();
-      latitude = position.latitude;
-      longitude = position.longitude;
-    } catch (_) {
-      // GPS optional for complaint — proceed without
-    }
-
     final Map<String, dynamic> payload = {
       'title': _titleController.text.trim(),
       'description': _descController.text.trim(),
-      if (latitude != null) 'latitude': latitude,
-      if (longitude != null) 'longitude': longitude,
     };
 
     try {
-      // Replace with your actual ApiService complaint endpoint
-      // final bool success = await _apiService.submitComplaint(payload, _photoXFile);
-      // Simulated success for now:
-      await Future.delayed(const Duration(seconds: 1));
       final bool success = await _apiService.submitComplaint(
         payload,
         _photoXFile,
@@ -190,7 +139,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     if (mounted) setState(() => _isSubmitting = false);
   }
 
-  // ── Snack ─────────────────────────────────────────────────────────────────────
   void _showSnack(String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -206,12 +154,12 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.75),
+                color: Colors.black.withValues(alpha:  0.75),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isError
-                      ? Colors.redAccent.withOpacity(0.5)
-                      : _orange.withOpacity(0.5),
+                      ? Colors.redAccent.withValues(alpha:  0.5)
+                      : _orange.withValues(alpha:  0.5),
                   width: 1.2,
                 ),
               ),
@@ -221,8 +169,8 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: isError
-                          ? Colors.redAccent.withOpacity(0.15)
-                          : _orange.withOpacity(0.15),
+                          ? Colors.redAccent.withValues(alpha:  0.15)
+                          : _orange.withValues(alpha:  0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -253,7 +201,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── BUILD ─────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -298,7 +245,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                     const SizedBox(height: 12),
                     _buildDescField(),
                     const SizedBox(height: 12),
-                    // And update the photo section label step number:
                     _buildSectionLabel(
                       "3",
                       "Foto Bukti (Opsional)",
@@ -322,7 +268,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Progress Bar ──────────────────────────────────────────────────────────────
   Widget _buildProgressBar() {
     return _glassCard(
       child: Column(
@@ -364,7 +309,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Section Label ─────────────────────────────────────────────────────────────
   Widget _buildSectionLabel(String step, String title, IconData icon) {
     return Row(
       children: [
@@ -402,7 +346,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Title Field ───────────────────────────────────────────────────────────────
   Widget _buildTitleField() {
     return _glassCard(
       padding: EdgeInsets.zero,
@@ -441,7 +384,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Description Field ─────────────────────────────────────────────────────────
   Widget _buildDescField() {
     return _glassCard(
       padding: EdgeInsets.zero,
@@ -477,7 +419,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Photo Container — CAMERA ONLY (OPTIONAL) ─────────────────────────────────
   Widget _buildPhotoContainer() {
     final bool hasPhoto = _photoXFile != null;
 
@@ -499,7 +440,7 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
               boxShadow: hasPhoto
                   ? [
                       BoxShadow(
-                        color: _orange.withOpacity(0.15),
+                        color: _orange.withValues(alpha:  0.15),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -528,7 +469,7 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.72),
+                                  Colors.black.withValues(alpha:  0.72),
                                 ],
                               ),
                             ),
@@ -536,7 +477,7 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.camera_alt_rounded,
+                                  Icons.photo_library_rounded,
                                   color: _orange,
                                   size: 15,
                                 ),
@@ -607,7 +548,7 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              "Tap untuk membuka kamera",
+                              "Tap untuk membuka galeri",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.white38,
@@ -617,8 +558,8 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _chip(Icons.camera_alt_rounded, "Kamera"),
-                                const SizedBox(width: 8),
+                                _chip(Icons.photo_library_rounded, "Galeri"),
+                                SizedBox(width: 8),
                                 _optionalBadge(),
                               ],
                             ),
@@ -640,14 +581,14 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                 Icon(
                   Icons.delete_outline_rounded,
                   size: 14,
-                  color: Colors.redAccent.withOpacity(0.7),
+                  color: Colors.redAccent.withValues(alpha:  0.7),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   "Hapus Foto",
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.redAccent.withOpacity(0.7),
+                    color: Colors.redAccent.withValues(alpha:  0.7),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -689,7 +630,7 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha:  0.06),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white24, width: 1),
       ),
@@ -704,14 +645,13 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Save Button ───────────────────────────────────────────────────────────────
   Widget _buildSaveButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _isSubmitting ? null : _submit,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _orange.withOpacity(0.3),
+          backgroundColor: _orange.withValues(alpha:  0.3),
           disabledBackgroundColor: Colors.white10,
           padding: const EdgeInsets.symmetric(vertical: 22),
           elevation: 0,
@@ -748,7 +688,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Cancel Button ─────────────────────────────────────────────────────────────
   Widget _buildCancelButton() {
     return SizedBox(
       width: double.infinity,
@@ -773,7 +712,6 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
     );
   }
 
-  // ── Glass Card ────────────────────────────────────────────────────────────────
   Widget _glassCard({required Widget child, EdgeInsets? padding}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
