@@ -214,9 +214,9 @@ Route::prefix('notifications')->group(function () {
 
 Route::get('/complaints', [ApiComplaintController::class, 'index']);
 Route::post('/complaints', [ApiComplaintController::class, 'store']);
+Route::get('/complaints/{id}', [ApiComplaintController::class, 'show']);
 Route::put('/complaints/{id}', [ApiComplaintController::class, 'update']);
 Route::delete('/complaints/{id}', [ApiComplaintController::class, 'destroy']);
-
 
 Route::get('/customer-care', function () {
    return response()->json([

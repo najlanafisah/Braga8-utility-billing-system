@@ -123,16 +123,17 @@ class ComplaintController extends Controller
        return response()->json(['message' => 'Complaint deleted successfully']);
    }
 
-
-    public function show($id)
+   public function show($id)
     {
-    $complaint = Complaint::findOrFail($id);
-    return response()->json($complaint);
+        $complaint = Complaint::findOrFail($id);
+        
+        if ($complaint->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'data' => $complaint
+        ]);
     }
 
-
-    public function action(Complaint $complaint)
-    {
-    return view('complaints.action', compact('complaint'));
-    }
 }

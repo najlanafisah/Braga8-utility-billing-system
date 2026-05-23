@@ -51,12 +51,20 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
       _complaint.status != 'resolved' &&
       _complaint.status != 'rejected';
 
+  // String get _imageFullUrl {
+  //   final raw = _complaint.imageUrl ?? '';
+  //   if (raw.isEmpty) return '';
+  //   if (raw.startsWith('http')) return raw;
+  //   final filename = raw.split('/').last;
+  //   return 'https://bunkbed-deem-spew.ngrok-free.dev/api/complaint-image/$filename';
+  // }
+
   String get _imageFullUrl {
     final raw = _complaint.imageUrl ?? '';
     if (raw.isEmpty) return '';
     if (raw.startsWith('http')) return raw;
-    final filename = raw.split('/').last;
-    return 'https://bunkbed-deem-spew.ngrok-free.dev/api/complaint-image/$filename';
+    return 'http://172.16.4.22:8000/storage/$raw';
+    // hasil: http://172.16.4.22:8000/storage/complaints/foto.jpeg
   }
 
   @override
@@ -87,13 +95,15 @@ class _DetailComplaintScreenState extends State<DetailComplaintScreen>
   Future<void> _refreshComplaint() async {
     setState(() => _isLoading = true);
     try {
-      // Fetch fresh complaint data from the API
       final fresh = await _apiService.fetchComplaintById(_complaint.id);
-      debugPrint('IMAGE URL RAW: ${fresh.imageUrl}');
-      debugPrint('IMAGE FULL URL: $_imageFullUrl');
-      if (mounted) setState(() => _complaint = fresh);
+      debugPrint('RAW JSON image field: ${fresh.imageUrl}');
+      if (mounted) {
+        setState(() => _complaint = fresh);
+        debugPrint('IMAGE URL RAW: ${fresh.imageUrl}');
+        debugPrint('IMAGE FULL URL: $_imageFullUrl');
+      }
     } catch (e) {
-      // silently keep existing data on error
+      debugPrint('Refresh error: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

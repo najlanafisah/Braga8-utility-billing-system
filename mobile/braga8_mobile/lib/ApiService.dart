@@ -11,7 +11,6 @@ import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as _dio;
 
 int unreadNotificationsCount = 0;
 
@@ -27,8 +26,9 @@ class ApiService {
   Map<String, dynamic>? currentUser;
   Tenant? currentTenant;
 
- static const String _baseUrl = 'http://localhost:8000/api';
-
+  static const String _baseUrl = 'http://172.16.4.22:8000/api';
+  // http://localhost:8000/api = web
+  // http://172.16.4.22:8000/api = mobile
   final Dio dio =
       Dio(
           BaseOptions(
@@ -39,6 +39,7 @@ class ApiService {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
               'ngrok-skip-browser-warning': 'true',
+              'X-Platform': 'mobile'
             },
           ),
         )
@@ -333,7 +334,9 @@ class ApiService {
     }
   }
 
-  Future<Object?> getBillingSummary(String token) async {}
+  Future<Object?> getBillingSummary(String token) async {
+    return null;
+  }
 
   Future<bool> clearAllNotifications(String providedToken) async {
     try {
@@ -389,19 +392,18 @@ class ApiService {
 
   Future<Complaint> fetchComplaintById(int id) async {
     try {
-      final response = await dio.get('/complaints', options: _authOptions());
-      final List<dynamic> data = response.data['data'] ?? response.data;
-      return data
-          .map((e) => Complaint.fromJson(e as Map<String, dynamic>))
-          .firstWhere((c) => c.id == id);
+      final response = await dio.get(
+        '/complaints/$id',
+        options: _authOptions(),
+      );
+      final json = response.data['data'] ?? response.data;
+      debugPrint('RAW RESPONSE: $json');
+      return Complaint.fromJson(json as Map<String, dynamic>);
     } on DioException catch (e) {
       final msg = e.response?.data?['message'] as String?;
       throw Exception(msg ?? "Gagal memuat komplain");
     }
   }
-
-  /// POST /api/complaints  (create)
-  /// POST /api/complaints/{id} + _method=PUT (edit)
 
   Future<bool> submitComplaint(
     Map<String, dynamic> payload,

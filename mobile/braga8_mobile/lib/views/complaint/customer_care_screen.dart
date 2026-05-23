@@ -875,7 +875,6 @@ String _truncateTitle(String title) => title.length <= _maxTitleLength
         rowBuilder: (item) {
           final complaint = item['object'] as Complaint;
           return [
-            // Keterangan
             Text(
               complaint.solution != null && complaint.solution!.isNotEmpty
                   ? complaint.solution!
@@ -885,10 +884,8 @@ String _truncateTitle(String title) => title.length <= _maxTitleLength
               overflow: TextOverflow.ellipsis,
             ),
 
-            // Status
             _complaintStatusBadge(complaint.status),
 
-            // Aksi
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -920,7 +917,6 @@ String _truncateTitle(String title) => title.length <= _maxTitleLength
     );
   }
 
-  // ── BUILD ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final filtered = _getFiltered(_complaints);

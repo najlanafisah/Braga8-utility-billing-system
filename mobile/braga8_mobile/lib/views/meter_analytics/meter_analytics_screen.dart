@@ -239,7 +239,6 @@ class _PetugasAnalyticsScreenState extends State<_PetugasAnalyticsScreen>
                         ),
                         const SliverToBoxAdapter(child: SizedBox(height: 14)),
 
-                        // ── Search + Filter button row
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
