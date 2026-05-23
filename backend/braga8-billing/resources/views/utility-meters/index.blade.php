@@ -454,8 +454,8 @@
         </div> 
         <div class="popup-header">Hapus Meteran Ini?</div> 
         <div class="popup-body btn-delete-wrapper flex gap-3"> 
+            <button class="dark-brown-button flex-1" data-close="delete-tariff">Tidak</button> 
             <button id="confirm-delete-btn" class="light-brown-btn flex-1">Ya, Hapus</button> 
-            <button class="dark-brown-button flex-1" data-close="delete-tariff">Tidak, Batalkan</button> 
         </div> 
     </div> 
 </div> 

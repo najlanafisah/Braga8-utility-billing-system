@@ -246,43 +246,43 @@
 </div> 
 
 <script> 
-function showImage(src, unit, type, value, date, status, number, address, lat, lon) { 
-    document.getElementById('modalImage').src = src; 
-    document.getElementById('modalImageLink').href = src; 
-    document.getElementById('modalUnitTitle').innerText = "Unit " + unit; 
-    document.getElementById('modalValueText').innerText = value; 
-    document.getElementById('modalDateText').innerText = date; 
-    document.getElementById('modalNumberText').innerText = number; 
-    document.getElementById('modalAddressText').innerText = address; 
-    
-    const mapsLink = document.getElementById('modalMapsLink'); 
-    if (lat && lon && lat != 0 && lon != 0) { 
-        mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`; 
-        mapsLink.style.display = "inline-flex"; 
-    } else { 
-        mapsLink.style.display = "none"; 
+    function showImage(src, unit, type, value, date, status, number, address, lat, lon) { 
+        document.getElementById('modalImage').src = src; 
+        document.getElementById('modalImageLink').href = src; 
+        document.getElementById('modalUnitTitle').innerText = "Unit " + unit; 
+        document.getElementById('modalValueText').innerText = value; 
+        document.getElementById('modalDateText').innerText = date; 
+        document.getElementById('modalNumberText').innerText = number; 
+        document.getElementById('modalAddressText').innerText = address; 
+        
+        const mapsLink = document.getElementById('modalMapsLink'); 
+        if (lat && lon && lat != 0 && lon != 0) { 
+            mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`; 
+            mapsLink.style.display = "inline-flex"; 
+        } else { 
+            mapsLink.style.display = "none"; 
+        } 
+        
+        const typeBadge = document.getElementById('modalTypeBadge'); 
+        const unitLabel = document.getElementById('modalUnitLabel'); 
+        if (type === 'electricity') { 
+            typeBadge.className = "amber-btn"; 
+            typeBadge.innerHTML = 'Listrik'; 
+            unitLabel.innerText = "kWh"; 
+        } else { 
+            typeBadge.className = "blue-btn"; 
+            typeBadge.innerHTML = 'Air'; 
+            unitLabel.innerText = "m³"; 
+        } 
+        
+        const statusBadge = document.getElementById('modalStatusBadge'); 
+        if (status === 'checked') { 
+            statusBadge.className = "dark-green-btn"; 
+            statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Terkonfirmasi'; 
+        } else { 
+            statusBadge.className = "red-btn"; 
+            statusBadge.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i> Menunggu'; 
+        } 
     } 
-    
-    const typeBadge = document.getElementById('modalTypeBadge'); 
-    const unitLabel = document.getElementById('modalUnitLabel'); 
-    if (type === 'electricity') { 
-        typeBadge.className = "amber-btn"; 
-        typeBadge.innerHTML = 'Listrik'; 
-        unitLabel.innerText = "kWh"; 
-    } else { 
-        typeBadge.className = "blue-btn"; 
-        typeBadge.innerHTML = 'Air'; 
-        unitLabel.innerText = "m³"; 
-    } 
-    
-    const statusBadge = document.getElementById('modalStatusBadge'); 
-    if (status === 'checked') { 
-        statusBadge.className = "dark-green-btn"; 
-        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Terkonfirmasi'; 
-    } else { 
-        statusBadge.className = "red-btn"; 
-        statusBadge.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i> Menunggu'; 
-    } 
-} 
 </script> 
 @endsection

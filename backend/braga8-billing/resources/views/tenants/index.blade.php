@@ -334,8 +334,8 @@
         <div class="popup-header">Hapus Tenant <span id="display-tenant-name" class="text-[#FA8327]"></span>?</div>
         <div class="popup-body">
             <div class="btn-delete-wrapper flex gap-3">
-                <button type="button" id="confirm-delete-btn" class="light-brown-btn flex-1">Ya, Hapus</button>
                 <button type="button" class="dark-brown-button flex-1" data-close="delete-tenant-modal">Batal</button>
+                <button type="button" id="confirm-delete-btn" class="light-brown-btn flex-1">Ya, Hapus</button>
             </div>
         </div>
     </div>
