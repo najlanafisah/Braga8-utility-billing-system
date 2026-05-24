@@ -234,19 +234,20 @@ class _InputPaymentScreenState extends State<InputPaymentScreen>
 
       if (mounted && success) {
         widget.onSuccess?.call();
+        final api = widget.api;
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => PaymentSuccessScreen(
+            builder: (successContext) => PaymentSuccessScreen(
               invoiceNumber: widget.invoice.invoiceNumber,
               amountPaid: _rupiahTotal,
-              onBack: () => Navigator.pop(context),
+              onBack: () {
+                Navigator.of(successContext).pop();
+              },
               onViewLogs: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
+                Navigator.of(successContext).pushReplacement(
                   MaterialPageRoute(
-                    builder: (_) => PaymentLogsScreen(api: widget.api),
+                    builder: (_) => PaymentLogsScreen(api: api),
                   ),
                 );
               },
