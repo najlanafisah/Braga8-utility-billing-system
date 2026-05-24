@@ -152,15 +152,13 @@
             <div class="card lg:col-span-3">
         
                 <div class="relative z-10">
-                    <p class="card-label">Input Meter Hari Ini</p>
+                    <p class="card-label">Input Meter Bulan Ini</p>
                     <div class="mt-6">
                         <h3>
                             <span class="card-value">{{ $metersDone }}</span>
                             <span class="metric-max">/{{ $totalMeters }}</span>
                         </h3>
-                        <p class="card-caption">
-                            {{ $unitsCompleted }} Unit Terverifikasi
-                        </p>
+                        <p class="card-caption">{{ $unitsCompleted }} Unit Selesai Bulan Ini</p>
                     </div>
                 </div>
 

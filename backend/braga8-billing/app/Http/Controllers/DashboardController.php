@@ -38,12 +38,15 @@ class DashboardController extends Controller
         $percentOverdue = round(($overdueCount / $totalInvoicesCount) * 100);
 
         $totalMeters = UtilityMeter::count();
-        $metersDone = MeterReading::whereDate('created_at', Carbon::today())->count();
+        $metersDone = MeterReading::whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->count();
         $metersRemaining = max($totalMeters - $metersDone, 0);
 
         $unitsCompleted = DB::table('meter_readings')
             ->join('utility_meters', 'meter_readings.meter_id', '=', 'utility_meters.id')
-            ->whereDate('meter_readings.created_at', Carbon::today())
+            ->whereMonth('meter_readings.created_at', Carbon::now()->month)
+            ->whereYear('meter_readings.created_at', Carbon::now()->year)
             ->select('utility_meters.unit_id')
             ->groupBy('utility_meters.unit_id')
             ->having(DB::raw('count(*)'), '>=', 2)
