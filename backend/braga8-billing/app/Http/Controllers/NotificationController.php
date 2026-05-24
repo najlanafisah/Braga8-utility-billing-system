@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    public function index()
+    {
+        return redirect()->route('dashboard');
+    }
+
     public function markAsRead(Request $request, $notification)
     {
         $notif = Notification::where('user_id', auth()->id())->findOrFail($notification);
@@ -29,6 +34,12 @@ class NotificationController extends Controller
             return response()->json(['success' => true]);
         }
 
+        return back();
+    }
+
+    public function destroyAll()
+    {
+        auth()->user()->customNotifications()->delete();
         return back();
     }
 }

@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('notifications')->group(function () {
         Route::get('/',                       [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/{notification}/read',   [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::delete('/',                    [NotificationController::class, 'destroyAll'])->name('notifications.destroyAll'); // ← tambah SEBELUM /{notification}
         Route::delete('/{notification}',      [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 });

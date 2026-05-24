@@ -247,7 +247,7 @@
                     Tindakan ini tidak bisa dibatalkan. Semua data riwayat pengelolaan unit Braga8 Anda akan dihapus permanen. SIlakan konfirmasi dengan memasukkan password akun Anda.
                 </p>
                 
-                <form method="post" action="{{ route('profile.destroy') }}" class="flex flex-col gap-6">
+                <form method="post" action="{{ url('/profile') }}" class="flex flex-col gap-6">
                     @csrf
                     @method('delete')
                     
@@ -277,7 +277,21 @@
                 <button class="popup-close"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="popup-header">Pemberitahuan</div>
-            <div class="popup-body">
+            <div class="popup-body flex flex-col gap-2">
+                @if(auth()->user()->customNotifications->isNotEmpty())
+                <div class="flex justify-end mb-3">
+                    <form action="{{ route('notifications.destroyAll') }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="text-xs text-zinc-500 hover:text-rose-400 transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                            Hapus Semua
+                        </button>
+                    </form>
+                </div>
+                @endif
+
                 <div class="notification-wrapper">
                     @forelse(auth()->user()->customNotifications as $notif)
                         <div class="notification {{ $notif->read_at ? 'is-read' : 'is-unread' }}" id="notif-{{ $notif->id }}"> 
