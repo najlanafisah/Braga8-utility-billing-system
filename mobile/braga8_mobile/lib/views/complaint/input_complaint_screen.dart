@@ -483,7 +483,7 @@ class _InputComplaintScreenState extends State<InputComplaintScreen>
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  "Ambil Ulang",
+                                  "Ganti Foto",
                                   style: TextStyle(
                                     color: _orange,
                                     fontWeight: FontWeight.bold,

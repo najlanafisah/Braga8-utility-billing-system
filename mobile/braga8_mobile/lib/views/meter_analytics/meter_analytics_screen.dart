@@ -40,7 +40,7 @@ const _orange = AppColors.primaryOrange;
 
 String? _buildPhotoUrl(String? path) {
   if (path == null || path.isEmpty) return null;
-  if (path.startsWith('http')) return path.replaceFirst('http://', 'https://');
+  if (path.startsWith('http')) return path;
   return 'http://172.16.4.22:8000/storage/$path';
 }
 
@@ -1148,6 +1148,29 @@ class _TenantAnalyticsScreenState extends State<_TenantAnalyticsScreen>
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
+                    if (_categoryFilter != 'Semua' || _selectedMonth != null)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: [
+                            if (_categoryFilter != 'Semua')
+                              _activeFilterChip(
+                                _categoryFilter,
+                                () => setState(() => _categoryFilter = 'Semua'),
+                              ),
+                            if (_selectedMonth != null)
+                              _activeFilterChip(
+                                DateFormat('MMM yyyy').format(_selectedMonth!),
+                                () => setState(() => _selectedMonth = null),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                     if (units.isEmpty)
                       SliverFillRemaining(child: _buildEmptyState())
                     else if (snap.connectionState == ConnectionState.waiting)
@@ -1184,6 +1207,35 @@ class _TenantAnalyticsScreenState extends State<_TenantAnalyticsScreen>
       ),
     );
   }
+
+  Widget _activeFilterChip(String label, VoidCallback onRemove) {
+  return Container(
+    padding: const EdgeInsets.only(left: 10, right: 6, top: 5, bottom: 5),
+    decoration: BoxDecoration(
+      color: _orange.withOpacity(0.15),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: _orange.withOpacity(0.3)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.orange,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(width: 4),
+        GestureDetector(
+          onTap: onRemove,
+          child: const Icon(Icons.close_rounded, size: 15, color: Colors.orange),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildTenantBanner() {
     return ClipRRect(

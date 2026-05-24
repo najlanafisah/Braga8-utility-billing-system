@@ -231,237 +231,239 @@ class _ProfileControllerSheetState extends State<ProfileControllerSheet> {
               width: 1.5,
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 5,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(10),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isEditing ? "Edit Profil" : "Profil Akun",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
+            
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isEditing ? "Edit Profil" : "Profil Akun",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                  ),
-                  if (!isLoadingTenant)
-                    GestureDetector(
-                      onTap: () {
-                        if (isEditing) _initFields();
-                        setState(() => isEditing = !isEditing);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
+                    if (!isLoadingTenant)
+                      GestureDetector(
+                        onTap: () {
+                          if (isEditing) _initFields();
+                          setState(() => isEditing = !isEditing);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.1),
+                            ),
+                          ),
+                          child: Icon(
+                            isEditing ? Icons.close : Icons.edit,
+                            color: AppColors.primaryOrange.withOpacity(0.8),
+                            size: 20,
                           ),
                         ),
+                      ),
+                  ],
+                ),
+            
+                const SizedBox(height: 24),
+            
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF7D1C0A), Color(0xFFFA6C2A)],
+                        ),
+                      ),
+                      child: const CircleAvatar(
+                        radius: 23,
+                        backgroundColor: Color(0xFFD2B4A6),
                         child: Icon(
-                          isEditing ? Icons.close : Icons.edit,
-                          color: AppColors.primaryOrange.withOpacity(0.8),
-                          size: 20,
+                          Icons.person,
+                          color: Color(0xFF7A4A32),
+                          size: 36,
                         ),
                       ),
                     ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFF7D1C0A), Color(0xFFFA6C2A)],
-                      ),
+                    const SizedBox(width: 15),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isLoadingTenant
+                            ? _buildLoadingPlaceholder(width: 120, height: 17)
+                            : Text(
+                                displayName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                        const SizedBox(height: 4),
+                        Text(
+                          displayUsername,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const CircleAvatar(
-                      radius: 23,
-                      backgroundColor: Color(0xFFD2B4A6),
-                      child: Icon(
-                        Icons.person,
-                        color: Color(0xFF7A4A32),
-                        size: 36,
-                      ),
+                  ],
+                ),
+            
+                const SizedBox(height: 24),
+                Divider(color: Colors.white.withValues(alpha: 0.1)),
+                const SizedBox(height: 12),
+            
+                if (isLoadingTenant)
+                  _buildLoadingBody()
+                else if (tenantFetchError != null && isTenant && tenant == null)
+                  _buildErrorBody()
+                else if (!isEditing) ...[
+                  if (!isTenant) ...[
+                    _buildInfoRow("Nama", user?['name']),
+                    _buildInfoRow("Username", user?['username'] ?? user?['name']),
+                    _buildInfoRow("Email", user?['email']),
+                    _buildInfoRow("Telepon", user?['phone_number']),
+                  ] else ...[
+                    _buildInfoRow("Nama Tenant", tenant?['tenant_name']),
+                    _buildInfoRow("PIC", tenant?['person_in_charge']),
+                    _buildInfoRow("Telepon", tenant?['contact_phone']),
+                    _buildInfoRow("Email", tenant?['contact_email']),
+                    _buildInfoRow("Perusahaan", tenant?['company_name']),
+                  ],
+            
+                  const SizedBox(height: 28),
+            
+                  if (showLogoutConfirm) ...[
+                    Text(
+                      "Apakah Anda yakin ingin keluar?",
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
                     ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildOutlineButton(
+                            label: "Ya, Keluar",
+                            icon: Icons.check,
+                            color: const Color(0xFFE57373),
+                            onTap: _handleLogout,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildOutlineButton(
+                            label: "Batal",
+                            icon: Icons.close,
+                            color: Colors.white54,
+                            onTap: () =>
+                                setState(() => showLogoutConfirm = false),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildOutlineButton(
+                            label: "Keluar",
+                            icon: Icons.logout,
+                            color: const Color(0xFFE57373),
+                            onTap: _handleLogout,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildOutlineButton(
+                            label: "Tutup",
+                            icon: Icons.close,
+                            color: Colors.white54,
+                            onTap: () => Navigator.pop(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ] else ...[
+                  _buildTextField(
+                    isTenant ? "Nama Tenant" : "Nama Lengkap",
+                    nameController,
                   ),
-                  const SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      isLoadingTenant
-                          ? _buildLoadingPlaceholder(width: 120, height: 17)
-                          : Text(
-                              displayName,
-                              style: const TextStyle(
+                  _buildTextField(
+                    isTenant ? "Telepon Kontak" : "Nomor Telepon",
+                    phoneController,
+                  ),
+                  _buildTextField("Email", emailController),
+                  if (isTenant)
+                    _buildTextField("Penanggung Jawab", picController),
+            
+                  const SizedBox(height: 28),
+            
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isSaving ? null : _handleSave,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryOrange.withOpacity(0.3),
+                        foregroundColor: Colors.white,
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          width: 0.9,
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 22),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: isSaving
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
                                 color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Simpan Perubahan",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
                               ),
                             ),
-                      const SizedBox(height: 4),
-                      Text(
-                        displayUsername,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-              Divider(color: Colors.white.withValues(alpha: 0.1)),
-              const SizedBox(height: 12),
-
-              if (isLoadingTenant)
-                _buildLoadingBody()
-              else if (tenantFetchError != null && isTenant && tenant == null)
-                _buildErrorBody()
-              else if (!isEditing) ...[
-                if (!isTenant) ...[
-                  _buildInfoRow("Nama", user?['name']),
-                  _buildInfoRow("Username", user?['username'] ?? user?['name']),
-                  _buildInfoRow("Email", user?['email']),
-                  _buildInfoRow("Telepon", user?['phone_number']),
-                ] else ...[
-                  _buildInfoRow("Nama Tenant", tenant?['tenant_name']),
-                  _buildInfoRow("PIC", tenant?['person_in_charge']),
-                  _buildInfoRow("Telepon", tenant?['contact_phone']),
-                  _buildInfoRow("Email", tenant?['contact_email']),
-                  _buildInfoRow("Perusahaan", tenant?['company_name']),
-                ],
-
-                const SizedBox(height: 28),
-
-                if (showLogoutConfirm) ...[
-                  Text(
-                    "Apakah Anda yakin ingin keluar?",
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildOutlineButton(
-                          label: "Ya, Keluar",
-                          icon: Icons.check,
-                          color: const Color(0xFFE57373),
-                          onTap: _handleLogout,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildOutlineButton(
-                          label: "Batal",
-                          icon: Icons.close,
-                          color: Colors.white54,
-                          onTap: () =>
-                              setState(() => showLogoutConfirm = false),
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildOutlineButton(
-                          label: "Keluar",
-                          icon: Icons.logout,
-                          color: const Color(0xFFE57373),
-                          onTap: _handleLogout,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildOutlineButton(
-                          label: "Tutup",
-                          icon: Icons.close,
-                          color: Colors.white54,
-                          onTap: () => Navigator.pop(context),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ] else ...[
-                _buildTextField(
-                  isTenant ? "Nama Tenant" : "Nama Lengkap",
-                  nameController,
-                ),
-                _buildTextField(
-                  isTenant ? "Telepon Kontak" : "Nomor Telepon",
-                  phoneController,
-                ),
-                _buildTextField("Email", emailController),
-                if (isTenant)
-                  _buildTextField("Penanggung Jawab", picController),
-
-                const SizedBox(height: 28),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: isSaving ? null : _handleSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOrange.withOpacity(0.3),
-                      foregroundColor: Colors.white,
-                      side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        width: 0.9,
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 22),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
                     ),
-                    child: isSaving
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            "Simpan Perubahan",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
