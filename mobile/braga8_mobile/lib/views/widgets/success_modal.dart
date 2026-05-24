@@ -6,9 +6,6 @@ class SuccessScreen extends StatefulWidget {
   final String category;
   final bool isElecChecked;
   final bool isWaterChecked;
-
-  /// Called after all screens are popped. Use this to refresh DetailUnit
-  /// or navigate to a new InputReadingScreen from a safe context.
   final VoidCallback onBack;
   final VoidCallback? onInputElectric;
   final VoidCallback? onInputWater;
@@ -93,15 +90,9 @@ class _SuccessScreenState extends State<SuccessScreen>
     super.dispose();
   }
 
-  /// Pops ALL pushed routes until we're back at DashboardScreen (the first
-  /// route), then fires [callback] so the caller can react (refresh / push
-  /// a new screen) from a guaranteed-valid context.
-  void _popToRootThen(VoidCallback callback) {
-    Navigator.of(
-      context,
-    ).popUntil((route) => route.settings.name == '/daftar-unit');
-    callback();
-  }
+void _popToRootThen(VoidCallback callback) {
+  callback();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +109,7 @@ class _SuccessScreenState extends State<SuccessScreen>
           Image.asset('assets/modal-bg.png', fit: BoxFit.cover),
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(color: Colors.black.withOpacity(0.6)),
+            child: Container(color: Colors.black.withValues(alpha: .6)),
           ),
           SafeArea(
             child: Padding(
@@ -142,7 +133,7 @@ class _SuccessScreenState extends State<SuccessScreen>
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: _orange.withOpacity(0.25),
+                                  color: _orange.withValues(alpha: .25),
                                   blurRadius: 60,
                                   spreadRadius: 10,
                                 ),
@@ -179,7 +170,7 @@ class _SuccessScreenState extends State<SuccessScreen>
                             "berhasil direkam untuk bulan ini.",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.55),
+                              color: Colors.white.withValues(alpha: .55),
                               fontSize: 14,
                               height: 1.5,
                             ),
@@ -285,13 +276,13 @@ class _ActionButtonState extends State<_ActionButton> {
                 padding: const EdgeInsets.symmetric(vertical: 17),
                 decoration: BoxDecoration(
                   color: widget.filled
-                      ? _orange.withOpacity(_pressed ? 0.35 : 0.22)
-                      : Colors.white.withOpacity(_pressed ? 0.10 : 0.06),
+                      ? _orange.withValues(alpha: _pressed ? 0.35 : 0.22)
+                      : Colors.white.withValues(alpha: _pressed ? 0.10 : 0.06),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: widget.filled
-                        ? _orange.withOpacity(0.55)
-                        : Colors.white.withOpacity(0.15),
+                        ? _orange.withValues(alpha: .55)
+                        : Colors.white.withValues(alpha: .15),
                     width: 1.2,
                   ),
                 ),

@@ -307,7 +307,7 @@ class _InputReadingScreenState extends State<InputReadingScreen>
         // SuccessScreen internally calls popUntil(isFirst) to clear the stack,
         // then fires the callback. The callbacks below run AFTER the stack is
         // cleared, so context is always the DashboardScreen root — safe to push from.
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (successCtx) => SuccessScreen(
@@ -316,7 +316,11 @@ class _InputReadingScreenState extends State<InputReadingScreen>
               isWaterChecked: updatedUnit.isWaterChecked,
               // onBack: pop to root (DashboardScreen), then switch IndexedStack
               // to Daftar Unit tab (index 2) so user lands on DetailUnitScreen.
-              onBack: widget.onBack ?? () {},
+               onBack: () {
+        // Pop SuccessScreen, kembali ke DetailUnitScreen
+        Navigator.of(successCtx).pop();
+        widget.onBack?.call();
+      },
               onInputElectric: () {
                 // Push a fresh Electric InputReadingScreen on top of Dashboard.
                 Navigator.of(successCtx).push(
