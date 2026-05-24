@@ -248,8 +248,8 @@
             <div class="popup-body flex flex-col gap-6 text-center"> 
                 <p class="text-sm text-zinc-600">Apakah Anda yakin ingin menghapus laporan keluhan ini? Tindakan ini tidak dapat dibatalkan.</p>
                 <div class="flex gap-4 justify-center"> 
-                    <button type="button" id="confirm-delete-btn" class="light-brown-btn px-10">Ya, Hapus</button> 
                     <button type="button" class="dark-brown-button px-10" data-close="delete-complaint">Batal</button> 
+                    <button type="button" id="confirm-delete-btn" class="light-brown-btn px-10">Ya, Hapus</button> 
                 </div> 
             </div> 
         </div> 

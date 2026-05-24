@@ -197,12 +197,12 @@
                                         <div class="popup-header">Hapus User <span class="text-[#FA8327]">{{ $user->name }}</span>?</div> 
                                         <div class="popup-body"> 
                                             <div class="btn-delete-wrapper flex gap-4"> 
+                                                <button type="button" class="dark-brown-button flex-1 py-2.5" data-close="delete-user-{{ $user->id }}">Batal</button> 
                                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="flex-1 m-0 p-0"> 
                                                     @csrf 
                                                     @method('DELETE') 
                                                     <button type="submit" class="light-brown-btn w-full py-2.5">Ya, Hapus</button> 
                                                 </form>
-                                                <button type="button" class="dark-brown-button flex-1 py-2.5" data-close="delete-user-{{ $user->id }}">Batal</button> 
                                             </div> 
                                         </div> 
                                     </div> 

@@ -279,8 +279,8 @@
             </div> 
             <div class="popup-header">Hapus Invoice <span id="display-invoice-number" class="text-[#FA8327]"></span>?</div> 
             <div class="popup-body btn-delete-wrapper"> 
-                <button id="confirm-delete-btn" class="light-brown-btn"> Ya, Hapus </button> 
                 <button class="dark-brown-button" data-close="delete-invoice"> Tidak </button> 
+                <button id="confirm-delete-btn" class="light-brown-btn"> Ya, Hapus </button> 
             </div> 
         </div> 
     </div> 

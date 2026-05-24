@@ -235,8 +235,8 @@
                         <p>Penyewa: <span id="display-tenant-name" class="text-white font-bold"></span> (<span id="display-unit-number" class="text-zinc-300"></span>)</p>
                     </div>
                     <div class="btn-delete-wrapper flex items-center gap-3 w-full mt-2"> 
-                        <button id="confirm-delete-btn" class="light-brown-btn flex-1 py-2.5 text-xs font-bold rounded-xl">Ya, Hapus</button> 
                         <button type="button" class="dark-brown-button flex-1 py-2.5 text-xs font-bold rounded-xl" data-close="delete-tariff">Tidak</button> 
+                        <button id="confirm-delete-btn" class="light-brown-btn flex-1 py-2.5 text-xs font-bold rounded-xl">Ya, Hapus</button> 
                     </div> 
                 </div> 
             </div> 

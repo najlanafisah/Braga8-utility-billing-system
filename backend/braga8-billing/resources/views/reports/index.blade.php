@@ -306,8 +306,8 @@
         <div class="popup-header">Hapus Laporan Periode <span id="display-invoice-number" class="text-[#FA8327]"></span>?</div> 
         <div class="popup-body btn-delete-wrapper"> 
             <div class="flex items-center gap-3 w-full"> 
+                <button type="button" class="dark-brown-button flex-1 py-2.5 text-xs font-bold rounded-xl" data-close="delete-report-modal">Tidak</button>
                 <button id="confirm-delete-btn" class="light-brown-btn flex-1 py-2.5 text-xs font-bold rounded-xl">Ya, Hapus</button> 
-                <button type="button" class="dark-brown-button flex-1 py-2.5 text-xs font-bold rounded-xl" data-close="delete-report-modal">Tidak</button> 
             </div> 
         </div> 
     </div> 
