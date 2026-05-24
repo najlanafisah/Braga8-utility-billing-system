@@ -862,7 +862,7 @@ String _truncateTitle(String title) => title.length <= _maxTitleLength
       child: TableCard(
         prefix: "Laporan",
         suffixText: _formatDate(c.reportDate),
-        main: _truncateTitle(c.title ?? '-'),
+        main: _truncateTitle(c.title),
         columnWidths: const {
           0: FlexColumnWidth(2.8),
           1: FlexColumnWidth(1.6),

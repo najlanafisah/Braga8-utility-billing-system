@@ -38,12 +38,11 @@ class MeterAnalyticsScreen extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 const _orange = AppColors.primaryOrange;
 
-const String _apiImageUrl =
-    "https://bunkbed-deem-spew.ngrok-free.dev/api/meter-photo/";
 
 String? _buildPhotoUrl(String? path) {
   if (path == null || path.isEmpty) return null;
-  return "$_apiImageUrl${path.split('/').last}";
+  if (path.startsWith('http')) return path.replaceFirst('http://', 'https://');
+  return 'http://172.16.4.22:8000/storage/$path';
 }
 
 String _formatDate(String? raw) {

@@ -37,13 +37,17 @@ class MeterPhoto {
   bool get isElectric => meterType.toLowerCase().contains('elect');
 
   factory MeterPhoto.fromJson(Map<String, dynamic> json) {
-    const baseUrl = "https://bunkbed-deem-spew.ngrok-free.dev/api/meter-photo/";
-    final rawPath =
-        json['photo_url'] as String? ?? json['photo_path'] as String?;
-    final resolvedUrl = (rawPath != null && rawPath.isNotEmpty)
-        ? "$baseUrl${rawPath.split('/').last}"
-        : null;
+    final rawPath = json['photo_url'] as String? ?? json['photo_path'] as String?;
+    String? resolvedUrl;
+    if (rawPath != null && rawPath.isNotEmpty) {
+      if (rawPath.startsWith('http')) {
+        resolvedUrl = rawPath.replaceFirst('http://', 'https://');
+      } else {
+        resolvedUrl = 'http://172.16.4.22:8000/storage/$rawPath';
+      }
+    }
 
+    // ← INI yang kurang, return MeterPhoto-nya!
     return MeterPhoto(
       meterType: json['meter_type'] as String? ?? 'electricity',
       readingValue: json['reading_value']?.toString() ?? '0',
@@ -76,9 +80,7 @@ class InvoiceDetail {
 
   static String? resolveImg(String? raw) {
     if (raw == null || raw.isEmpty) return null;
-
-    if (raw.startsWith('http')) return raw;
-
-    return 'https://bunkbed-deem-spew.ngrok-free.dev/storage/$raw';
+    if (raw.startsWith('http')) return raw.replaceFirst('http://', 'https://');
+    return 'http://172.16.4.22:8000/storage/$raw';
   }
 }

@@ -68,11 +68,8 @@ class PaymentLog {
 
     String? resolveImg(String? raw) {
       if (raw == null || raw.isEmpty) return null;
-      // Force https for ngrok URLs
-      return raw.replaceFirst(
-        'http://',
-        'https://',
-      ); // was replacing http→http (no-op)
+      if (raw.startsWith('http')) return raw.replaceFirst('http://', 'https://');
+      return 'http://172.16.4.22:8000/storage/$raw';
     }
 
     DateTime? parseDate(dynamic v) {
