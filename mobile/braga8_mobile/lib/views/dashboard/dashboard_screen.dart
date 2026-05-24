@@ -14,9 +14,6 @@ import 'package:braga8_mobile/views/widgets/bottom_navbar_custom.dart';
 import 'package:braga8_mobile/core/app_colors.dart';
 import 'package:flutter/material.dart';
 
-// ---------------------------------------------------------------------------
-// DashboardScreen — StatefulWidget, owns nav + data state
-// ---------------------------------------------------------------------------
 class DashboardScreen extends StatefulWidget {
   final ApiService api;
   final String token;
@@ -36,10 +33,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // --- Nav state ---
   late int _selectedIndex;
 
-  // --- Dashboard data state ---
   int _totalMeters = 0;
   int _readMeters = 0;
   int _unreadCount = 0;
@@ -53,7 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
-    _loadDashboardData(); // ← just call it directly
+    _loadDashboardData();
 
     if (widget.role.toLowerCase() == 'tenant') {
       widget.api.loadCurrentTenantUnits().then((_) {
@@ -135,9 +130,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  // -----------------------------------------------------------------------
-  // NOTIFICATION CENTER
-  // -----------------------------------------------------------------------
   void _openNotificationCenter(BuildContext context) async {
     showDialog(
       context: context,
@@ -174,10 +166,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
-
-  // -----------------------------------------------------------------------
-  // PAGES — built once, kept alive by IndexedStack
-  // -----------------------------------------------------------------------
 
   List<Widget> get _pages {
     final bool isPetugas = widget.role.toLowerCase() == 'petugas';
@@ -219,11 +207,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       MeterAnalyticsScreen(
         userRole: 'tenant',
         tenant: widget.api.currentTenant,
-        onBack: () => _onItemTapped(0),  // ← tambah ini
+        onBack: () => _onItemTapped(0),
       ),
       DaftarInvoicesScreen(
         api: widget.api,
-        onBack: () => _onItemTapped(0),  // ← tambah ini
+        onBack: () => _onItemTapped(0), 
       ),
       CustomerCareListScreen(
         // 3
@@ -234,10 +222,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       AuditLogScreen(onBack: () => _onItemTapped(0)),
     ];
   }
-
-  // -----------------------------------------------------------------------
-  // BUILD
-  // -----------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {

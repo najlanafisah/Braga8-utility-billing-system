@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 class BottomNavbarCustom extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
-  final String role; // ← add this
+  final String role;
 
   const BottomNavbarCustom({
     super.key,
     required this.currentIndex,
     required this.onTap,
-    required this.role, // ← add this
+    required this.role,
   });
 
   bool get _isPetugas => role.toLowerCase() == 'petugas';
@@ -49,8 +49,8 @@ class BottomNavbarCustom extends StatelessWidget {
                           _navItem(0, Icons.home_filled, "Home"),
                           _navItem(1, Icons.speed, "Meter Input"),
                           _navItem(2, Icons.store_outlined, "Daftar Unit"),
-                          _navItem(3, Icons.history, "History"),
                           _navItem(4, Icons.analytics, "Data Meter"),
+                          _navItem(3, Icons.history, "History"),
                         ]
                       : [
                           _navItem(0, Icons.home_filled, "Home"),

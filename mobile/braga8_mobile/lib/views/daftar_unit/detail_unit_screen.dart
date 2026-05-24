@@ -4,13 +4,9 @@ import 'package:braga8_mobile/views/widgets/main_layouts.dart';
 import 'package:flutter/material.dart';
 import 'package:braga8_mobile/ApiService.dart';
 import 'package:braga8_mobile/views/meter_input/input_reading_screen.dart';
-import 'package:braga8_mobile/views/daftar_unit/meter_reading_screen.dart';
 import 'package:braga8_mobile/data/models/tenant_model.dart';
-import 'package:braga8_mobile/components/header_unit_detail_card_component.dart';
 import 'package:braga8_mobile/components/image_container_proof_component.dart';
-import 'package:braga8_mobile/components/image_detail_card_component.dart';
 import 'package:braga8_mobile/core/app_colors.dart';
-import 'package:intl/intl.dart';
 
 class DetailUnitScreen extends StatefulWidget {
   final String shopName;
@@ -36,10 +32,10 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
   final ApiService _apiService = ApiService();
 
   static const _orange = AppColors.primaryOrange;
-  Color get _orangeDim => _orange.withOpacity(0.18);
-  Color get _orangeBorder => _orange.withOpacity(0.45);
-  Color get _glass => Colors.white.withOpacity(0.05);
-  Color get _glassBorder => Colors.white.withOpacity(0.12);
+  Color get _orangeDim => _orange.withValues(alpha: .18);
+  Color get _orangeBorder => _orange.withValues(alpha: .45);
+  Color get _glass => Colors.white.withValues(alpha: .05);
+  Color get _glassBorder => Colors.white.withValues(alpha: .12);
 
   AnimationController? _animController;
   Animation<double>? _fadeAnim;
@@ -138,14 +134,14 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
       return '$h:$m, $d ${months[dt.month]} ${dt.year}';
     } catch (e) {
       debugPrint('_formatDate error: $e  raw: $raw');
-      return raw ?? '-';
+      return raw;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const String apiImageUrl =
-        "https://bunkbed-deem-spew.ngrok-free.dev/api/meter-photo/";
+    final String apiImageUrl =
+    "${ApiService().dio.options.baseUrl.replaceAll('/api', '')}/api/meter-photo/";
     final bool isElectric = selectedCategory == "Electric";
 
     final String? readingValue = isElectric
@@ -198,10 +194,10 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.07),
+                                color: Colors.white.withValues(alpha: .07),
                                 borderRadius: BorderRadius.circular(30),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.12),
+                                  color: Colors.white.withValues(alpha: .12),
                                   width: 1,
                                 ),
                               ),
@@ -214,17 +210,14 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
                           ),
                         ),
                         const SizedBox(height: 10),
-                        // ── Info Unit Card ──────────────────────────────────
                         _buildUnitInfoCard(),
 
                         const SizedBox(height: 20),
 
-                        // ── Category Switcher (prominent) ───────────────────
                         _buildCategorySwitcher(isElectric),
 
                         const SizedBox(height: 24),
 
-                        // ── Reading / Empty ─────────────────────────────────
                         if (!hasData)
                           _buildEmptyState(isElectric)
                         else ...[
@@ -250,8 +243,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
 
                         const SizedBox(height: 32),
 
-                        // ── Action Buttons ──────────────────────────────────
-                        // ── Action Buttons ──────────────────────────────────
                         if (!hasData)
                           _buildPrimaryButton(
                             icon: Icons.add_circle_outline_rounded,
@@ -315,12 +306,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
                         ),
 
                         const SizedBox(height: 10),
-
-                        _buildSecondaryButton(
-                          icon: Icons.arrow_back_rounded,
-                          label: "Kembali",
-                          onTap: widget.onBack ?? () => Navigator.pop(context),
-                        ),
                       ],
                     ),
                   ),
@@ -330,13 +315,10 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
     );
   }
 
-  // ── Unit Info Card ──────────────────────────────────────────────────────────
-
   Widget _buildUnitInfoCard() {
     return _glassCard(
       child: Row(
         children: [
-          // Icon circle
           Container(
             width: 48,
             height: 48,
@@ -369,7 +351,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
               ],
             ),
           ),
-          // Status chips
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -415,13 +396,10 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
     );
   }
 
-  // ── Category Switcher ───────────────────────────────────────────────────────
-
   Widget _buildCategorySwitcher(bool isElectric) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label hint agar user tahu ini bisa di-tap
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 10),
           child: Row(
@@ -432,7 +410,7 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
                 "Pilih jenis meter yang ingin dilihat",
                 style: TextStyle(
                   fontSize: 12,
-                  color: _orange.withOpacity(0.8),
+                  color: _orange.withValues(alpha: .8),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -550,7 +528,7 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: hasData
-                      ? Colors.greenAccent.withOpacity(0.8)
+                      ? Colors.greenAccent.withValues(alpha: .8)
                       : Colors.white24,
                 ),
               ),
@@ -560,8 +538,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
       ),
     );
   }
-
-  // ── Reading Card ────────────────────────────────────────────────────────────
 
   Widget _buildReadingCard(bool isElectric, String readingValue) {
     return _glassCard(
@@ -612,8 +588,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
     );
   }
 
-  // ── Empty State ─────────────────────────────────────────────────────────────
-
   Widget _buildEmptyState(bool isElectric) {
     return _glassCard(
       child: Padding(
@@ -659,8 +633,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
     );
   }
 
-  // ── Metadata Card ───────────────────────────────────────────────────────────
-
   Widget _buildMetadataCard(String? date, String? location) {
     return _glassCard(
       child: Column(
@@ -703,8 +675,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
     );
   }
 
-  // ── Section Label ───────────────────────────────────────────────────────────
-
   Widget _buildSectionLabel(IconData icon, String title) {
     return Row(
       children: [
@@ -721,8 +691,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
       ],
     );
   }
-
-  // ── Buttons ─────────────────────────────────────────────────────────────────
 
   Widget _buildPrimaryButton({
     required IconData icon,
@@ -744,7 +712,7 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: _orange.withOpacity(0.28),
+          backgroundColor: _orange.withValues(alpha: .28),
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16),
           side: BorderSide(color: _orangeBorder, width: 1.2),
@@ -785,8 +753,6 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
       ),
     );
   }
-
-  // ── Glass Card Helper ───────────────────────────────────────────────────────
 
   Widget _glassCard({required Widget child, EdgeInsets? padding}) {
     return ClipRRect(
@@ -851,14 +817,14 @@ class _DetailUnitScreenState extends State<DetailUnitScreen>
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: isRejected
-              ? Colors.redAccent.withOpacity(0.25)
-              : Colors.white.withOpacity(0.05),
+              ? Colors.redAccent.withValues(alpha: .25)
+              : Colors.white.withValues(alpha: .05),
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16),
           side: BorderSide(
             color: isRejected
-                ? Colors.redAccent.withOpacity(0.5)
-                : Colors.white.withOpacity(0.1),
+                ? Colors.redAccent.withValues(alpha: .5)
+                : Colors.white.withValues(alpha: .1),
             width: 1.2,
           ),
           shape: RoundedRectangleBorder(

@@ -1,8 +1,9 @@
 import 'dart:typed_data';
+import 'package:braga8_mobile/ApiService.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-class ImageContainerProofComponent extends StatelessWidget {
+class ImageContainerProofComponent extends StatefulWidget {
   final String? currentImageUrl;
   final String? previousImageUrl;
 
@@ -12,46 +13,66 @@ class ImageContainerProofComponent extends StatelessWidget {
     this.previousImageUrl,
   });
 
-  static final Dio _dio = Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 15),
-    receiveTimeout: const Duration(seconds: 15),
-    headers: {
-      'ngrok-skip-browser-warning': 'true',
-      'Accept': 'image/*',
-    },
-  ));
+  @override
+  State<ImageContainerProofComponent> createState() =>
+      _ImageContainerProofComponentState();
+}
+
+class _ImageContainerProofComponentState
+    extends State<ImageContainerProofComponent> {
+  late Future<Uint8List?> _currentFuture;
+  late Future<Uint8List?> _previousFuture;
 
   Future<Uint8List?> _getImageBytes(String? url) async {
     if (url == null || url.isEmpty) return null;
     try {
-      final response = await _dio.get<List<int>>(
+      final response = await ApiService().dio.get<List<int>>(
         url,
-        options: Options(responseType: ResponseType.bytes),
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+            'Accept': 'image/*',
+          },
+        ),
       );
       if (response.statusCode == 200 && response.data != null) {
         return Uint8List.fromList(response.data!);
       }
-      debugPrint("Image Fetch Failed: Status ${response.statusCode} for $url");
-    } catch (e) {
-      debugPrint("Error fetching image bytes: $e");
-    }
+    } catch (_) {}
     return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentFuture = _getImageBytes(widget.currentImageUrl);
+    _previousFuture = _getImageBytes(widget.previousImageUrl);
+  }
+
+  @override
+  void didUpdateWidget(ImageContainerProofComponent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentImageUrl != widget.currentImageUrl) {
+      setState(() => _currentFuture = _getImageBytes(widget.currentImageUrl));
+    }
+    if (oldWidget.previousImageUrl != widget.previousImageUrl) {
+      setState(() => _previousFuture = _getImageBytes(widget.previousImageUrl));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _buildImageWrapper("Current Reading", currentImageUrl),
+        _buildImageWrapper("Current Reading", _currentFuture),
         const SizedBox(width: 12),
-        _buildImageWrapper("Previous Reading", previousImageUrl),
+        _buildImageWrapper("Previous Reading", _previousFuture),
       ],
     );
   }
 
-  Widget _buildImageWrapper(String label, String? imageUrl) {
-    final bool hasImage = imageUrl != null && imageUrl.isNotEmpty;
-
+  Widget _buildImageWrapper(String label, Future<Uint8List?> future) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,59 +94,44 @@ class ImageContainerProofComponent extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
             ),
             clipBehavior: Clip.antiAlias,
-            child: !hasImage
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.image_not_supported,
-                            color: Colors.grey, size: 30),
-                        SizedBox(height: 4),
-                        Text("No Data",
-                            style:
-                                TextStyle(fontSize: 10, color: Colors.grey)),
-                      ],
+            child: FutureBuilder<Uint8List?>(
+              future: future,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFF723CFF),
                     ),
-                  )
-                : FutureBuilder<Uint8List?>(
-                    key: ValueKey(imageUrl),
-                    future: _getImageBytes(imageUrl),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Color(0xFF723CFF),
-                          ),
-                        );
-                      }
-
-                      if (snapshot.hasData && snapshot.data != null) {
-                        return Image.memory(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        );
-                      }
-
-                      return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image,
-                                color: Colors.redAccent, size: 30),
-                            SizedBox(height: 4),
-                            Text("Load Error",
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.redAccent)),
-                          ],
-                        ),
-                      );
-                    },
+                  );
+                }
+                if (snapshot.hasData && snapshot.data != null) {
+                  return Image.memory(
+                    snapshot.data!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  );
+                }
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                        size: 30,
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "No Data",
+                        style: TextStyle(fontSize: 10, color: Colors.grey),
+                      ),
+                    ],
                   ),
+                );
+              },
+            ),
           ),
         ],
       ),

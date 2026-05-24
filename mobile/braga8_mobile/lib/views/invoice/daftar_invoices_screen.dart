@@ -5,55 +5,13 @@ import 'package:braga8_mobile/data/models/invoice_model.dart';
 import 'package:braga8_mobile/core/app_colors.dart';
 import 'package:braga8_mobile/views/invoice/detail_invoices_screen.dart';
 import 'package:braga8_mobile/views/payments/input_payment_screen.dart';
-import 'package:braga8_mobile/views/widgets/action_button_table.dart';
 import 'package:braga8_mobile/views/widgets/app_header.dart';
 import 'package:braga8_mobile/views/widgets/custom_search_bar.dart';
 import 'package:braga8_mobile/views/widgets/main_layouts.dart';
 import 'package:braga8_mobile/views/widgets/page_header.dart';
-import 'package:braga8_mobile/views/widgets/status_badge.dart';
 import 'package:braga8_mobile/views/widgets/table_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-// ---------------------------------------------------------------------------
-// MODEL
-// ---------------------------------------------------------------------------
-
-// invoice_model.dart should contain:
-//
-// class InvoiceGroup {
-//   final int tenantId;
-//   final String tenantName;
-//   final List<Invoice> invoices;
-//   InvoiceGroup({required this.tenantId, required this.tenantName, required this.invoices});
-//   factory InvoiceGroup.fromJson(Map<String, dynamic> json) => InvoiceGroup(
-//     tenantId: json['tenant_id'],
-//     tenantName: json['tenant_name'],
-//     invoices: (json['invoices'] as List).map((e) => Invoice.fromJson(e)).toList(),
-//   );
-// }
-//
-// class Invoice {
-//   final int id;
-//   final String invoiceNumber;
-//   final String unitNumber;
-//   final double totalAmount;
-//   final bool isPaid;
-//   final DateTime billingPeriodStart;
-//   InvoiceGroup({...});
-//   factory Invoice.fromJson(Map<String, dynamic> json) => Invoice(
-//     id: json['id'],
-//     invoiceNumber: json['invoice_number'],
-//     unitNumber: json['unit_number'],
-//     totalAmount: (json['total_amount'] as num).toDouble(),
-//     isPaid: json['is_paid'] ?? false,
-//     billingPeriodStart: DateTime.parse(json['billing_period_start']),
-//   );
-// }
-
-// ---------------------------------------------------------------------------
-// HELPERS
-// ---------------------------------------------------------------------------
 
 String _formatRupiah(double amount) {
   return NumberFormat.currency(
@@ -65,10 +23,6 @@ String _formatRupiah(double amount) {
 
 String _billingMonth(DateTime date) =>
     DateFormat('MMMM yyyy', 'id_ID').format(date);
-
-// ---------------------------------------------------------------------------
-// SCREEN
-// ---------------------------------------------------------------------------
 
 class DaftarInvoicesScreen extends StatefulWidget {
   final ApiService api;
@@ -85,8 +39,8 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
   final TextEditingController _searchController = TextEditingController();
 
   String _searchQuery = '';
-  String _statusFilter = 'all'; // 'all' | 'paid' | 'unpaid'
-  Set<String> _selectedMonths = {}; // e.g. {'2025-06', '2025-07'}
+  String _statusFilter = 'all';
+  Set<String> _selectedMonths = {}; 
 
   @override
   void initState() {
@@ -113,10 +67,6 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
     });
   }
 
-  // -------------------------------------------------------------------------
-  // FILTER HELPERS
-  // -------------------------------------------------------------------------
-
   List<String> _allMonths(List<InvoiceGroup> groups) {
     final months = <String>{};
     for (final g in groups) {
@@ -134,34 +84,37 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
     final result = <MapEntry<InvoiceGroup, List<Invoice>>>[];
 
     for (final group in groups) {
-      final filtered = group.invoices.where((inv) {
-        if (_searchQuery.isNotEmpty) {
-          final q = _searchQuery.toLowerCase();
-          if (!group.tenantName.toLowerCase().contains(q) &&
-              !inv.invoiceNumber.toLowerCase().contains(q) &&
-              !inv.unitNumber.toLowerCase().contains(q)) {
-            return false;
-          }
-        }
+      final q = _searchQuery.toLowerCase().trim();
+      
+      final isTenantMatch = _searchQuery.isNotEmpty && group.tenantName.toLowerCase().contains(q);
+
+      final filteredInvoices = group.invoices.where((inv) {
         if (_selectedMonths.isNotEmpty) {
           final monthKey = DateFormat('yyyy-MM').format(inv.billingPeriodStart);
           if (!_selectedMonths.contains(monthKey)) return false;
         }
+        
         if (_statusFilter == 'paid' && !inv.isPaid) return false;
         if (_statusFilter == 'unpaid' && inv.isPaid) return false;
+
+        if (q.isNotEmpty) {
+          if (isTenantMatch) return true;
+
+          final isInvoiceMatch = inv.invoiceNumber.toLowerCase().contains(q);
+          final isUnitMatch = inv.unitNumber.toLowerCase().contains(q);
+          
+          return isInvoiceMatch || isUnitMatch;
+        }
+
         return true;
       }).toList();
 
-      if (filtered.isNotEmpty) {
-        result.add(MapEntry(group, filtered));
+      if (filteredInvoices.isNotEmpty) {
+        result.add(MapEntry(group, filteredInvoices));
       }
     }
     return result;
   }
-
-  // -------------------------------------------------------------------------
-  // FILTER BOTTOM SHEET
-  // -------------------------------------------------------------------------
 
   void _showFilterModal(List<InvoiceGroup> groups) {
     final months = _allMonths(groups);
@@ -277,10 +230,6 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
     );
   }
 
-  // -------------------------------------------------------------------------
-  // ACTIVE FILTER BAR
-  // -------------------------------------------------------------------------
-
   Widget _buildActiveFilterBar() {
     final hasMonth = _selectedMonths.isNotEmpty;
     final hasStatus = _statusFilter != 'all';
@@ -312,10 +261,6 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
       ),
     );
   }
-
-  // -------------------------------------------------------------------------
-  // BUILD
-  // -------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -490,9 +435,9 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
                                             ? Icons.check_circle_outline
                                             : Icons.payment,
                                         color: inv.isPaid
-                                            ? Colors.green.withOpacity(0.9)
+                                            ? Colors.green.withValues(alpha: .9)
                                             : AppColors.primaryOrange
-                                                  .withOpacity(0.9),
+                                                  .withValues(alpha: .9),
 
                                         onPressed: inv.isPaid
                                             ? null
@@ -530,7 +475,6 @@ class _DaftarInvoicesScreenState extends State<DaftarInvoicesScreen>
   }
 }
 
-// ── Action button ─────────────────────────────────────────────────────────
 Widget _actionBtn({
   required String label,
   required IconData icon,
@@ -545,11 +489,11 @@ Widget _actionBtn({
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: disabled
-            ? Colors.white.withOpacity(0.04)
-            : color.withOpacity(0.15),
+            ? Colors.white.withValues(alpha: .04)
+            : color.withValues(alpha: .15),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: disabled ? Colors.white12 : color.withOpacity(0.4),
+          color: disabled ? Colors.white12 : color.withValues(alpha: .4),
           width: 1.2,
         ),
       ),
@@ -572,10 +516,6 @@ Widget _actionBtn({
     ),
   );
 }
-
-// ---------------------------------------------------------------------------
-// EXTRACTED SMALL WIDGETS
-// ---------------------------------------------------------------------------
 
 class _ModalDragHandle extends StatelessWidget {
   @override
@@ -654,12 +594,12 @@ class _FilterChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: isSelected
-            ? AppColors.primaryOrange.withOpacity(0.25)
+            ? AppColors.primaryOrange.withValues(alpha: .25)
             : Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isSelected
-              ? AppColors.primaryOrange.withOpacity(0.5)
+              ? AppColors.primaryOrange.withValues(alpha: .5)
               : Colors.white.withValues(alpha: 0.1),
           width: 1.5,
         ),
@@ -668,7 +608,7 @@ class _FilterChip extends StatelessWidget {
         label,
         style: TextStyle(
           color: isSelected
-              ? AppColors.primaryOrange.withOpacity(0.8)
+              ? AppColors.primaryOrange.withValues(alpha: .8)
               : Colors.white70,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           fontSize: 13,
@@ -688,7 +628,7 @@ class _ApplyButton extends StatelessWidget {
     child: ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryOrange.withOpacity(0.3),
+        backgroundColor: AppColors.primaryOrange.withValues(alpha: .3),
         foregroundColor: Colors.white,
         side: BorderSide(
           color: Colors.white.withValues(alpha: 0.2),
@@ -715,10 +655,10 @@ class _ActiveChip extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.only(left: 12, right: 6, top: 6, bottom: 6),
     decoration: BoxDecoration(
-      color: AppColors.primaryOrange.withOpacity(0.15),
+      color: AppColors.primaryOrange.withValues(alpha: .15),
       borderRadius: BorderRadius.circular(8),
       border: Border.all(
-        color: AppColors.primaryOrange.withOpacity(0.3),
+        color: AppColors.primaryOrange.withValues(alpha: .3),
         width: 1,
       ),
     ),
@@ -783,7 +723,7 @@ class _SmallIconButton extends StatelessWidget {
       height: 36,
       width: 36,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.3),
+        color: color.withValues(alpha: .3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.15),
