@@ -87,6 +87,7 @@
                                 <th>No. Meteran</th> 
                                 <th>Tipe</th> 
                                 <th>Nilai Catat</th> 
+                                <th>Deskripsi</th>
                                 <th>Petugas</th> 
                                 <th class="text-center">Konfirmasi</th> 
                                 <th>Tanggal</th> 
@@ -109,7 +110,10 @@
                                                     <span class="blue-btn">Air</span> 
                                                 @endif 
                                             </td> 
-                                            <td>{{ number_format($reading->reading_value, 2) }}</td> 
+                                            <td>{{ number_format($reading->reading_value, 2) }}</td>
+                                            <td class="text-xs text-zinc-400 max-w-[160px]">
+                                                {{ $reading->description ?? '-' }}
+                                            </td> 
                                             <td>{{ $reading->user->name }}</td> 
                                             <td class="text-center"> 
                                                 <form action="{{ route('meter-readings.update-status', $reading->id) }}" method="POST"> 
