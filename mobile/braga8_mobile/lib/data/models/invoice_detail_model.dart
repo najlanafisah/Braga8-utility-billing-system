@@ -41,13 +41,12 @@ class MeterPhoto {
     String? resolvedUrl;
     if (rawPath != null && rawPath.isNotEmpty) {
       if (rawPath.startsWith('http')) {
-        resolvedUrl = rawPath.replaceFirst('http://', 'https://');
+        resolvedUrl = rawPath;
       } else {
         resolvedUrl = 'http://172.16.4.22:8000/storage/$rawPath';
       }
     }
 
-    // ← INI yang kurang, return MeterPhoto-nya!
     return MeterPhoto(
       meterType: json['meter_type'] as String? ?? 'electricity',
       readingValue: json['reading_value']?.toString() ?? '0',
@@ -80,7 +79,7 @@ class InvoiceDetail {
 
   static String? resolveImg(String? raw) {
     if (raw == null || raw.isEmpty) return null;
-    if (raw.startsWith('http')) return raw.replaceFirst('http://', 'https://');
+    if (raw.startsWith('http')) return raw;
     return 'http://172.16.4.22:8000/storage/$raw';
   }
 }

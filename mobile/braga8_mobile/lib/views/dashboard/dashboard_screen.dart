@@ -198,7 +198,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         InputReadingScreen(onBack: () => _onItemTapped(0)),
         DaftarUnitScreen(api: widget.api, onBack: () => _onItemTapped(0)),
         AuditLogScreen(onBack: () => _onItemTapped(0)),
-        MeterAnalyticsScreen(userRole: 'petugas'),
+        MeterAnalyticsScreen(
+          userRole: 'petugas',
+          onBack: () => _onItemTapped(0), 
+        ),
       ];
     }
     return [
@@ -216,8 +219,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       MeterAnalyticsScreen(
         userRole: 'tenant',
         tenant: widget.api.currentTenant,
-      ), // 1
-      DaftarInvoicesScreen(api: widget.api), // 2
+        onBack: () => _onItemTapped(0),  // ← tambah ini
+      ),
+      DaftarInvoicesScreen(
+        api: widget.api,
+        onBack: () => _onItemTapped(0),  // ← tambah ini
+      ),
       CustomerCareListScreen(
         // 3
         onBack: () => _onItemTapped(0),
@@ -257,12 +264,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         InputReadingScreen(onBack: () => _onItemTapped(0)),
         DaftarUnitScreen(api: widget.api, onBack: () => _onItemTapped(0)),
         AuditLogScreen(onBack: () => _onItemTapped(0)),
-        // CustomerCareListScreen(
-        //   onBack: () => _onItemTapped(0),
-        //   api: widget.api,
-        //   token: widget.token,
-        // ),
-        MeterAnalyticsScreen(userRole: 'petugas'),
+        MeterAnalyticsScreen(
+          userRole: 'petugas',
+          onBack: () => _onItemTapped(0),
+        ),
       ];
     }
     return [

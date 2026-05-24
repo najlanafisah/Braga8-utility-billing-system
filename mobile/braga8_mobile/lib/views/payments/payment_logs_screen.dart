@@ -68,7 +68,7 @@ class PaymentLog {
 
     String? resolveImg(String? raw) {
       if (raw == null || raw.isEmpty) return null;
-      if (raw.startsWith('http')) return raw.replaceFirst('http://', 'https://');
+      if (raw.startsWith('http')) return raw;
       return 'http://172.16.4.22:8000/storage/$raw';
     }
 
@@ -115,16 +115,15 @@ class _NgrokImage extends StatelessWidget {
 
   const _NgrokImage({
     required this.url,
-    this.fit = BoxFit.cover,
     this.height,
-    this.width,
-  });
+  }) : width = null, fit = BoxFit.cover;
 
   @override
   Widget build(BuildContext context) {
     final h = height ?? 180.0;
     // Force https — the API returns http:// for ngrok URLs
-    final safeUrl = url.replaceFirst('http://', 'https://');
+    final safeUrl = url;
+
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
@@ -146,7 +145,7 @@ class _NgrokImage extends StatelessWidget {
           height: h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
+            color: Colors.white.withValues(alpha: .03),
             borderRadius: BorderRadius.circular(16),
           ),
           child: const Center(
@@ -181,8 +180,8 @@ class _PaymentLogsScreenState extends State<PaymentLogsScreen>
   static const _tabKeys = ['all', 'pending', 'verified', 'rejected'];
 
   static const _orange = AppColors.primaryOrange;
-  Color get _glass => Colors.white.withOpacity(0.05);
-  Color get _glassBorder => Colors.white.withOpacity(0.10);
+  Color get _glass => Colors.white.withValues(alpha: .05);
+  Color get _glassBorder => Colors.white.withValues(alpha: .10);
 
   final _rupiah = NumberFormat.currency(
     locale: 'id_ID',
@@ -288,9 +287,9 @@ class _PaymentLogsScreenState extends State<PaymentLogsScreen>
               isScrollable: true,
               tabAlignment: TabAlignment.start,
               indicator: BoxDecoration(
-                color: _orange.withOpacity(0.22),
+                color: _orange.withValues(alpha: .22),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: _orange.withOpacity(0.5), width: 1),
+                border: Border.all(color: _orange.withValues(alpha: .5), width: 1),
               ),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
@@ -326,8 +325,8 @@ class _PaymentLogsScreenState extends State<PaymentLogsScreen>
                           ),
                           decoration: BoxDecoration(
                             color: idx == _tabController.index
-                                ? _orange.withOpacity(0.3)
-                                : Colors.white.withOpacity(0.08),
+                                ? _orange.withValues(alpha: .3)
+                                : Colors.white.withValues(alpha: .08),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -450,10 +449,10 @@ class _PaymentLogsScreenState extends State<PaymentLogsScreen>
                     width: 46,
                     height: 46,
                     decoration: BoxDecoration(
-                      color: sc.withOpacity(0.12),
+                      color: sc.withValues(alpha: .12),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: sc.withOpacity(0.35),
+                        color: sc.withValues(alpha: .35),
                         width: 1.5,
                       ),
                     ),
@@ -542,10 +541,10 @@ class _PaymentLogsScreenState extends State<PaymentLogsScreen>
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: sc.withOpacity(0.12),
+                          color: sc.withValues(alpha: .12),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: sc.withOpacity(0.3),
+                            color: sc.withValues(alpha: .3),
                             width: 1,
                           ),
                         ),
@@ -599,13 +598,13 @@ class _PaymentLogsScreenState extends State<PaymentLogsScreen>
           width: 72,
           height: 72,
           decoration: BoxDecoration(
-            color: _orange.withOpacity(0.08),
+            color: _orange.withValues(alpha: .08),
             shape: BoxShape.circle,
-            border: Border.all(color: _orange.withOpacity(0.25), width: 1.5),
+            border: Border.all(color: _orange.withValues(alpha: .25), width: 1.5),
           ),
           child: Icon(
             Icons.receipt_long_rounded,
-            color: _orange.withOpacity(0.5),
+            color: _orange.withValues(alpha: .5),
             size: 32,
           ),
         ),
@@ -695,8 +694,8 @@ class _PaymentDetailSheet extends StatefulWidget {
 
 class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
   static const _orange = AppColors.primaryOrange;
-  Color get _glass => Colors.white.withOpacity(0.05);
-  Color get _glassBorder => Colors.white.withOpacity(0.10);
+  Color get _glass => Colors.white.withValues(alpha: .05);
+  Color get _glassBorder => Colors.white.withValues(alpha: .10);
 
   // Pass ngrok header so images don't redirect to the browser warning page
   static const _imgHeaders = {'ngrok-skip-browser-warning': 'true'};
@@ -735,7 +734,7 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
           filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF131115).withOpacity(0.96),
+              color: const Color(0xFF131115).withValues(alpha: .96),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(24),
               ),
@@ -769,10 +768,10 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: sc.withOpacity(0.10),
+                        color: sc.withValues(alpha: .10),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: sc.withOpacity(0.35),
+                          color: sc.withValues(alpha: .35),
                           width: 1.5,
                         ),
                       ),
@@ -839,14 +838,14 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
                           Icon(
                             Icons.account_balance_wallet_outlined,
                             size: 13,
-                            color: _orange.withOpacity(0.7),
+                            color: _orange.withValues(alpha: .7),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             'Total Dibayar',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.white.withOpacity(0.4),
+                              color: Colors.white.withValues(alpha: .4),
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.4,
                             ),
@@ -946,7 +945,7 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
                                     width: 28,
                                     height: 28,
                                     decoration: BoxDecoration(
-                                      color: _orange.withOpacity(0.1),
+                                      color: _orange.withValues(alpha: .1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Center(
@@ -1070,7 +1069,7 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
                     return Container(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Colors.white.withValues(alpha: .04),
                       child: Center(
                         child: CircularProgressIndicator(
                           color: _orange,
@@ -1096,7 +1095,7 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.82),
+                        Colors.black.withValues(alpha: .82),
                       ],
                     ),
                   ),
@@ -1155,7 +1154,7 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
   }
 
   Widget _meterPlaceholder(MeterPhoto mp) => Container(
-    color: Colors.white.withOpacity(0.03),
+    color: Colors.white.withValues(alpha: .03),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1214,7 +1213,7 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
   Widget _detailRow(IconData icon, String label, String value) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Icon(icon, size: 16, color: _orange.withOpacity(0.7)),
+      Icon(icon, size: 16, color: _orange.withValues(alpha: .7)),
       const SizedBox(width: 10),
       SizedBox(
         width: 90,
@@ -1241,9 +1240,9 @@ class _PaymentDetailSheetState extends State<_PaymentDetailSheet> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: sc.withOpacity(0.12),
+        color: sc.withValues(alpha: .12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: sc.withOpacity(0.3)),
+        border: Border.all(color: sc.withValues(alpha: .3)),
       ),
       child: Text(
         _statusLabel(s),

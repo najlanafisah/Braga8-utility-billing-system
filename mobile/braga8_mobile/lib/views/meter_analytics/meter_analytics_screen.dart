@@ -27,7 +27,6 @@ class MeterAnalyticsScreen extends StatelessWidget {
     if (userRole == 'petugas') {
       return _PetugasAnalyticsScreen(onBack: onBack);
     } else {
-      assert(tenant != null, 'Tenant data must be provided for tenant role.');
       return _TenantAnalyticsScreen(tenant: tenant!, onBack: onBack);
     }
   }
@@ -214,7 +213,7 @@ class _PetugasAnalyticsScreenState extends State<_PetugasAnalyticsScreen>
                             child: AppHeader(
                               title: "Analitik Meter",
                               titleIcon: Icons.bar_chart_rounded,
-                              onBack: () => Navigator.pop(context),
+                              onBack: widget.onBack,
                               trailing: GestureDetector(
                                 onTap: _refreshData,
                                 child: _refreshButton(),
@@ -1063,7 +1062,7 @@ class _TenantAnalyticsScreenState extends State<_TenantAnalyticsScreen>
                         child: AppHeader(
                           title: "Data Meter Tenant",
                           titleIcon: Icons.electric_meter_rounded,
-                          onBack: () => Navigator.pop(context),
+                          onBack: widget.onBack,
                           trailing: GestureDetector(
                             onTap: _refreshData,
                             child: _refreshButton(),
